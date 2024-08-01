@@ -13,7 +13,7 @@ key = 'igjk1S52YiKgplP2y66Z%2F4KqaZwVaNRm3ebIvFIV65JS4hI22neHjrrErvTJxE%2FxY%2B%
 db = mysql.connector.connect(
     host="127.0.0.1",  # MySQL 서버 호스트
     user="pet",  # MySQL 사용자명
-    password="pet123",
+    password="Petharmony123@",
     database="petharmony",  # 사용할 데이터베이스 명
     port=3306  # MySQL 서버 포트
 )
