@@ -11,7 +11,7 @@ key = 'igjk1S52YiKgplP2y66Z%2F4KqaZwVaNRm3ebIvFIV65JS4hI22neHjrrErvTJxE%2FxY%2B%
 
 # MySQL 데이터베이스 연결
 db = mysql.connector.connect(
-    host="lkvk-database-1.cv0eq20uqxp3.us-east-2.rds.amazonaws.com",  # MySQL 서버 호스트
+    host="lkvk-database.c1ukcuwq4uyu.ap-northeast-2.rds.amazonaws.com",  # MySQL 서버 호스트
     user="root",  # MySQL 사용자명
     password="Petharmony123",
     database="petharmony",  # 사용할 데이터베이스 명
