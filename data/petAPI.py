@@ -11,9 +11,9 @@ key = 'igjk1S52YiKgplP2y66Z%2F4KqaZwVaNRm3ebIvFIV65JS4hI22neHjrrErvTJxE%2FxY%2B%
 
 # MySQL 데이터베이스 연결
 db = mysql.connector.connect(
-    host="127.0.0.1",  # MySQL 서버 호스트
-    user="pet",  # MySQL 사용자명
-    password="Petharmony123@",
+    host="lkvk-database-1.cv0eq20uqxp3.us-east-2.rds.amazonaws.com",  # MySQL 서버 호스트
+    user="root",  # MySQL 사용자명
+    password="Petharmony123",
     database="petharmony",  # 사용할 데이터베이스 명
     port=3306  # MySQL 서버 포트
 )
@@ -28,7 +28,7 @@ while True:
     # 쿼리 파라미터 설정
     queryParams = '?' + parse.quote_plus("serviceKey") + '=' + key + '&' + parse.urlencode({
         parse.quote_plus('bgnde'): '20240101',  # 검색 시작일
-        parse.quote_plus('endde'): '20240726',  # 검색 종료일
+        parse.quote_plus('endde'): '20240805',  # 검색 종료일
         parse.quote_plus('pageNo'): str(page_no),
         parse.quote_plus('numOfRows'): '1000',  # 한 번에 가져올 데이터 수
         parse.quote_plus('_type'): 'xml'
