@@ -82,12 +82,12 @@ while True:
 
         sql = """
         INSERT INTO shelter_info (
-            careNm, orgNm, divisionNm, saveTrgtAnimal, careAddr, jibunAddr, 
-            lat, lng, dsignationDate, weekOprStime, weekOprEtime, weekCellStime, 
+            careNm, orgNm, divisionNm, saveTrgtAnimal, careAddr, 
+            lat, lng, weekOprStime, weekOprEtime, weekCellStime, 
             weekCellEtime, weekendOprStime, weekendOprEtime, weekendCellStime, 
             weekendCellEtime, closeDay, vetPersonCnt, specsPersonCnt, medicalCnt, 
-            breedCnt, quarabtineCnt, feedCnt, transCarCnt, careTel, dataStdDt
-        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            breedCnt, quarabtineCnt, feedCnt, transCarCnt, careTel
+        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
 
         values = (
@@ -96,10 +96,8 @@ while True:
             item.find('divisionNm').text if item.find('divisionNm') is not None else None,
             item.find('saveTrgtAnimal').text if item.find('saveTrgtAnimal') is not None else None,
             item.find('careAddr').text if item.find('careAddr') is not None else None,
-            item.find('jibunAddr').text if item.find('jibunAddr') is not None else None,
             item.find('lat').text if item.find('lat') is not None else None,
             item.find('lng').text if item.find('lng') is not None else None,
-            item.find('dsignationDate').text if item.find('dsignationDate') is not None else None,
             item.find('weekOprStime').text if item.find('weekOprStime') is not None else None,
             item.find('weekOprEtime').text if item.find('weekOprEtime') is not None else None,
             item.find('weekCellStime').text if item.find('weekCellStime') is not None else None,
@@ -117,7 +115,6 @@ while True:
             item.find('feedCnt').text if item.find('feedCnt') is not None else None,
             item.find('transCarCnt').text if item.find('transCarCnt') is not None else None,
             careTel,
-            datetime.strptime(item.find('dataStdDt').text, '%Y-%m-%d') if item.find('dataStdDt') is not None else None
         )
 
         cursor.execute(sql, values)
