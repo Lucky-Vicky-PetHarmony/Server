@@ -25,53 +25,54 @@ class PetHarmonyApplicationTests {
 	@Transactional
 	void testSaveAndFindPetInfo() {
 		// given
-		PetInfo pet = new PetInfo();
-		pet.setDesertionNo("12345");
-		pet.setFilename("test.jpg");
-		pet.setHappenDt(new Date());
-		pet.setHappenPlace("Test Place");
-		pet.setKindCd("Dog");
-		pet.setColorCd("Brown");
-		pet.setAge("2 years");
-		pet.setWeight("5 kg");
-		pet.setNoticeNo("Notice123");
-		pet.setNoticeSdt(new Date());
-		pet.setNoticeEdt(new Date());
-		pet.setPopfile("popfile.jpg");
-		pet.setProcessState("Adopted");
-		pet.setSexCd('M');
-		pet.setNeuterYn('Y');
-		pet.setSpecialMark("No marks");
-		pet.setCareNm("Care Center");
-		pet.setChargeNm("John Doe");
-		pet.setOfficetel("123-456-7890");
-		pet.setNoticeComment("No comments");
+		PetInfo pet = PetInfo.builder()
+				.desertion_no("12345")
+				.filename("test.jpg")
+				.happen_dt(new Date())
+				.happen_place("Test Place")
+				.kind_cd("Dog")
+				.color_cd("Brown")
+				.age("2 years")
+				.weight("5 kg")
+				.notice_no("Notice123")
+				.notice_sdt(new Date())
+				.notice_edt(new Date())
+				.popfile("popfile.jpg")
+				.process_state("Adopted")
+				.sex_cd('M')
+				.neuter_yn('Y')
+				.special_mark("No marks")
+				.care_nm("Care Center")
+				.charge_nm("John Doe")
+				.officetel("123-456-7890")
+				.notice_comment("No comments")
+				.build();
 
 		// when
 		PetInfo insertedPet = petInfoRepository.save(pet);
-		PetInfo foundPet = petInfoRepository.findById(insertedPet.getDesertionNo()).orElse(null);
+		PetInfo foundPet = petInfoRepository.findById(insertedPet.getDesertion_no()).orElse(null);
 
 		// then
 		assertThat(foundPet).isNotNull();
-		assertThat(foundPet.getDesertionNo()).isEqualTo(insertedPet.getDesertionNo());
+		assertThat(foundPet.getDesertion_no()).isEqualTo(insertedPet.getDesertion_no());
 		assertThat(foundPet.getFilename()).isEqualTo(insertedPet.getFilename());
-		assertThat(foundPet.getHappenDt()).isEqualTo(insertedPet.getHappenDt());
-		assertThat(foundPet.getHappenPlace()).isEqualTo(insertedPet.getHappenPlace());
-		assertThat(foundPet.getKindCd()).isEqualTo(insertedPet.getKindCd());
-		assertThat(foundPet.getColorCd()).isEqualTo(insertedPet.getColorCd());
+		assertThat(foundPet.getHappen_dt()).isEqualTo(insertedPet.getHappen_dt());
+		assertThat(foundPet.getHappen_place()).isEqualTo(insertedPet.getHappen_place());
+		assertThat(foundPet.getKind_cd()).isEqualTo(insertedPet.getKind_cd());
+		assertThat(foundPet.getColor_cd()).isEqualTo(insertedPet.getColor_cd());
 		assertThat(foundPet.getAge()).isEqualTo(insertedPet.getAge());
 		assertThat(foundPet.getWeight()).isEqualTo(insertedPet.getWeight());
-		assertThat(foundPet.getNoticeNo()).isEqualTo(insertedPet.getNoticeNo());
-		assertThat(foundPet.getNoticeSdt()).isEqualTo(insertedPet.getNoticeSdt());
-		assertThat(foundPet.getNoticeEdt()).isEqualTo(insertedPet.getNoticeEdt());
+		assertThat(foundPet.getNotice_no()).isEqualTo(insertedPet.getNotice_no());
+		assertThat(foundPet.getNotice_sdt()).isEqualTo(insertedPet.getNotice_sdt());
+		assertThat(foundPet.getNotice_edt()).isEqualTo(insertedPet.getNotice_edt());
 		assertThat(foundPet.getPopfile()).isEqualTo(insertedPet.getPopfile());
-		assertThat(foundPet.getProcessState()).isEqualTo(insertedPet.getProcessState());
-		assertThat(foundPet.getSexCd()).isEqualTo(insertedPet.getSexCd());
-		assertThat(foundPet.getNeuterYn()).isEqualTo(insertedPet.getNeuterYn());
-		assertThat(foundPet.getSpecialMark()).isEqualTo(insertedPet.getSpecialMark());
-		assertThat(foundPet.getCareNm()).isEqualTo(insertedPet.getCareNm());
-		assertThat(foundPet.getChargeNm()).isEqualTo(insertedPet.getChargeNm());
+		assertThat(foundPet.getProcess_state()).isEqualTo(insertedPet.getProcess_state());
+		assertThat(foundPet.getSex_cd()).isEqualTo(insertedPet.getSex_cd());
+		assertThat(foundPet.getNeuter_yn()).isEqualTo(insertedPet.getNeuter_yn());
+		assertThat(foundPet.getSpecial_mark()).isEqualTo(insertedPet.getSpecial_mark());
+		assertThat(foundPet.getCare_nm()).isEqualTo(insertedPet.getCare_nm());
+		assertThat(foundPet.getCharge_nm()).isEqualTo(insertedPet.getCharge_nm());
 		assertThat(foundPet.getOfficetel()).isEqualTo(insertedPet.getOfficetel());
-		assertThat(foundPet.getNoticeComment()).isEqualTo(insertedPet.getNoticeComment());
+		assertThat(foundPet.getNotice_comment()).isEqualTo(insertedPet.getNotice_comment());
 	}
 }

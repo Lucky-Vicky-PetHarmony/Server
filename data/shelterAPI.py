@@ -3,9 +3,10 @@ from urllib import parse
 import xml.etree.ElementTree as ET
 import mysql.connector
 from datetime import datetime
+import time
 
 # API URL 및 키 설정
-url = 'http://apis.data.go.kr/1543061/animalShelterSrvc/shelterInfo'
+url = 'http://apis.data.go.kr/1543061/abandonmentPublicSrvc/abandonmentPublic'
 key = 'igjk1S52YiKgplP2y66Z%2F4KqaZwVaNRm3ebIvFIV65JS4hI22neHjrrErvTJxE%2FxY%2B%2Fc1IH%2B8SCGHOb0S2U8ww%3D%3D'
 
 # MySQL 데이터베이스 연결
@@ -26,6 +27,8 @@ rowcount = 0
 while True:
     # 쿼리 파라미터 설정
     queryParams = '?' + parse.quote_plus("serviceKey") + '=' + key + '&' + parse.urlencode({
+        parse.quote_plus('bgnde'): '20240101',  # 검색 시작일
+        parse.quote_plus('endde'): '20240805',  # 검색 종료일
         parse.quote_plus('pageNo'): str(page_no),
         parse.quote_plus('numOfRows'): '1000',  # 한 번에 가져올 데이터 수
         parse.quote_plus('_type'): 'xml'
@@ -72,21 +75,21 @@ while True:
         break
 
     for item in items:
-        careTel = item.find('careTel').text if item.find('careTel') is not None else None
+        care_tel = item.find('careTel').text if item.find('careTel') is not None else None
 
         # 중복 확인
-        cursor.execute("SELECT COUNT(*) FROM shelter_info WHERE careTel = %s", (careTel,))
+        cursor.execute("SELECT COUNT(*) FROM shelter_info WHERE care_tel = %s", (care_tel,))
         if cursor.fetchone()[0] > 0:
-            print(f"중복된 데이터: {careTel}")
+            print(f"중복된 데이터: {care_tel}")
             continue
 
         sql = """
         INSERT INTO shelter_info (
-            careNm, orgNm, divisionNm, saveTrgtAnimal, careAddr, 
-            lat, lng, weekOprStime, weekOprEtime, weekCellStime, 
-            weekCellEtime, weekendOprStime, weekendOprEtime, weekendCellStime, 
-            weekendCellEtime, closeDay, vetPersonCnt, specsPersonCnt, medicalCnt, 
-            breedCnt, quarabtineCnt, feedCnt, transCarCnt, careTel
+            care_nm, org_nm, division_nm, save_trgt_animal, care_addr, 
+            lat, lng, week_opr_stime, week_opr_etime, week_cell_stime, 
+            week_cell_etime, weekend_opr_stime, weekend_opr_etime, weekend_cell_stime, 
+            weekend_cell_etime, close_day, vet_person_cnt, specs_person_cnt, medical_cnt, 
+            breed_cnt, quarantine_cnt, feed_cnt, trans_car_cnt, care_tel
         ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
 
@@ -111,10 +114,10 @@ while True:
             item.find('specsPersonCnt').text if item.find('specsPersonCnt') is not None else None,
             item.find('medicalCnt').text if item.find('medicalCnt') is not None else None,
             item.find('breedCnt').text if item.find('breedCnt') is not None else None,
-            item.find('quarabtineCnt').text if item.find('quarabtineCnt') is not None else None,
+            item.find('quarantineCnt').text if item.find('quarantineCnt') is not None else None,
             item.find('feedCnt').text if item.find('feedCnt') is not None else None,
             item.find('transCarCnt').text if item.find('transCarCnt') is not None else None,
-            careTel,
+            care_tel
         )
 
         cursor.execute(sql, values)
@@ -122,6 +125,9 @@ while True:
 
     # 페이지 번호 증가
     page_no += 1
+
+    # API 요청 간 딜레이 (0.5초)
+    time.sleep(0.5)
 
     # 총 데이터 개수만큼 가져왔으면 종료
     if rowcount >= total_count:
@@ -132,4 +138,4 @@ db.commit()
 cursor.close()
 db.close()
 
-print(f"{rowcount} 개의 기록이 삽입되었습니다.")
+print(f"{rowcount} 개의 기록이 삽입/업데이트되었습니다.")
