@@ -40,5 +40,5 @@ public class User {
 
     // User엔티티에서 UserWord에 접근(특정 사용자가 선택한 모든 단어를 조회)
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserWord> userWords;
+    private List<UserWord> userWords; // 사용자가 선택한 단어 목록
 }
