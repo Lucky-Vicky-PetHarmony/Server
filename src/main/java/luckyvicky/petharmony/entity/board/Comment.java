@@ -14,21 +14,22 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
+@Table(name = "comment")
 public class Comment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long commId;                // id
 
-    @Column(nullable = false)
+    @Column(name = "comm_content", nullable = false)
     private String commContent;         // 댓글 내용
 
     @CreationTimestamp
-    @Column(nullable = false, updatable = false)
+    @Column(name = "comm_create", nullable = false, updatable = false)
     private LocalDateTime commCreate;   // 댓글 등록 날짜
 
     @UpdateTimestamp
-    @Column(nullable = false)
+    @Column(name = "comm_update", nullable = false)
     private LocalDateTime commUpdate;   // 댓글 수정 날짜
 
     @ManyToOne(fetch = FetchType.LAZY)

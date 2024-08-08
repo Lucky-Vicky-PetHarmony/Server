@@ -15,15 +15,16 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
+@Table(name = "board")
 public class Board {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long boardId;            // id
 
-    @Column(length = 100, nullable = false)
+    @Column(name = "board_title", length = 100, nullable = false)
     private String boardTitle;       // 게시물 제목
 
-    @Column(length = 500, nullable = false)
+    @Column(name = "board_content", length = 500, nullable = false)
     private String boardContent;     // 게시물 내용
 
     @Builder.Default
@@ -31,12 +32,12 @@ public class Board {
     private Integer view = 0;   // 게시물 조회수
 
     @CreationTimestamp
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime boardCreateDate;   // 게시물 생성 날짜
+    @Column(name = "board_create", nullable = false, updatable = false)
+    private LocalDateTime boardCreate;   // 게시물 생성 날짜
 
     @UpdateTimestamp
-    @Column(nullable = false)
-    private LocalDateTime boardModifyDate;   // 게시물 업데이트 날짜
+    @Column(name = "board_update", nullable = false)
+    private LocalDateTime boardUpdate;   // 게시물 업데이트 날짜
 
     @Column(nullable = false)
     private Category category;

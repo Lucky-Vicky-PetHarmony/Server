@@ -14,20 +14,21 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
+@Table(name = "image")
 public class Image {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long imageId;                // id
 
-    @Column(length = 2048, nullable = false)
-    private String imageName;         // 게시물 파일 URL
+    @Column(name = "image_name", length = 2048, nullable = false)
+    private String imageName;         // 게시물 파일 이름
 
-    @Column(length = 2048, nullable = false)
-    private String imageUrl;         // 게시물 파일 UUID
+    @Column(name = "image_url", length = 2048, nullable = false)
+    private String imageUrl;         // 게시물 파일 url
 
-    @Column(length = 2048, nullable = false)
-    private String imageUuid;         // 게시물 파일 FileName
+    @Column(name = "image_uuid", length = 2048, nullable = false)
+    private String imageUuid;         // 게시물 파일 uuid
 
 //    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @ManyToOne(fetch = FetchType.LAZY)
