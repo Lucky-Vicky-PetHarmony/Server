@@ -2,6 +2,8 @@ package luckyvicky.petharmony.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import luckyvicky.petharmony.entity.board.Board;
+import luckyvicky.petharmony.entity.board.Comment;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
@@ -41,4 +43,16 @@ public class User {
     // User엔티티에서 UserWord에 접근(특정 사용자가 선택한 모든 단어를 조회)
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserWord> userWords;
+
+    // User엔티티에서 PetLikes에 접근(사용자가 좋아요 누른 동물 조회)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PetLike> petLikes;
+
+    // User엔티티에서 Board에 접근(사용자가 작성한 글 조회)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Board> boards;
+
+    // User엔티티에서 Comment에 접근(사용자가 작성한 댓글 조회)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments;
 }
