@@ -14,6 +14,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "user")
 public class User {
 
     @Id
@@ -21,7 +22,7 @@ public class User {
     @Column(name = "user_id")
     private Long userId;                           // 회원 ID
 
-    @Column(length = 100, nullable = false)
+    @Column(name = "user_name", length = 100, nullable = false)
     private String userName;                       // 회원 이름
 
     @Column(length = 100, nullable = false)
@@ -37,7 +38,7 @@ public class User {
     private String address;                       // 회원 주소
 
     @CreationTimestamp
-    @Column(nullable = false, updatable = false)
+    @Column(name = "create_date", nullable = false, updatable = false)
     private LocalDateTime createDate;             // 회원 가입일자
 
     // User엔티티에서 UserWord에 접근(특정 사용자가 선택한 모든 단어를 조회)
