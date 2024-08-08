@@ -11,10 +11,11 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "user_word")
 public class UserWord {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "userword_di")
+    @Column(name = "userword_id")
     private Long userWordId;
 
     @ManyToOne
