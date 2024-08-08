@@ -19,6 +19,7 @@ public class Comment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "comm_id")
     private Long commId;                // id
 
     @Column(name = "comm_content", nullable = false)

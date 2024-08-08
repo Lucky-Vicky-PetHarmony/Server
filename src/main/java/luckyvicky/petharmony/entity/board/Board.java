@@ -19,6 +19,7 @@ import java.util.List;
 public class Board {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "board_id")
     private Long boardId;            // id
 
     @Column(name = "board_title", length = 100, nullable = false)
