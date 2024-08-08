@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import luckyvicky.petharmony.entity.board.Board;
 import luckyvicky.petharmony.entity.board.Comment;
+import luckyvicky.petharmony.security.Role;
+import luckyvicky.petharmony.security.UserState;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
@@ -25,7 +27,7 @@ public class User {
     @Column(name = "user_name", length = 100, nullable = false)
     private String userName;                       // 회원 이름
 
-    @Column(length = 100, nullable = false)
+    @Column(length = 100, nullable = false, unique = true)
     private String email;                         // 회원 이메일
 
     @Column(length = 100, nullable = false)
@@ -40,6 +42,14 @@ public class User {
     @CreationTimestamp
     @Column(name = "create_date", nullable = false, updatable = false)
     private LocalDateTime createDate;             // 회원 가입일자
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false)
+    private Role role;                            // (USER : 회원, ADMIN : 관리자)
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "user_state", nullable = false)
+    private UserState userState;                  // 회원 상태 (ACTIVE, BANNED)
 
     // User엔티티에서 UserWord에 접근(특정 사용자가 선택한 모든 단어를 조회)
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
