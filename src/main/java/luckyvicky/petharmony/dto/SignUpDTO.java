@@ -7,7 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SignUpDTO {
-    private String username;     // 이름
+    private String userName;     // 이름
 
     private String email;        // 이메일
 
