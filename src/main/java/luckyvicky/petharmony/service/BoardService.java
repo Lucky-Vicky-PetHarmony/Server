@@ -14,6 +14,7 @@ public interface BoardService {
     Long boardUpdate(BoardUpdateDTO boardUpdateDTO) throws IOException;
 
     //게시물 삭제
+    void boardDelete(Long userId, Long boardId) throws IOException;
 
     //게시물 조회수 관리
 

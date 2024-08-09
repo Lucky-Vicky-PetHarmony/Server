@@ -28,9 +28,7 @@ public class BoardServiceImpl implements BoardService {
 
     private final BoardRepository boardRepository;
     private final UserRepository userRepository;
-
     private final ImageService imageService;
-
 
 
     /**
@@ -42,7 +40,7 @@ public class BoardServiceImpl implements BoardService {
      */
     @Override
     public Long boardPost(BoardPostDTO boardPostDTO) throws IOException {
-        User user = userRepository.findById(boardPostDTO.getUserId()).orElseThrow(() -> new IllegalArgumentException("Invalid user ID"));
+        User user = userRepository.findById(boardPostDTO.getUserId()).orElseThrow(() -> new IllegalArgumentException("유효하지않은 user ID"));
 
         // board 테이블에 저장
         Board board = Board.builder()
@@ -72,7 +70,7 @@ public class BoardServiceImpl implements BoardService {
     @Override
     public Long boardUpdate(BoardUpdateDTO boardUpdateDTO) throws IOException {
         Board board = boardRepository.findById(boardUpdateDTO.getBoardId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid board ID"));
+                .orElseThrow(() -> new IllegalArgumentException("유효하지않은 board ID"));
         List<Image> imageList = new ArrayList<>(); //추가된 이미지 배열을 저장
 
         Board updateBoard = board.toBuilder()
@@ -93,5 +91,29 @@ public class BoardServiceImpl implements BoardService {
         boardRepository.save(updateBoard);
 
         return board.getBoardId();
+    }
+
+    /**
+     * 게시물 삭제
+     *
+     * @param userId
+     * @param boardId
+     * @throws IOException
+     */
+    @Override
+    public void boardDelete(Long userId, Long boardId) throws IOException {
+        Board board = boardRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("유효하지않은 boardId"));
+        if(board.getUser().getUserId().equals(userId)) {
+            // TODO: 댓글 삭제
+
+            //이미지 삭제
+            List<Long> imageIds = imageService.findImageIdsByBoardId(boardId);
+            imageService.deleteImage(imageIds);
+
+            //게시글 삭제
+            boardRepository.delete(board);
+        }else {
+            throw new IllegalArgumentException("게시글 작성자가 아닙니다.");
+        }
     }
 }

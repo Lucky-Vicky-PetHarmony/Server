@@ -13,4 +13,7 @@ public interface ImageService {
 
     //이미지 삭제
     void deleteImage(List<Long> ids) throws IOException;
+
+    //boardId에 해당하는 imageId들 찾기
+    List<Long> findImageIdsByBoardId(Long boardId);
 }

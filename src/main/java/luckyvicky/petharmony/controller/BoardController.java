@@ -54,4 +54,20 @@ public class BoardController {
         }
     }
 
+
+    /**
+     * 게시글 삭제
+     *
+     * @param userId 삭제를 요청한 게시글 작성자 id
+     * @param boardId 삭제를 요청당한 게시글 id
+     * @return 삭제성공시 200반환
+     * @throws IOException 파일 삭제 중 발생할 수 있는 예외를 처리
+     */
+    @DeleteMapping("/delete")
+    public ResponseEntity<String> boardDelete(Long userId, Long boardId) throws IOException {
+        boardService.boardDelete(userId, boardId);
+
+        return ResponseEntity.ok(boardId+"번 게시글 삭제 성공");
+    }
+
 }

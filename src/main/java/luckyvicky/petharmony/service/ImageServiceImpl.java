@@ -72,4 +72,15 @@ public class ImageServiceImpl implements ImageService {
             imageRepository.deleteById(id);
         }
     }
+
+    /**
+     * boardId에 해당하는 imageId들 찾기
+     *
+     * @param boardId
+     * @return imageId를 리스트 형태로 반환
+     */
+    @Override
+    public List<Long> findImageIdsByBoardId(Long boardId) {
+        return imageRepository.findImageIdsByBoardId(boardId);
+    }
 }
