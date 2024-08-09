@@ -2,6 +2,8 @@ package luckyvicky.petharmony.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import luckyvicky.petharmony.entity.board.Board;
+import luckyvicky.petharmony.entity.board.Comment;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
@@ -38,5 +40,5 @@ public class User {
     @Column(name = "create_date", nullable = false, updatable = false)
     private LocalDateTime createDate;             // 회원 가입일자
 
-    // 사용자가 선택한 단어 목록은 직접 쿼리를 작성하여 조회할 예정이므로 @OneToMany 제거
+
 }
