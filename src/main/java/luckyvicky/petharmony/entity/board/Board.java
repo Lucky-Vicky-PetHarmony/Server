@@ -41,6 +41,7 @@ public class Board {
     private LocalDateTime boardUpdate;   // 게시물 업데이트 날짜
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING) //카테고리 이름을 그대로 저장
     private Category category;
 
     @ManyToOne(fetch = FetchType.LAZY)
