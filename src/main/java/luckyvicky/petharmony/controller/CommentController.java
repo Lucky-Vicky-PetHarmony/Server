@@ -2,6 +2,7 @@ package luckyvicky.petharmony.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import luckyvicky.petharmony.dto.comment.CommentDeleteDTO;
 import luckyvicky.petharmony.dto.comment.CommentPostDTO;
 import luckyvicky.petharmony.dto.comment.CommentUpdateDTO;
 import luckyvicky.petharmony.service.CommentService;
@@ -29,8 +30,8 @@ public class CommentController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<String> deleteComment(@RequestParam Long userId, @RequestParam Long commId) {
-        commentService.deleteComment(userId,commId);
+    public ResponseEntity<String> deleteComment(@RequestBody CommentDeleteDTO commentDeleteDTO) {
+        commentService.deleteComment(commentDeleteDTO.getUserId(), commentDeleteDTO.getCommentId());
         return ResponseEntity.ok("댓글삭제완료");
     }
 }

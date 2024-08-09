@@ -2,6 +2,7 @@ package luckyvicky.petharmony.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import luckyvicky.petharmony.dto.board.BoardDeleteDTO;
 import luckyvicky.petharmony.dto.board.BoardPostDTO;
 import luckyvicky.petharmony.dto.board.BoardUpdateDTO;
 import luckyvicky.petharmony.service.BoardService;
@@ -63,10 +64,10 @@ public class BoardController {
      * @throws IOException 파일 삭제 중 발생할 수 있는 예외를 처리
      */
     @DeleteMapping("/delete")
-    public ResponseEntity<String> boardDelete(@RequestParam Long userId, @RequestParam Long boardId) throws IOException {
-        boardService.boardDelete(userId, boardId);
+    public ResponseEntity<String> boardDelete(@RequestBody BoardDeleteDTO boardDeleteDTO) throws IOException {
+        boardService.boardDelete(boardDeleteDTO.getUserId(), boardDeleteDTO.getBoardId());
 
-        return ResponseEntity.ok(boardId+"번 게시글 삭제 성공");
+        return ResponseEntity.ok(boardDeleteDTO.getBoardId()+"번 게시글 삭제 성공");
     }
 
 }
