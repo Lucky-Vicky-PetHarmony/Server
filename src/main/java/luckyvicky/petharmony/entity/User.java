@@ -9,7 +9,6 @@ import luckyvicky.petharmony.security.UserState;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Getter
@@ -51,19 +50,4 @@ public class User {
     @Column(name = "user_state", nullable = false)
     private UserState userState;                  // 회원 상태 (ACTIVE, BANNED)
 
-    // User엔티티에서 UserWord에 접근(특정 사용자가 선택한 모든 단어를 조회)
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserWord> userWords;
-
-    // User엔티티에서 PetLikes에 접근(사용자가 좋아요 누른 동물 조회)
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PetLike> petLikes;
-
-    // User엔티티에서 Board에 접근(사용자가 작성한 글 조회)
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Board> boards;
-
-    // User엔티티에서 Comment에 접근(사용자가 작성한 댓글 조회)
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Comment> comments;
 }
