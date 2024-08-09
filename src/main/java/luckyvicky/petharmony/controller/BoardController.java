@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import luckyvicky.petharmony.dto.board.BoardPostDTO;
 import luckyvicky.petharmony.dto.board.BoardUpdateDTO;
-import luckyvicky.petharmony.entity.board.Board;
 import luckyvicky.petharmony.service.BoardService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

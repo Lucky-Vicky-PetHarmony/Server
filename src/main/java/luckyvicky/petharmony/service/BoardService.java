@@ -16,9 +16,5 @@ public interface BoardService {
     //게시물 삭제
     void boardDelete(Long userId, Long boardId) throws IOException;
 
-    //게시물 조회수 관리
-
-    //댓글 작성
-
-    //댓글 수정
+    //게시물 조회
 }
