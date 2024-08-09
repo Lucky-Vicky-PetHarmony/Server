@@ -3,6 +3,7 @@ package luckyvicky.petharmony.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import luckyvicky.petharmony.dto.board.BoardPostDTO;
+import luckyvicky.petharmony.dto.board.BoardUpdateDTO;
 import luckyvicky.petharmony.entity.board.Board;
 import luckyvicky.petharmony.service.BoardService;
 import org.springframework.http.ResponseEntity;
@@ -25,9 +26,27 @@ public class BoardController {
      * @throws IOException 파일 업로드 중 발생할 수 있는 예외를 처리
      */
     @PostMapping("/post")
-    public ResponseEntity<Long> post(@ModelAttribute BoardPostDTO boardPostDTO) throws IOException {
+    public ResponseEntity<Long> boardPost(@ModelAttribute BoardPostDTO boardPostDTO) throws IOException {
 
         Long boardId = boardService.boardPost(boardPostDTO);
+        if (boardId!=null){
+            return ResponseEntity.ok(boardId);
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    /**
+     * 게시글 수정
+     *
+     * @param boardUpdateDTO 게시글 수정 정보를 담고 있는 DTO
+     * @return 수정된 게시글의 ID를 반환하며, 성공 시 HTTP 200 OK 응답을, 실패 시 HTTP 400 Bad Request 응답을 반환
+     * @throws IOException 파일 업로드 중 발생할 수 있는 예외를 처리
+     */
+    @PutMapping("/update")
+    public ResponseEntity<Long> boardUpdate(@ModelAttribute BoardUpdateDTO boardUpdateDTO) throws IOException {
+
+        Long boardId = boardService.boardUpdate(boardUpdateDTO);
         if (boardId!=null){
             return ResponseEntity.ok(boardId);
         } else {
