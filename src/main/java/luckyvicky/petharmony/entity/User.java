@@ -5,7 +5,6 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Getter
@@ -39,7 +38,5 @@ public class User {
     @Column(name = "create_date", nullable = false, updatable = false)
     private LocalDateTime createDate;             // 회원 가입일자
 
-    // User엔티티에서 UserWord에 접근(특정 사용자가 선택한 모든 단어를 조회)
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserWord> userWords; // 사용자가 선택한 단어 목록
+    // 사용자가 선택한 단어 목록은 직접 쿼리를 작성하여 조회할 예정이므로 @OneToMany 제거
 }
