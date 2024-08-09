@@ -1,4 +1,4 @@
-package luckyvicky.petharmony.dto;
+package luckyvicky.petharmony.dto.user;
 
 import lombok.*;
 

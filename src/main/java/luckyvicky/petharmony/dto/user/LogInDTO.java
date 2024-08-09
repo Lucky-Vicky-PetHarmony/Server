@@ -1,4 +1,4 @@
-package luckyvicky.petharmony.dto;
+package luckyvicky.petharmony.dto.user;
 
 import lombok.*;
 
@@ -6,12 +6,8 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SignUpDTO {
-    private String username;     // 이름
-
+public class LogInDTO {
     private String email;        // 이메일
 
     private String password;     // 비밀번호
-
-    private String phone;        // 전화번호
 }
