@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import luckyvicky.petharmony.dto.comment.CommentPostDTO;
+import luckyvicky.petharmony.dto.comment.CommentUpdateDTO;
 import luckyvicky.petharmony.entity.User;
 import luckyvicky.petharmony.entity.board.Board;
 import luckyvicky.petharmony.entity.board.Comment;
@@ -44,19 +45,19 @@ public class CommentServiceImpl implements CommentService {
     /**
      * 댓글 수정
      *
-     * @param commentPostDTO
+     * @param commentUpdateDTO
      */
     @Override
-    public void updateComment(CommentPostDTO commentPostDTO) {
-        User user = userRepository.findById(commentPostDTO.getUserId()).orElseThrow(() -> new IllegalArgumentException("유효하지않은 user ID"));
-        Board board = boardRepository.findById(commentPostDTO.getBoardId()).orElseThrow(() -> new IllegalArgumentException("유효하지않은 board ID"));
+    public void updateComment(CommentUpdateDTO commentUpdateDTO) {
+        Comment comment = commentRepository.findById(commentUpdateDTO.getCommId()).orElseThrow(() -> new IllegalArgumentException("유효하지 않은 comm ID"));
 
-        Comment comment = Comment.builder()
-                .user(user)
-                .board(board)
-                .commContent(commentPostDTO.getCommContent())
-                .build();
-
-        commentRepository.save(comment);
+        if(comment.getUser().getUserId().equals(commentUpdateDTO.getUserId())) {
+            Comment updateComment = comment.toBuilder()
+                    .commContent(commentUpdateDTO.getCommContent())
+                    .build();
+            commentRepository.save(updateComment);
+        }else{
+            throw new IllegalArgumentException("댓글 작성자가 아닙니다.");
+        }
     }
 }
