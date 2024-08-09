@@ -12,4 +12,5 @@ public interface CommentService {
     void updateComment(CommentUpdateDTO commentUpdateDTO);
 
     //댓글 삭제
+    void deleteComment(Long userId, Long commId);
 }

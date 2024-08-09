@@ -26,7 +26,8 @@ public class CommentServiceImpl implements CommentService {
     /**
      * 댓글 작성
      *
-     * @param commentPostDTO
+     * @param commentPostDTO 작성자 id, 게시물 id, 댓글 내용
+     * @throws IllegalArgumentException boardId가 없거나 userId가 없을때
      */
     @Override
     public void addComment(CommentPostDTO commentPostDTO) {
@@ -45,7 +46,8 @@ public class CommentServiceImpl implements CommentService {
     /**
      * 댓글 수정
      *
-     * @param commentUpdateDTO
+     * @param commentUpdateDTO 댓글을 삭제하려는 사람 Id, 삭제하려는 댓글의 Id, 수정할 내용
+     * @throws IllegalArgumentException commId가 없거나 댓글 작성자가 아닐때
      */
     @Override
     public void updateComment(CommentUpdateDTO commentUpdateDTO) {
@@ -57,7 +59,27 @@ public class CommentServiceImpl implements CommentService {
                     .build();
             commentRepository.save(updateComment);
         }else{
-            throw new IllegalArgumentException("댓글 작성자가 아닙니다.");
+            throw new IllegalArgumentException("댓글 작성자만 수정가능합니다.");
         }
+    }
+
+    /**
+     * 댓글 삭제
+     *
+     * @param commId 삭제하려는 댓글 id
+     * @param userId 삭제를 시도하는 유저 id
+     * @throws IllegalArgumentException commId가 없거나 userId가 없거나 댓글 작성자가 아닐때
+     */
+    @Override
+    public void deleteComment(Long userId, Long commId) {
+        Comment comment = commentRepository.findById(commId).orElseThrow(() -> new IllegalArgumentException("유효하지 않은 comm ID"));
+
+        if(comment.getUser().getUserId().equals(userId)) {
+            commentRepository.deleteById(commId);
+        }else{
+            throw new IllegalArgumentException("댓글 작성자만 삭제가 가능합니다.");
+        }
+
+
     }
 }

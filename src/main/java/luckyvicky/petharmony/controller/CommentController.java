@@ -25,6 +25,12 @@ public class CommentController {
     @PutMapping("/update")
     public ResponseEntity<String> updateComment(@RequestBody CommentUpdateDTO commentUpdateDTO) {
         commentService.updateComment(commentUpdateDTO);
-        return ResponseEntity.ok("댓글수정");
+        return ResponseEntity.ok("댓글수정완료");
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<String> deleteComment(@RequestParam Long userId, @RequestParam Long commId) {
+        commentService.deleteComment(userId,commId);
+        return ResponseEntity.ok("댓글삭제완료");
     }
 }
