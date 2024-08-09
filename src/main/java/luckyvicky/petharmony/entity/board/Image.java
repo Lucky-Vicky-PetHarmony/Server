@@ -19,6 +19,7 @@ public class Image {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "image_id")
     private Long imageId;                // id
 
     @Column(name = "image_name", length = 2048, nullable = false)
