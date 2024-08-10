@@ -19,6 +19,9 @@ public class BoardUpdateDTO {
     // 게시글 id
     private Long boardId;
 
+    // 작성자 id
+    private Long userId;
+
     // 게시글 제목
     private String title;
 

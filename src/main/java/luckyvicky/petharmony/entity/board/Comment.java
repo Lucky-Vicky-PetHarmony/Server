@@ -1,5 +1,6 @@
 package luckyvicky.petharmony.entity.board;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
 import luckyvicky.petharmony.entity.User;
@@ -27,11 +28,11 @@ public class Comment {
 
     @CreationTimestamp
     @Column(name = "comm_create", nullable = false, updatable = false)
-    private LocalDateTime commCreate;   // 댓글 등록 날짜
+    private LocalDateTime commCreate;   // 댓글 등록 시간
 
     @UpdateTimestamp
     @Column(name = "comm_update", nullable = false)
-    private LocalDateTime commUpdate;   // 댓글 수정 날짜
+    private LocalDateTime commUpdate;   // 댓글 수정 시간
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id")
@@ -41,5 +42,10 @@ public class Comment {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;                  // 유저 테이블
+
+    public void updateContent(String newContent) {
+        this.commContent = newContent;
+        // updateTime은 @UpdateTimestamp에 의해 자동으로 갱신
+    }
 
 }

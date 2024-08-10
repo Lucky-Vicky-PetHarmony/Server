@@ -17,7 +17,7 @@ import java.util.List;
 public class BoardPostDTO {
 
     // 게시글 작성한 user id
-    private Long userId;
+    private String userId;
 
     // 게시글 제목
     private String title;
