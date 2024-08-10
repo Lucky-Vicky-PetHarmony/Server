@@ -11,7 +11,7 @@ import java.util.List;
 
 @Entity
 @Getter
-@Builder(toBuilder = true)
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
@@ -48,11 +48,13 @@ public class Board {
     @JoinColumn(name = "user_id")
     private User user;                  // 유저 테이블
 
-    // Board엔티티에서 Comment에 접근(게시물에 작성된 댓글 조회)
-    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Comment> comments;
+    public void viewCount() {
+        this.view++;
+    }
 
-    // Board엔티티에서 Image에 접근(게시물에 작성된 첨부파일 조회)
-    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Image> images;
+    public void updateBoard(String newContent, String newTitle, Category category) {
+        this.boardContent = newContent;
+        this.boardTitle = newTitle;
+        this.category = category;
+    }
 }

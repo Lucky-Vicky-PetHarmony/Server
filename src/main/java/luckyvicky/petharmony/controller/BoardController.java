@@ -2,9 +2,8 @@ package luckyvicky.petharmony.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import luckyvicky.petharmony.dto.board.BoardDeleteDTO;
-import luckyvicky.petharmony.dto.board.BoardPostDTO;
-import luckyvicky.petharmony.dto.board.BoardUpdateDTO;
+import luckyvicky.petharmony.dto.board.*;
+import luckyvicky.petharmony.dto.comment.CommentResponseDTO;
 import luckyvicky.petharmony.service.BoardService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +15,7 @@ import java.io.IOException;
 @Log4j2
 @RequestMapping("/api/public/board")
 public class BoardController {
+
     private final BoardService boardService;
 
     /**
@@ -26,11 +26,11 @@ public class BoardController {
      * @throws IOException 파일 업로드 중 발생할 수 있는 예외를 처리
      */
     @PostMapping("/post")
-    public ResponseEntity<Long> boardPost(@ModelAttribute BoardPostDTO boardPostDTO) throws IOException {
+    public ResponseEntity<BoardDetailResponseDTO> boardPost(@ModelAttribute BoardPostDTO boardPostDTO) throws IOException {
 
-        Long boardId = boardService.boardPost(boardPostDTO);
-        if (boardId!=null){
-            return ResponseEntity.ok(boardId);
+        BoardDetailResponseDTO boardDetailResponseDTO = boardService.boardPost(boardPostDTO);
+        if (boardDetailResponseDTO!=null){
+            return ResponseEntity.ok(boardDetailResponseDTO);
         } else {
             return ResponseEntity.badRequest().build();
         }
@@ -44,11 +44,11 @@ public class BoardController {
      * @throws IOException 파일 업로드 중 발생할 수 있는 예외를 처리
      */
     @PutMapping("/update")
-    public ResponseEntity<Long> boardUpdate(@ModelAttribute BoardUpdateDTO boardUpdateDTO) throws IOException {
+    public ResponseEntity<BoardDetailResponseDTO> boardUpdate(@ModelAttribute BoardUpdateDTO boardUpdateDTO) throws IOException {
 
-        Long boardId = boardService.boardUpdate(boardUpdateDTO);
-        if (boardId!=null){
-            return ResponseEntity.ok(boardId);
+        BoardDetailResponseDTO boardDetailResponseDTO = boardService.boardUpdate(boardUpdateDTO);
+        if (boardDetailResponseDTO!=null){
+            return ResponseEntity.ok(boardDetailResponseDTO);
         } else {
             return ResponseEntity.badRequest().build();
         }
@@ -58,8 +58,7 @@ public class BoardController {
     /**
      * 게시글 삭제
      *
-     * @param userId 삭제를 요청한 게시글 작성자 id
-     * @param boardId 삭제를 요청당한 게시글 id
+     * @param boardDeleteDTO 삭제를 요청한 게시글 작성자 id, 삭제를 요청당한 게시글 id
      * @return 삭제성공시 200반환
      * @throws IOException 파일 삭제 중 발생할 수 있는 예외를 처리
      */
@@ -68,6 +67,20 @@ public class BoardController {
         boardService.boardDelete(boardDeleteDTO.getUserId(), boardDeleteDTO.getBoardId());
 
         return ResponseEntity.ok(boardDeleteDTO.getBoardId()+"번 게시글 삭제 성공");
+    }
+
+    /**
+     * 게시글 조회
+     *
+     * @param
+     * @return
+     * @throws
+     */
+    @GetMapping("/view")
+    public ResponseEntity<BoardDetailResponseDTO> boardDetailView(@RequestBody BoardDetailRequestDTO boardDetailRequestDTO) throws IOException {
+        BoardDetailResponseDTO boardDetailResponseDTO = boardService.boardDetail(boardDetailRequestDTO.getUserId(), boardDetailRequestDTO.getBoardId());
+        log.info("@@@@@@@"+boardDetailResponseDTO);
+        return ResponseEntity.ok(boardDetailResponseDTO);
     }
 
 }

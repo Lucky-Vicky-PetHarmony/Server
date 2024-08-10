@@ -10,4 +10,7 @@ public interface ImageRepository extends JpaRepository<Image, Long> {
 
     @Query("SELECT i.imageId FROM Image i WHERE i.board.boardId = :boardId")
     List<Long> findImageIdsByBoardId(Long boardId);
+
+//    @Query("FROM Image i WHERE i.board.boardId = :boardId")
+    List<Image> findByBoard_BoardId(Long boardId);
 }
