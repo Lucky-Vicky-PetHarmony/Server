@@ -110,7 +110,8 @@ public class BoardServiceImpl implements BoardService {
     public void boardDelete(Long userId, Long boardId) throws IOException {
         Board board = boardRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("유효하지않은 boardId"));
         if(board.getUser().getUserId().equals(userId)) {
-            // TODO: 댓글 삭제
+            // 댓글 삭제
+            commentRepository.deleteByBoard_BoardId(boardId);
 
             //이미지 삭제
             List<Long> imageIds = imageService.findImageIdsByBoardId(boardId);
