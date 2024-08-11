@@ -28,7 +28,7 @@ while True:
     # 쿼리 파라미터 설정
     queryParams = '?' + parse.quote_plus("serviceKey") + '=' + key + '&' + parse.urlencode({
         parse.quote_plus('bgnde'): '20240101',  # 검색 시작일
-        parse.quote_plus('endde'): '20240805',  # 검색 종료일
+        parse.quote_plus('endde'): '20240811',  # 검색 종료일
         parse.quote_plus('pageNo'): str(page_no),
         parse.quote_plus('numOfRows'): '1000',  # 한 번에 가져올 데이터 수
         parse.quote_plus('_type'): 'xml'
@@ -78,37 +78,77 @@ while True:
         desertion_no = item.find('desertionNo').text if item.find('desertionNo') is not None else None
         process_state = item.find('processState').text if item.find('processState') is not None else None
 
-        # 데이터베이스에서 해당 데이터가 존재하는지 확인
-        cursor.execute("SELECT process_state FROM pet_info WHERE desertion_no = %s", (desertion_no,))
-        result = cursor.fetchone()
+        if process_state and "종료" in process_state:
+            # process_state에 "종료"가 포함된 경우 데이터 삭제
+            cursor.execute("DELETE FROM pet_info WHERE desertion_no = %s", (desertion_no,))
+            rowcount += 1
+        else:
+            # 데이터베이스에서 해당 데이터가 존재하는지 확인
+            cursor.execute("SELECT process_state FROM pet_info WHERE desertion_no = %s", (desertion_no,))
+            result = cursor.fetchone()
 
-        if result:
-            # 기존 데이터가 존재하는 경우 process_state가 변경되었는지 확인
-            if result[0] != process_state:
+            if result:
+                # 기존 데이터가 존재하는 경우 process_state가 변경되었는지 확인
+                if result[0] != process_state:
+                    sql = """
+                    UPDATE pet_info SET
+                        happen_dt = %s,
+                        happen_place = %s,
+                        kind_cd = %s,
+                        color_cd = %s,
+                        age = %s,
+                        weight = %s,
+                        notice_no = %s,
+                        notice_sdt = %s,
+                        notice_edt = %s,
+                        popfile = %s,
+                        process_state = %s,
+                        sex_cd = %s,
+                        neuter_yn = %s,
+                        special_mark = %s,
+                        care_nm = %s,
+                        charge_nm = %s,
+                        officetel = %s,
+                        notice_comment = %s
+                    WHERE desertion_no = %s
+                    """
+
+                    values = (
+                        datetime.strptime(item.find('happenDt').text, '%Y%m%d') if item.find('happenDt') is not None else None,
+                        item.find('happenPlace').text if item.find('happenPlace') is not None else None,
+                        item.find('kindCd').text if item.find('kindCd') is not None else None,
+                        item.find('colorCd').text if item.find('colorCd') is not None else None,
+                        item.find('age').text if item.find('age') is not None else None,
+                        item.find('weight').text if item.find('weight') is not None else None,
+                        item.find('noticeNo').text if item.find('noticeNo') is not None else None,
+                        datetime.strptime(item.find('noticeSdt').text, '%Y%m%d') if item.find('noticeSdt') is not None else None,
+                        datetime.strptime(item.find('noticeEdt').text, '%Y%m%d') if item.find('noticeEdt') is not None else None,
+                        item.find('popfile').text if item.find('popfile') is not None else None,
+                        process_state,
+                        item.find('sexCd').text if item.find('sexCd') is not None else None,
+                        item.find('neuterYn').text if item.find('neuterYn') is not None else None,
+                        item.find('specialMark').text if item.find('specialMark') is not None else None,
+                        item.find('careNm').text if item.find('careNm') is not None else None,
+                        item.find('chargeNm').text if item.find('chargeNm') is not None else None,
+                        item.find('officetel').text if item.find('officetel') is not None else None,
+                        item.find('noticeComment').text if item.find('noticeComment') is not None else None,
+                        desertion_no
+                    )
+
+                    cursor.execute(sql, values)
+                    rowcount += 1
+
+            else:
+                # 새 데이터인 경우 삽입
                 sql = """
-                UPDATE pet_info SET
-                    happen_dt = %s,
-                    happen_place = %s,
-                    kind_cd = %s,
-                    color_cd = %s,
-                    age = %s,
-                    weight = %s,
-                    notice_no = %s,
-                    notice_sdt = %s,
-                    notice_edt = %s,
-                    popfile = %s,
-                    process_state = %s,
-                    sex_cd = %s,
-                    neuter_yn = %s,
-                    special_mark = %s,
-                    care_nm = %s,
-                    charge_nm = %s,
-                    officetel = %s,
-                    notice_comment = %s
-                WHERE desertion_no = %s
+                INSERT INTO pet_info (
+                    desertion_no, happen_dt, happen_place, kind_cd, color_cd, age, weight, notice_no, notice_sdt, notice_edt, 
+                    popfile, process_state, sex_cd, neuter_yn, special_mark, care_nm, charge_nm, officetel, notice_comment
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """
 
                 values = (
+                    desertion_no,
                     datetime.strptime(item.find('happenDt').text, '%Y%m%d') if item.find('happenDt') is not None else None,
                     item.find('happenPlace').text if item.find('happenPlace') is not None else None,
                     item.find('kindCd').text if item.find('kindCd') is not None else None,
@@ -126,46 +166,11 @@ while True:
                     item.find('careNm').text if item.find('careNm') is not None else None,
                     item.find('chargeNm').text if item.find('chargeNm') is not None else None,
                     item.find('officetel').text if item.find('officetel') is not None else None,
-                    item.find('noticeComment').text if item.find('noticeComment') is not None else None,
-                    desertion_no
+                    item.find('noticeComment').text if item.find('noticeComment') is not None else None
                 )
 
                 cursor.execute(sql, values)
                 rowcount += 1
-
-        else:
-            # 새 데이터인 경우 삽입
-            sql = """
-            INSERT INTO pet_info (
-                desertion_no, happen_dt, happen_place, kind_cd, color_cd, age, weight, notice_no, notice_sdt, notice_edt, 
-                popfile, process_state, sex_cd, neuter_yn, special_mark, care_nm, charge_nm, officetel, notice_comment
-            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-            """
-
-            values = (
-                desertion_no,
-                datetime.strptime(item.find('happenDt').text, '%Y%m%d') if item.find('happenDt') is not None else None,
-                item.find('happenPlace').text if item.find('happenPlace') is not None else None,
-                item.find('kindCd').text if item.find('kindCd') is not None else None,
-                item.find('colorCd').text if item.find('colorCd') is not None else None,
-                item.find('age').text if item.find('age') is not None else None,
-                item.find('weight').text if item.find('weight') is not None else None,
-                item.find('noticeNo').text if item.find('noticeNo') is not None else None,
-                datetime.strptime(item.find('noticeSdt').text, '%Y%m%d') if item.find('noticeSdt') is not None else None,
-                datetime.strptime(item.find('noticeEdt').text, '%Y%m%d') if item.find('noticeEdt') is not None else None,
-                item.find('popfile').text if item.find('popfile') is not None else None,
-                process_state,
-                item.find('sexCd').text if item.find('sexCd') is not None else None,
-                item.find('neuterYn').text if item.find('neuterYn') is not None else None,
-                item.find('specialMark').text if item.find('specialMark') is not None else None,
-                item.find('careNm').text if item.find('careNm') is not None else None,
-                item.find('chargeNm').text if item.find('chargeNm') is not None else None,
-                item.find('officetel').text if item.find('officetel') is not None else None,
-                item.find('noticeComment').text if item.find('noticeComment') is not None else None
-            )
-
-            cursor.execute(sql, values)
-            rowcount += 1
 
     # 페이지 번호 증가
     page_no += 1
@@ -182,4 +187,4 @@ db.commit()
 cursor.close()
 db.close()
 
-print(f"{rowcount} 개의 기록이 삽입/업데이트되었습니다.")
+print(f"{rowcount} 개의 기록이 삽입/업데이트/삭제되었습니다.")
