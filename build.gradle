@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.3.2'
 	id 'io.spring.dependency-management' version '1.1.6'
+	id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
 }
 
 group = 'luckyvicky'
@@ -34,20 +35,40 @@ dependencies {
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
-	// lombok
+	// Lombok
 	compileOnly 'org.projectlombok:lombok:1.18.20'
 	annotationProcessor 'org.projectlombok:lombok:1.18.20'
-	// For tests
 	testCompileOnly 'org.projectlombok:lombok:1.18.20'
 	testAnnotationProcessor 'org.projectlombok:lombok:1.18.20'
 
-	//	AWS S3 서비스를 사용하기 위한 라이브러리
+	// AWS S3 서비스를 사용하기 위한 라이브러리
 	implementation 'com.amazonaws:aws-java-sdk-s3:1.11.238'
 	implementation 'javax.xml.bind:jaxb-api:2.3.1'
 	implementation 'org.glassfish.jaxb:jaxb-runtime:2.3.3'
 	implementation 'javax.activation:activation:1.1.1'
+
+	// QueryDSL
+	implementation 'com.querydsl:querydsl-jpa:5.1.0'
+	annotationProcessor 'com.querydsl:querydsl-apt:5.1.0:jpa'
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+def generatedSourcesDir = "$buildDir/generated/sources/annotationProcessor/java/main"
+
+// QueryDSL 플러그인 설정
+querydsl {
+	jpa = true
+	querydslSourcesDir = generatedSourcesDir
+}
+
+// SourceSets 설정: QueryDSL로 생성된 Q 클래스를 포함
+sourceSets {
+	main {
+		java {
+			srcDirs = ['src/main/java', generatedSourcesDir]
+		}
+	}
 }

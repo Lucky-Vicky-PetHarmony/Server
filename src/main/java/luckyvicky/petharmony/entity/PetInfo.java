@@ -15,63 +15,66 @@ import java.util.Date;
 public class PetInfo {
 
     @Id
-    @Column(nullable = false, length = 15)
-    private String desertion_no;
-
-    @Column(length = 100)
-    private String filename;
+    @Column(name = "desertion_no", nullable = false, length = 15)
+    private String desertionNo;
 
     @Temporal(TemporalType.DATE)
-    private Date happen_dt;
+    @Column(name = "happen_dt")
+    private Date happenDt;
 
-    @Column(length = 100)
-    private String happen_place;
+    @Column(name = "happen_place", length = 100)
+    private String happenPlace;
 
-    @Column(length = 50)
-    private String kind_cd;
+    @Column(name = "kind_cd", length = 50)
+    private String kindCd;
 
-    @Column(length = 30)
-    private String color_cd;
+    @Column(name = "color_cd", length = 30)
+    private String colorCd;
 
-    @Column(length = 30)
+    @Column(name = "age", length = 30)
     private String age;
 
-    @Column(length = 30)
+    @Column(name = "weight", length = 30)
     private String weight;
 
-    @Column(length = 30)
-    private String notice_no;
+    @Column(name = "notice_no", length = 30)
+    private String noticeNo;
 
     @Temporal(TemporalType.DATE)
-    private Date notice_sdt;
+    @Column(name = "notice_sdt")
+    private Date noticeSdt;
 
     @Temporal(TemporalType.DATE)
-    private Date notice_edt;
+    @Column(name = "notice_edt")
+    private Date noticeEdt;
 
-    @Column(length = 100)
+    @Column(name = "popfile", length = 100)
     private String popfile;
 
-    @Column(length = 10)
-    private String process_state;
+    @Column(name = "process_state", length = 10)
+    private String processState;
 
-    @Column(length = 1)
-    private char sex_cd;
+    @Column(name = "sex_cd", length = 1)
+    private char sexCd;
 
-    @Column(length = 1)
-    private char neuter_yn;
+    @Column(name = "neuter_yn", length = 1)
+    private char neuterYn;
 
-    @Column(length = 200)
-    private String special_mark;
+    @Column(name = "special_mark", length = 200)
+    private String specialMark;
 
-    @Column(length = 50)
-    private String care_nm;
+    @Column(name = "care_nm", length = 50)
+    private String careNm;
 
-    @Column(length = 20)
-    private String charge_nm;
+    @Column(name = "charge_nm", length = 20)
+    private String chargeNm;
 
-    @Column(length = 14)
+    @Column(name = "officetel", length = 14)
     private String officetel;
 
-    @Column(length = 200)
-    private String notice_comment;
+    @Column(name = "notice_comment", length = 200)
+    private String noticeComment;
+
+    @Column(name = "word_id", length = 255) // 적절한 길이로 설정
+    private String wordId;
 }
