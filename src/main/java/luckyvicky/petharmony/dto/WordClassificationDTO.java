@@ -1,5 +1,8 @@
 package luckyvicky.petharmony.dto;
 
+import luckyvicky.petharmony.entity.PetInfo;
+import luckyvicky.petharmony.entity.Word;
+
 public class WordClassificationDTO {
     private String desertionNo;
     private String specialMark;
@@ -7,10 +10,8 @@ public class WordClassificationDTO {
     private String sexCd;
     private String wordId;
 
-    // 기본 생성자
     public WordClassificationDTO() {}
 
-    // 필드별로 값을 전달받는 생성자
     public WordClassificationDTO(String desertionNo, String specialMark, String age, String sexCd, String wordId) {
         this.desertionNo = desertionNo;
         this.specialMark = specialMark;
@@ -19,7 +20,6 @@ public class WordClassificationDTO {
         this.wordId = wordId;
     }
 
-    // Getter와 Setter
     public String getDesertionNo() {
         return desertionNo;
     }
@@ -58,5 +58,10 @@ public class WordClassificationDTO {
 
     public void setWordId(String wordId) {
         this.wordId = wordId;
+    }
+
+    public PetInfo toEntity(PetInfo petInfo, Word word) {
+        petInfo.setWord(word);
+        return petInfo;
     }
 }

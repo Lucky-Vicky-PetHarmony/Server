@@ -2,82 +2,116 @@ package luckyvicky.petharmony.service;
 
 import luckyvicky.petharmony.dto.WordClassificationDTO;
 import luckyvicky.petharmony.entity.PetInfo;
+import luckyvicky.petharmony.entity.Word;
 import luckyvicky.petharmony.repository.PetInfoRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import luckyvicky.petharmony.repository.WordRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * PetInfoWordService 클래스는 PetInfo 엔티티를 처리하고, 해당 데이터를 WordClassificationDTO로 변환하는 로직
+ * OpenAI API를 사용하여 반려동물의 특성(specialMark)을 분석하고, 이를 기반으로 Word 엔티티와 연관된 정보를 업데이트
+ */
 @Service
 public class PetInfoWordService {
 
-    @Autowired
-    private PetInfoRepository petInfoRepository;
+    private final PetInfoRepository petInfoRepository;
+    private final WordRepository wordRepository;
+    private final OpenAiService openAiService;
 
-    private static final String OPENAI_API_URL = "https://api.openai.com/v1/engines/davinci/completions";
-    private static final String OPENAI_API_KEY = ""; // OpenAI API 키를 입력하세요
+    private static final int PAGE_SIZE = 100; // 페이징 처리시 사용
 
-    // 모든 pet_info 데이터를 처리하는 메서드
+    /**
+     * PetInfoWordService의 생성자
+     * @param petInfoRepository  PetInfo 엔티티와 상호작용하는 리포지토리
+     * @param wordRepository     Word 엔티티와 상호작용하는 리포지토리
+     * @param openAiService      OpenAI API와 통신하는 서비스
+     */
+    public PetInfoWordService(PetInfoRepository petInfoRepository, WordRepository wordRepository, OpenAiService openAiService) {
+        this.petInfoRepository = petInfoRepository;
+        this.wordRepository = wordRepository;
+        this.openAiService = openAiService;
+    }
+
+    /**
+     * 모든 PetInfo 레코드를 처리
+     * 페이징을 사용하여 한 번에 PAGE_SIZE만큼의 레코드를 처리하며,
+     * 각 레코드에 대해 processPetInfo 메서드를 호출하여 처리
+     */
+    @Transactional
     public void processAllPetInfo() {
         int page = 0;
-        int size = 100; // 한 번에 처리할 데이터 양 설정
-
         Page<PetInfo> resultPage;
 
+        // 페이징을 사용하여 모든 PetInfo 레코드를 처리
         do {
-            // 페이징을 통해 데이터를 가져옴
-            resultPage = petInfoRepository.findAll(PageRequest.of(page, size));
+            resultPage = petInfoRepository.findAll(PageRequest.of(page, PAGE_SIZE));
             List<PetInfo> petInfoList = resultPage.getContent();
-            petInfoList.forEach(this::processPetInfo); // 각 pet_info 데이터를 처리
+            petInfoList.forEach(this::processPetInfo);
             page++;
         } while (resultPage.hasNext());
     }
 
-    // 각 pet_info 데이터를 처리하는 메서드
+    /**
+     * 단일 PetInfo 레코드를 처리
+     * 이 메서드는 PetInfo 레코드를 WordClassificationDTO로 변환한 다음,
+     * OpenAI API를 호출하여 특성을 분석하고, 분석된 결과에 따라 Word 엔티티를 업데이트
+     * 최종적으로 PetInfo 레코드를 데이터베이스에 저장
+     *
+     * @param petInfo 처리할 PetInfo 엔티티
+     */
+    @Transactional
     public void processPetInfo(PetInfo petInfo) {
         // PetInfo 엔티티를 DTO로 변환
         WordClassificationDTO dto = convertToDTO(petInfo);
 
-        // 단어 분석 로직을 호출하여 wordId 설정
+        // 특성(specialMark)을 분석하여 관련된 WordId를 결정
         String analyzedWordId = analyzeSpecialMark(dto);
         dto.setWordId(analyzedWordId);
 
-        // DTO를 사용하여 엔티티를 업데이트
-        dto.toEntity(petInfo);
+        // WordId에 해당하는 Word 엔티티를 찾아 PetInfo 엔티티에 설정
+        Word word = wordRepository.findById(Long.parseLong(analyzedWordId))
+                .orElseThrow(() -> new RuntimeException("Word not found"));
+        dto.toEntity(petInfo, word);
 
-        // 엔티티를 데이터베이스에 저장
+        // 업데이트된 PetInfo 엔티티를 데이터베이스에 저장
         petInfoRepository.save(petInfo);
     }
 
-    // PetInfo 엔티티를 WordClassificationDTO로 변환하는 메서드
+    /**
+     * PetInfo 엔티티를 WordClassificationDTO로 변환
+     * @param petInfo 변환할 PetInfo 엔티티
+     * @return        변환된 WordClassificationDTO 객체
+     */
     private WordClassificationDTO convertToDTO(PetInfo petInfo) {
         return new WordClassificationDTO(
                 petInfo.getDesertionNo(),
                 petInfo.getSpecialMark(),
                 petInfo.getAge(),
                 String.valueOf(petInfo.getSexCd()),
-                petInfo.getWordId()
+                petInfo.getWordId() != null ? String.valueOf(petInfo.getWordId()) : null
         );
     }
 
-    // WordClassificationDTO를 분석하여 WordId를 설정하는 메서드
+    /**
+     * OpenAI API를 호출하여 specialMark 필드를 분석하고, 분석 결과에 따라 WordId를 반환
+     * 분석 결과는 특정 조건에 따라 다양한 WordId로 매핑
+     *
+     * @param dto WordClassificationDTO 객체, 분석할 specialMark 필드를 포함
+     * @return    분석 결과에 따라 선택된 WordId들 중 최대 5개의 단어 ID를 콤마로 연결한 문자열
+     */
     private String analyzeSpecialMark(WordClassificationDTO dto) {
         List<String> wordIds = new ArrayList<>();
 
-        // 나이에 따른 분류 (String 비교로 연도 구분)
+        // 나이에 따른 분류
         List<String> recentYears = Arrays.asList("2024", "2023", "2022", "2021", "2020", "2019", "2018");
-
-        // age 필드에 따라 "활발한" 또는 "차분한"을 분류
         if (dto.getAge().contains("60일미만") || recentYears.stream().anyMatch(dto.getAge()::contains)) {
             wordIds.add("5"); // 활발한 (2018년 이후)
         } else {
@@ -97,8 +131,8 @@ public class PetInfoWordService {
                 break;
         }
 
-        // special_mark 필드를 분석 (OpenAI API 호출)
-        String openAiAnalysis = callOpenAiApi(dto.getSpecialMark());
+        // special_mark 필드를 OpenAiService를 통해 분석
+        String openAiAnalysis = openAiService.analyzeSpecialMark(dto.getSpecialMark());
 
         // 분석된 결과에 따라 WordId 추가
         if (openAiAnalysis.contains("특별한")) {
@@ -149,35 +183,5 @@ public class PetInfoWordService {
 
         // 중복된 단어를 제거하고 최대 5개의 단어만 선택하여 반환
         return wordIds.stream().distinct().limit(5).collect(Collectors.joining(","));
-    }
-
-    // OpenAI API를 호출하여 special_mark를 분석하는 메서드
-    private String callOpenAiApi(String specialMark) {
-        RestTemplate restTemplate = new RestTemplate();
-
-        // HTTP 헤더 설정
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + OPENAI_API_KEY); // OpenAI API 키 설정
-        headers.set("Content-Type", "application/json"); // 콘텐츠 유형 설정
-
-        // 요청 본문 설정
-        String requestBody = String.format(
-                "{\"prompt\": \"Analyze the following special mark and provide relevant characteristics: '%s'.\", \"max_tokens\": 50}",
-                specialMark
-        );
-
-        // HTTP 요청 엔터티 생성
-        HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
-
-        // OpenAI API 호출 및 응답 받기
-        ResponseEntity<String> response = restTemplate.exchange(
-                OPENAI_API_URL,
-                HttpMethod.POST,
-                entity,
-                String.class
-        );
-
-        // 응답을 단순화하여 문자열로 반환
-        return response.getBody();
     }
 }
