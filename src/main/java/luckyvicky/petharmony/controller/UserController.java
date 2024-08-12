@@ -2,10 +2,7 @@ package luckyvicky.petharmony.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import luckyvicky.petharmony.dto.user.FindIdDTO;
-import luckyvicky.petharmony.dto.user.LogInDTO;
-import luckyvicky.petharmony.dto.user.LoginResponseDTO;
-import luckyvicky.petharmony.dto.user.SignUpDTO;
+import luckyvicky.petharmony.dto.user.*;
 import luckyvicky.petharmony.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -65,6 +62,22 @@ public class UserController {
         } catch (Exception e) {
             e.printStackTrace();  // 예외 스택 트레이스를 출력
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("인증번호 전송에 실패하였습니다.");
+        }
+    }
+
+    /**
+     * 인증번호 확인 API 엔드포인트
+     *
+     * @param findIdDTO 전화번호와 인증번호 정보가 포함된 DTO
+     * @return ResponseEntity<FindIdResponseDTO>
+     */
+    @PostMapping("/api/public/check-certification")
+    public ResponseEntity<FindIdResponseDTO> checkingNumberToFindId(@RequestBody FindIdDTO findIdDTO) {
+        try {
+            FindIdResponseDTO findIdResponseDTO = userService.checkNumberToFindid(findIdDTO);
+            return ResponseEntity.ok(findIdResponseDTO);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(null);
         }
     }
 }

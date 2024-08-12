@@ -133,4 +133,31 @@ public class UserServiceImpl implements UserService {
             return "가입되지 않은 번호입니다.";
         }
     }
+
+    /**
+     * 아이디 찾기 2 - 인증번호 확인
+     * <p>
+     * 주어진 전화번호와 인증번호를 확인하여 사용자의 아이디(이메일)를 반환합니다.
+     * 인증번호가 유효한 경우 사용자의 정보를 반환하며, 그렇지 않으면 오류 메시지를 반환합니다.
+     *
+     * @param findIdDTO 전화번호 정보를 담고 있는 DTO
+     * @return 인증번호 확인 결과 메시지와 사용자 정보를 담은 FindIdResponseDTO
+     */
+    @Override
+    public FindIdResponseDTO checkNumberToFindid(FindIdDTO findIdDTO) {
+        Optional<Certification> optionalCertification = certificationRepository.findTopByPhoneOrderByCreateDateDesc(findIdDTO.getPhone());
+
+        if (optionalCertification.isPresent() && optionalCertification.get().getCertificationNumber().equals(findIdDTO.getCertificationNumber())) {
+            Optional<User> optionalUser = userRepository.findByPhone(findIdDTO.getPhone());
+
+            if (optionalUser.isPresent()) {
+                User user = optionalUser.get();
+                return new FindIdResponseDTO(user.getEmail(), user.getCreateDate(), null);
+            } else {
+                return new FindIdResponseDTO(null, null, "해당 전화번호로 등록된 사용자가 없습니다.");
+            }
+        } else {
+            return new FindIdResponseDTO(null, null, "인증번호가 틀립니다.");
+        }
+    }
 }
