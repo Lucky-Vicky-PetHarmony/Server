@@ -75,6 +75,7 @@ public class PetInfo {
     @Column(name = "notice_comment", length = 200)
     private String noticeComment;
 
-    @Column(name = "word_id", length = 255) // 적절한 길이로 설정
-    private String wordId;
+    @ManyToOne
+    @JoinColumn(name = "word_id") // 외래 키로 매핑
+    private Word word;
 }

@@ -1,7 +1,5 @@
 package luckyvicky.petharmony.dto;
 
-import luckyvicky.petharmony.entity.PetInfo;
-
 public class WordClassificationDTO {
     private String desertionNo;
     private String specialMark;
@@ -60,11 +58,5 @@ public class WordClassificationDTO {
 
     public void setWordId(String wordId) {
         this.wordId = wordId;
-    }
-
-    // DTO에서 엔티티로 변환하는 메서드
-    public PetInfo toEntity(PetInfo petInfo) {
-        petInfo.setWordId(this.wordId); // 필요한 필드만 업데이트
-        return petInfo;
     }
 }
