@@ -9,6 +9,9 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.RestClientException;
 
 /**
  * OpenAiServiceImpl 클래스는 OpenAiService 인터페이스를 구현하여
@@ -29,6 +32,14 @@ public class OpenAiServiceImpl implements OpenAiService {
     // .env 파일에서 API 키를 로드하여 보안적으로 안전하게 관리
     private final String openAiApiKey = dotenv.get("OPENAI_API_KEY");
 
+    // RestTemplate 객체를 Bean으로 관리하여 재사용 가능하도록 수정
+    private final RestTemplate restTemplate;
+
+    // 생성자를 통해 RestTemplate을 주입받아 재사용
+    public OpenAiServiceImpl(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
+
     /**
      * analyzeSpecialMark 메서드는 주어진 특수 문구(specialMark)를 OpenAI API를 통해 분석하고,
      * 그 결과를 텍스트로 반환
@@ -39,9 +50,6 @@ public class OpenAiServiceImpl implements OpenAiService {
      */
     @Override
     public String analyzeSpecialMark(String specialMark) {
-        // RestTemplate 객체를 생성하여 HTTP 요청을 수행
-        RestTemplate restTemplate = new RestTemplate();
-
         // HTTP 요청의 헤더를 설정합니다.
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + openAiApiKey); // OpenAI API 키를 사용하여 인증
@@ -56,23 +64,29 @@ public class OpenAiServiceImpl implements OpenAiService {
         // 요청 엔터티를 생성하여 헤더와 본문을 포함
         HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
 
-        // OpenAI API로 HTTP POST 요청을 보내고, 응답을 받아옴
-        ResponseEntity<String> response = restTemplate.exchange(
-                OPENAI_API_URL,
-                HttpMethod.POST,
-                entity,
-                String.class
-        );
-
         try {
+            // OpenAI API로 HTTP POST 요청을 보내고, 응답을 받아옴
+            ResponseEntity<String> response = restTemplate.exchange(
+                    OPENAI_API_URL,
+                    HttpMethod.POST,
+                    entity,
+                    String.class
+            );
+
             // 응답 데이터를 JSON 형식으로 파싱
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode root = objectMapper.readTree(response.getBody());
 
             // 응답에서 'text' 필드를 추출하여 반환
             return root.path("choices").path(0).path("text").asText();
+        } catch (HttpClientErrorException | HttpServerErrorException e) {
+            // HTTP 오류 발생 시 상세한 메시지를 포함한 예외 처리
+            throw new RuntimeException("OpenAI API returned an error: " + e.getStatusCode() + " " + e.getResponseBodyAsString(), e);
+        } catch (RestClientException e) {
+            // 일반적인 클라이언트 오류에 대한 예외 처리
+            throw new RuntimeException("Failed to connect to OpenAI API", e);
         } catch (Exception e) {
-            // 예외가 발생할 경우 RuntimeException으로 래핑하여 처리
+            // 기타 예외에 대한 일반적인 처리
             throw new RuntimeException("Failed to parse OpenAI API response", e);
         }
     }
