@@ -80,6 +80,4 @@ public class PetInfo {
     public void updateWordId(Long wordId) {
         this.wordId = wordId;
     }
-
-    // 다른 비즈니스 로직 메서드 추가 가능
 }
