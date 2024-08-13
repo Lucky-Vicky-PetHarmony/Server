@@ -12,6 +12,7 @@ import luckyvicky.petharmony.security.CustomUserDetails;
 import luckyvicky.petharmony.security.JwtTokenProvider;
 import luckyvicky.petharmony.security.Role;
 import luckyvicky.petharmony.security.UserState;
+import luckyvicky.petharmony.util.EmailUtil;
 import luckyvicky.petharmony.util.SmsUtil;
 import net.nurigo.sdk.message.response.SingleMessageSentResponse;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -33,6 +34,7 @@ public class UserServiceImpl implements UserService {
     private final JwtTokenProvider jwtTokenProvider;
     private final SmsUtil smsUtil;
     private final CertificationRepository certificationRepository;
+    private final EmailUtil emailUtil;
 
     /**
      * 회원가입
@@ -158,6 +160,44 @@ public class UserServiceImpl implements UserService {
             }
         } else {
             return new FindIdResponseDTO(null, null, "인증번호가 틀립니다.");
+        }
+    }
+
+    /**
+     * 비밀번호 찾기 - 이메일로 임시 비밀번호 발송
+     * <p>
+     * 주어진 이메일을 통해 사용자를 찾고, 임시 비밀번호를 생성하여 사용자의 비밀번호를 업데이트합니다.
+     * 임시 비밀번호는 이메일로 발송되며, 사용자는 해당 비밀번호로 로그인 후 비밀번호를 재설정해야 합니다.
+     * 사용자가 존재하지 않으면 오류 메시지를 반환합니다.
+     *
+     * @param findPasswordDTO 이메일 정보를 담고 있는 DTO
+     * @return 오류 메시지 또는 빈 문자열을 반환
+     */
+    @Override
+    public String sendingEmailToFindPassword(FindPasswordDTO findPasswordDTO) {
+        Optional<User> optionalUser = userRepository.findByEmail(findPasswordDTO.getEmail());
+
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            String certificationCode = String.format("%08d", (int) (Math.random() * 100000000));
+
+            user.updatePassword(certificationCode);
+
+            userRepository.save(user);
+
+            String title = "[PetHarmony] 임시 비밀번호 알림";
+
+            String content = String.format(
+                    "안녕하세요. PetHarmony 입니다 🐶" +
+                            "\n%s님의 임시 비밀번호는 %s입니다." +
+                            "\n임시 비밀번호로 로그인 후 꼭 비밀번호를 재설정 해주시길 바랍니다.",
+                    user.getUserName(), certificationCode
+            );
+
+            emailUtil.sendEmail(user.getEmail(), title, content);
+            return "임시 비밀번호가 이메일로 발송되었습니다.";
+        } else {
+            return "가입되지 않은 이메일입니다.";
         }
     }
 }
