@@ -79,8 +79,9 @@ public class BoardController {
      * @throws
      */
     @GetMapping("/view")
-    public ResponseEntity<BoardDetailResponseDTO> boardDetailView(@RequestBody BoardDetailRequestDTO boardDetailRequestDTO) throws IOException {
-        BoardDetailResponseDTO boardDetailResponseDTO = boardService.boardDetail(boardDetailRequestDTO.getUserId(), boardDetailRequestDTO.getBoardId());
+    public ResponseEntity<BoardDetailResponseDTO> boardDetailView(@RequestParam Long userId,
+                                                                  @RequestParam Long boardId) throws IOException {
+        BoardDetailResponseDTO boardDetailResponseDTO = boardService.boardDetail(userId, boardId);
         return ResponseEntity.ok(boardDetailResponseDTO);
     }
 

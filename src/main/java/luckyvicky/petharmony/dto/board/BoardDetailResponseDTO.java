@@ -21,6 +21,8 @@ public class BoardDetailResponseDTO {
 
     private Long userId; //작성자
 
+    private String userName; //작성자 이름
+
     private String title; //제목
 
     private String content; //내용

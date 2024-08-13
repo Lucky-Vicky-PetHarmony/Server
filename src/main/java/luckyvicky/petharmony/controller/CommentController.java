@@ -38,8 +38,8 @@ public class CommentController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<String> deleteComment(@RequestParam Long userId, @RequestParam Long commentId) {
-        commentService.deleteComment(userId, commentId);
+    public ResponseEntity<String> deleteComment(@RequestParam Long userId, @RequestParam Long commId) {
+        commentService.deleteComment(userId, commId);
         return ResponseEntity.ok("댓글삭제완료");
     }
 }

@@ -223,6 +223,7 @@ public class BoardServiceImpl implements BoardService {
 
     // board엔티티를 클라이언트 응답할 DTO로 변환
     private BoardDetailResponseDTO getBoardDetailResponseDTO(Board board) {
+        User user = board.getUser();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
         List<Image> images = imageRepository.findByBoard_BoardId(board.getBoardId());
@@ -236,6 +237,7 @@ public class BoardServiceImpl implements BoardService {
         return BoardDetailResponseDTO.builder()
                 .boardId(board.getBoardId())
                 .userId(board.getUser().getUserId())
+                .userName(user.getUserName())
                 .title(board.getBoardTitle())
                 .content(board.getBoardContent())
                 .category(board.getCategory())
