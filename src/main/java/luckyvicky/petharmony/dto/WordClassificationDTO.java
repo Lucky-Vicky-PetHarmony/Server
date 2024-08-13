@@ -1,7 +1,6 @@
 package luckyvicky.petharmony.dto;
 
 import luckyvicky.petharmony.entity.PetInfo;
-import luckyvicky.petharmony.entity.Word;
 
 public class WordClassificationDTO {
     private String desertionNo;
@@ -20,6 +19,7 @@ public class WordClassificationDTO {
         this.wordId = wordId;
     }
 
+    // Getter 및 Setter 메서드 (필요한 경우에만 사용)
     public String getDesertionNo() {
         return desertionNo;
     }
@@ -60,8 +60,10 @@ public class WordClassificationDTO {
         this.wordId = wordId;
     }
 
-    public PetInfo toEntity(PetInfo petInfo, Word word) {
-        petInfo.setWord(word);
-        return petInfo;
+    // 엔티티 업데이트 로직
+    public void updateEntity(PetInfo petInfo) {
+        petInfo.updateWordId(Long.valueOf(this.wordId));
     }
+
+    // 추가적으로 필요한 DTO 내부의 데이터 처리 로직을 여기에 추가
 }

@@ -2,9 +2,9 @@ package luckyvicky.petharmony.service;
 
 import luckyvicky.petharmony.dto.WordClassificationDTO;
 import luckyvicky.petharmony.entity.PetInfo;
-import luckyvicky.petharmony.entity.Word;
 import luckyvicky.petharmony.repository.PetInfoRepository;
 import luckyvicky.petharmony.repository.WordRepository;
+import luckyvicky.petharmony.service.openapi.OpenAiService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -62,7 +62,7 @@ public class PetInfoWordService {
     /**
      * 단일 PetInfo 레코드를 처리
      * 이 메서드는 PetInfo 레코드를 WordClassificationDTO로 변환한 다음,
-     * OpenAI API를 호출하여 특성을 분석하고, 분석된 결과에 따라 Word 엔티티를 업데이트
+     * OpenAI API를 호출하여 특성을 분석하고, 분석된 결과에 따라 PetInfo 엔티티를 업데이트
      * 최종적으로 PetInfo 레코드를 데이터베이스에 저장
      *
      * @param petInfo 처리할 PetInfo 엔티티
@@ -76,10 +76,8 @@ public class PetInfoWordService {
         String analyzedWordId = analyzeSpecialMark(dto);
         dto.setWordId(analyzedWordId);
 
-        // WordId에 해당하는 Word 엔티티를 찾아 PetInfo 엔티티에 설정
-        Word word = wordRepository.findById(Long.parseLong(analyzedWordId))
-                .orElseThrow(() -> new RuntimeException("Word not found"));
-        dto.toEntity(petInfo, word);
+        // DTO에서 엔티티 업데이트 로직 수행
+        dto.updateEntity(petInfo);
 
         // 업데이트된 PetInfo 엔티티를 데이터베이스에 저장
         petInfoRepository.save(petInfo);
@@ -95,7 +93,7 @@ public class PetInfoWordService {
                 petInfo.getDesertionNo(),
                 petInfo.getSpecialMark(),
                 petInfo.getAge(),
-                String.valueOf(petInfo.getSexCd()),
+                petInfo.getSexCd(),
                 petInfo.getWordId() != null ? String.valueOf(petInfo.getWordId()) : null
         );
     }

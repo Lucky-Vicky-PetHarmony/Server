@@ -1,4 +1,4 @@
-package luckyvicky.petharmony.service;
+package luckyvicky.petharmony.service.openapi;
 
 /**
  * OpenAiService는 OpenAI API와의 통신을 처리하는 서비스 인터페이스

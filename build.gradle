@@ -2,7 +2,6 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.3.2'
 	id 'io.spring.dependency-management' version '1.1.6'
-	id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
 }
 
 group = 'luckyvicky'
@@ -47,28 +46,10 @@ dependencies {
 	implementation 'org.glassfish.jaxb:jaxb-runtime:2.3.3'
 	implementation 'javax.activation:activation:1.1.1'
 
-	// QueryDSL
-	implementation 'com.querydsl:querydsl-jpa:5.1.0'
-	annotationProcessor 'com.querydsl:querydsl-apt:5.1.0:jpa'
+	// OpenAi키를 활용하기 위한 dotenv
+	implementation 'io.github.cdimascio:dotenv-java:3.0.0'
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
-}
-
-def generatedSourcesDir = "$buildDir/generated/sources/annotationProcessor/java/main"
-
-// QueryDSL 플러그인 설정
-querydsl {
-	jpa = true
-	querydslSourcesDir = generatedSourcesDir
-}
-
-// SourceSets 설정: QueryDSL로 생성된 Q 클래스를 포함
-sourceSets {
-	main {
-		java {
-			srcDirs = ['src/main/java', generatedSourcesDir]
-		}
-	}
 }
