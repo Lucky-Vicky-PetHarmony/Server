@@ -3,25 +3,27 @@ package luckyvicky.petharmony.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import luckyvicky.petharmony.dto.board.BoardDetailResponseDTO;
-import luckyvicky.petharmony.dto.board.BoardPostDTO;
-import luckyvicky.petharmony.dto.board.BoardUpdateDTO;
+import luckyvicky.petharmony.dto.board.*;
 import luckyvicky.petharmony.dto.comment.CommentResponseDTO;
 import luckyvicky.petharmony.entity.User;
 import luckyvicky.petharmony.entity.board.Board;
+import luckyvicky.petharmony.entity.board.Category;
 import luckyvicky.petharmony.entity.board.Comment;
 import luckyvicky.petharmony.entity.board.Image;
 import luckyvicky.petharmony.repository.BoardRepository;
 import luckyvicky.petharmony.repository.CommentRepository;
 import luckyvicky.petharmony.repository.ImageRepository;
 import luckyvicky.petharmony.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
 @Service
 @Log4j2
@@ -125,6 +127,8 @@ public class BoardServiceImpl implements BoardService {
     }
 
     /**
+     * 게시물 상세페이지
+     *
      * @param boardId
      * @return
      * @throws IOException
@@ -140,6 +144,82 @@ public class BoardServiceImpl implements BoardService {
 
         return getBoardDetailResponseDTO(board);
     }
+
+    /**
+     * 게시물 리스트 조회
+     *
+     * @param boardListRequestDTO
+     * @return
+     */
+    @Override
+    public Page<BoardListResponseDTO> boardList(BoardListRequestDTO boardListRequestDTO) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        // 기본적으로 날짜 기준으로 내림차순 정렬
+        Sort sort = Sort.by(Sort.Direction.ASC, "boardUpdate");
+
+        // Pageable 객체 생성
+        Pageable pageable = PageRequest.of(
+                boardListRequestDTO.getPage(), //요청페이지
+                boardListRequestDTO.getSize(), //
+                sort
+        );
+
+        // 카테고리 필터링을 위한 조건을 생성
+        String categoryFilter = boardListRequestDTO.getCategory();
+        Page<Board> boardPage;
+
+        // 정렬 기준에 따라 다른 쿼리를 사용
+        if ("comments".equalsIgnoreCase(boardListRequestDTO.getSortBy())) {
+            if (Objects.equals(categoryFilter, "ALL")) {
+                boardPage = boardRepository.findAllOrderByCommentCountDesc(pageable);
+            } else {
+                boardPage = boardRepository.findByCategoryOrderByCommentCountDesc(Category.valueOf(categoryFilter), pageable);
+            }
+        } else if ("views".equalsIgnoreCase(boardListRequestDTO.getSortBy())) {
+            if (Objects.equals(categoryFilter, "ALL")) {
+                boardPage = boardRepository.findAllOrderByViewDesc(pageable);
+            } else {
+                boardPage = boardRepository.findByCategoryOrderByViewDesc(Category.valueOf(categoryFilter), pageable);
+            }
+        } else {
+            // 기본적으로 날짜 기준으로 정렬
+            if (Objects.equals(categoryFilter, "ALL")) {
+                boardPage = boardRepository.findAllOrderByBoardUpdateDesc(pageable);
+            } else {
+                boardPage = boardRepository.findByCategoryOrderByBoardUpdateDesc(Category.valueOf(categoryFilter), pageable);
+            }
+        }
+
+//        if(Objects.equals(categoryFilter, "ALL")) { // 모든 게시물
+//            boardPage = boardRepository.findAll(pageable);
+//        }else { //카테고리 선택한 경우
+//            boardPage = boardRepository.findByCategory(Category.valueOf(categoryFilter), pageable);
+//        }
+
+        // Board 엔티티를 BoardListResponseDTO로 변환
+        Page<BoardListResponseDTO> responsePage = boardPage.map(board -> {
+            // 댓글 수 조회
+            int commentCount = commentRepository.countByBoard_BoardId(board.getBoardId());
+
+            // 이미지 유무 조회
+            boolean hasImage = imageRepository.existsByBoard_BoardId(board.getBoardId());
+
+            return BoardListResponseDTO.builder()
+                            .boardId(board.getBoardId())
+                            .boardTitle(board.getBoardTitle())
+                            .category(board.getCategory())
+                            .viewCount(board.getView())
+                            .commentCount(commentCount)
+                            .image(hasImage)
+                            .boardCreate(board.getBoardCreate().format(formatter))
+                            .boardUpdate(board.getBoardUpdate().format(formatter))
+                            .build();
+                });
+
+        return responsePage;
+    }
+
 
     // board엔티티를 클라이언트 응답할 DTO로 변환
     private BoardDetailResponseDTO getBoardDetailResponseDTO(Board board) {

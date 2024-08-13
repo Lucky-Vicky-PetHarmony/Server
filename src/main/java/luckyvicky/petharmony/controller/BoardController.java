@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import luckyvicky.petharmony.dto.board.*;
 import luckyvicky.petharmony.dto.comment.CommentResponseDTO;
+import luckyvicky.petharmony.entity.board.Board;
 import luckyvicky.petharmony.service.BoardService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -70,7 +72,7 @@ public class BoardController {
     }
 
     /**
-     * 게시글 조회
+     * 게시글 상세 조회
      *
      * @param
      * @return
@@ -81,5 +83,29 @@ public class BoardController {
         BoardDetailResponseDTO boardDetailResponseDTO = boardService.boardDetail(boardDetailRequestDTO.getUserId(), boardDetailRequestDTO.getBoardId());
         return ResponseEntity.ok(boardDetailResponseDTO);
     }
+
+    /**
+     * 게시글 조회 - 최신순, 댓글순, 조회순/ 카테고리별
+     *
+     * @param
+     * @return
+     * @throws
+     */
+    @GetMapping("/list")
+    public Page<BoardListResponseDTO> boardList(@RequestParam String category,
+                                                @RequestParam String sortBy,
+                                                @RequestParam int page,
+                                                @RequestParam int size){
+
+        BoardListRequestDTO boardListRequestDTO = BoardListRequestDTO.builder()
+                .category(category)
+                .sortBy(sortBy)
+                .page(page)
+                .size(size)
+                .build();
+
+        return boardService.boardList(boardListRequestDTO);
+    }
+
 
 }

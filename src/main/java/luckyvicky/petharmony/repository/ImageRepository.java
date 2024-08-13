@@ -13,4 +13,6 @@ public interface ImageRepository extends JpaRepository<Image, Long> {
 
 //    @Query("FROM Image i WHERE i.board.boardId = :boardId")
     List<Image> findByBoard_BoardId(Long boardId);
+
+    boolean existsByBoard_BoardId(Long boardId);
 }

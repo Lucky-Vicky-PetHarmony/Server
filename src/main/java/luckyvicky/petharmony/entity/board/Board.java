@@ -48,6 +48,9 @@ public class Board {
     @JoinColumn(name = "user_id")
     private User user;                  // 유저 테이블
 
+    @OneToMany(mappedBy = "board", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments;  // 댓글 리스트
+
     public void viewCount() {
         this.view++;
     }

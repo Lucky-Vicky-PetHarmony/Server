@@ -1,8 +1,7 @@
 package luckyvicky.petharmony.service;
 
-import luckyvicky.petharmony.dto.board.BoardDetailResponseDTO;
-import luckyvicky.petharmony.dto.board.BoardPostDTO;
-import luckyvicky.petharmony.dto.board.BoardUpdateDTO;
+import luckyvicky.petharmony.dto.board.*;
+import org.springframework.data.domain.Page;
 
 import java.io.IOException;
 
@@ -17,6 +16,9 @@ public interface BoardService {
     //게시물 삭제
     void boardDelete(Long userId, Long boardId) throws IOException;
 
-    //게시물 조회
+    //게시물상세 조회
     BoardDetailResponseDTO boardDetail(Long userId, Long boardId) throws IOException;
+
+    //게시물리스트 조회
+    Page<BoardListResponseDTO> boardList(BoardListRequestDTO boardListRequestDTO);
 }
