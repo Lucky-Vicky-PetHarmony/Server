@@ -72,9 +72,9 @@ public class PetInfoWordService {
         // PetInfo 엔티티를 DTO로 변환
         WordClassificationDTO dto = convertToDTO(petInfo);
 
-        // 특성(specialMark)을 분석하여 관련된 WordId를 결정
-        String analyzedWordId = analyzeSpecialMark(dto);
-        dto.setWordId(analyzedWordId);
+        // 특성(specialMark)을 분석하여 관련된 Words를 결정
+        String analyzedWords = analyzeSpecialMark(dto);
+        dto.setWords(analyzedWords);
 
         // DTO에서 엔티티 업데이트 로직 수행
         dto.updateEntity(petInfo);
@@ -94,16 +94,16 @@ public class PetInfoWordService {
                 petInfo.getSpecialMark(),
                 petInfo.getAge(),
                 petInfo.getSexCd(),
-                petInfo.getWordId() != null ? String.valueOf(petInfo.getWordId()) : null
+                petInfo.getWords() // Words 필드를 직접 가져옴
         );
     }
 
     /**
-     * OpenAI API를 호출하여 specialMark 필드를 분석하고, 분석 결과에 따라 WordId를 반환
-     * 분석 결과는 특정 조건에 따라 다양한 WordId로 매핑
+     * OpenAI API를 호출하여 specialMark 필드를 분석하고, 분석 결과에 따라 Words를 반환
+     * 분석 결과는 특정 조건에 따라 다양한 Words로 매핑
      *
      * @param dto WordClassificationDTO 객체, 분석할 specialMark 필드를 포함
-     * @return    분석 결과에 따라 선택된 WordId들 중 최대 5개의 단어 ID를 콤마로 연결한 문자열
+     * @return    분석 결과에 따라 선택된 Words들 중 최대 5개의 단어 ID를 콤마로 연결한 문자열
      */
     private String analyzeSpecialMark(WordClassificationDTO dto) {
         List<String> wordIds = new ArrayList<>();
@@ -132,7 +132,7 @@ public class PetInfoWordService {
         // special_mark 필드를 OpenAiService를 통해 분석
         String openAiAnalysis = openAiService.analyzeSpecialMark(dto.getSpecialMark());
 
-        // 분석된 결과에 따라 WordId 추가
+        // 분석된 결과에 따라 Words 추가
         if (openAiAnalysis.contains("특별한")) {
             wordIds.add("17"); // 특별한
         }

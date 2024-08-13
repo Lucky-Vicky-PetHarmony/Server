@@ -73,11 +73,11 @@ public class PetInfo {
     @Column(name = "notice_comment", length = 200)
     private String noticeComment;
 
-    @Column(name = "word_id")
-    private Long wordId;
+    @Column(name = "words")
+    private String words;
 
     // WordId 업데이트를 위한 메서드
-    public void updateWordId(Long wordId) {
-        this.wordId = wordId;
+    public void updateWordId(String words) {
+        this.words = words;
     }
 }

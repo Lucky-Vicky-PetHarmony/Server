@@ -7,19 +7,19 @@ public class WordClassificationDTO {
     private String specialMark;
     private String age;
     private String sexCd;
-    private String wordId;
+    private String words;
 
     public WordClassificationDTO() {}
 
-    public WordClassificationDTO(String desertionNo, String specialMark, String age, String sexCd, String wordId) {
+    public WordClassificationDTO(String desertionNo, String specialMark, String age, String sexCd, String words) {
         this.desertionNo = desertionNo;
         this.specialMark = specialMark;
         this.age = age;
         this.sexCd = sexCd;
-        this.wordId = wordId;
+        this.words = words;
     }
 
-    // Getter 및 Setter 메서드 (필요한 경우에만 사용)
+    // Getter 및 Setter 메서드
     public String getDesertionNo() {
         return desertionNo;
     }
@@ -52,18 +52,18 @@ public class WordClassificationDTO {
         this.sexCd = sexCd;
     }
 
-    public String getWordId() {
-        return wordId;
+    public String getWords() {
+        return words;
     }
 
-    public void setWordId(String wordId) {
-        this.wordId = wordId;
+    public void setWords(String words) {
+        this.words = words;
     }
 
     // 엔티티 업데이트 로직
     public void updateEntity(PetInfo petInfo) {
-        petInfo.updateWordId(Long.valueOf(this.wordId));
+        if (this.words != null) {
+            petInfo.updateWordId(this.words);
+        }
     }
-
-    // 추가적으로 필요한 DTO 내부의 데이터 처리 로직을 여기에 추가
 }
