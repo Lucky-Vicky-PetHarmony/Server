@@ -16,6 +16,11 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @Log4j2
@@ -26,6 +31,8 @@ public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
     private final BoardRepository boardRepository;
+
+    CommentService commentService;
 
     /**
      * 댓글 작성
@@ -97,8 +104,6 @@ public class CommentServiceImpl implements CommentService {
      * @papram comment 저장된 댓글엔티티
      * @return commentResponseDTO 응답에 필요한 댓글 DTO
      */
-
-    @Override
     public CommentResponseDTO convertCommentToCommentResponseDTO(Comment comment) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         return CommentResponseDTO.builder()
@@ -109,5 +114,23 @@ public class CommentServiceImpl implements CommentService {
                 .userId(comment.getUser().getUserId())
                 .userName(comment.getUser().getUserName())
                 .build();
+    }
+
+    /**
+     * 특정 게시물의 댓글 리스트
+     *
+     * @param boardId
+     * @return 특정 게시물의 댓글들을 dto에 담아 리스트로 보냄
+     */
+    @Override
+    public List<CommentResponseDTO> listComment(Long boardId) {
+
+        List<Comment> comments = commentRepository.findByBoard_BoardId(boardId);
+
+        // Comment 객체들을 CommentResponseDTO로 변환
+        return comments.stream()
+                .sorted(Comparator.comparing(Comment::getCommUpdate).reversed()) // 최신순 정렬
+                .map(this::convertCommentToCommentResponseDTO)
+                .collect(Collectors.toList()); // .toList() 대신 사용 가능
     }
 }

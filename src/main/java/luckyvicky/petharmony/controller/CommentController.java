@@ -9,6 +9,8 @@ import luckyvicky.petharmony.service.CommentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @Log4j2
@@ -41,5 +43,15 @@ public class CommentController {
     public ResponseEntity<String> deleteComment(@RequestParam Long userId, @RequestParam Long commId) {
         commentService.deleteComment(userId, commId);
         return ResponseEntity.ok("댓글삭제완료");
+    }
+
+    @GetMapping("/list")
+    public ResponseEntity<List<CommentResponseDTO>> listComment(@RequestParam Long boardId) {
+        List<CommentResponseDTO> commentResponseDTOList = commentService.listComment(boardId);
+        if (commentService.listComment(boardId) == null) {
+            return ResponseEntity.badRequest().body(null);
+        }else {
+            return ResponseEntity.ok(commentResponseDTOList);
+        }
     }
 }

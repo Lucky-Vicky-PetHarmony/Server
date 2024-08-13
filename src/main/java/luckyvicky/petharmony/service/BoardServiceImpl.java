@@ -139,7 +139,6 @@ public class BoardServiceImpl implements BoardService {
         //조회수
         if(!board.getUser().getUserId().equals(userId)) {
             board.viewCount();
-            boardRepository.flush();
         }
 
         return getBoardDetailResponseDTO(board);
@@ -191,12 +190,6 @@ public class BoardServiceImpl implements BoardService {
             }
         }
 
-//        if(Objects.equals(categoryFilter, "ALL")) { // 모든 게시물
-//            boardPage = boardRepository.findAll(pageable);
-//        }else { //카테고리 선택한 경우
-//            boardPage = boardRepository.findByCategory(Category.valueOf(categoryFilter), pageable);
-//        }
-
         // Board 엔티티를 BoardListResponseDTO로 변환
         Page<BoardListResponseDTO> responsePage = boardPage.map(board -> {
             // 댓글 수 조회
@@ -227,12 +220,6 @@ public class BoardServiceImpl implements BoardService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
         List<Image> images = imageRepository.findByBoard_BoardId(board.getBoardId());
-        List<Comment> comments = commentRepository.findByBoard_BoardId(board.getBoardId());
-
-        // Comment 객체들을 CommentResponseDTO로 변환
-        List<CommentResponseDTO> commentResponseDTOList = comments.stream()
-                .map(commentService::convertCommentToCommentResponseDTO)
-                .toList();
 
         return BoardDetailResponseDTO.builder()
                 .boardId(board.getBoardId())
@@ -244,9 +231,7 @@ public class BoardServiceImpl implements BoardService {
                 .createTime(board.getBoardCreate().format(formatter))
                 .updateTime(board.getBoardUpdate().format(formatter))
                 .views(board.getView())
-                .commentCount(comments.size())
                 .images(images)
-                .commentList(commentResponseDTOList)
                 .build();
     }
 }

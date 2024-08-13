@@ -35,13 +35,13 @@ public class BoardDetailResponseDTO {
 
     private Integer views; //조회수
 
-    private Integer commentCount; //댓글수
+//    private Integer commentCount; //댓글수
 
     //이미지
     private List<Image> images = new ArrayList<>(); //빈리스트
 
     //댓글
-    private List<CommentResponseDTO> commentList = new ArrayList<>(); //빈리스트
+//    private List<CommentResponseDTO> commentList = new ArrayList<>(); //빈리스트
 
 
 
