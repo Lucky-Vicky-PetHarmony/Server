@@ -80,4 +80,20 @@ public class UserController {
             return ResponseEntity.badRequest().body(null);
         }
     }
+
+    /**
+     * 임시 비밀번호 발송 API 엔드포인트
+     *
+     * @param findPasswordDTO
+     * @return 메시지 반환
+     */
+    @PostMapping("/api/public/send-email")
+    public ResponseEntity<String> sendingEmailToFindPassword(@RequestBody FindPasswordDTO findPasswordDTO) {
+        try {
+            String resultMsg = userService.sendingEmailToFindPassword(findPasswordDTO);
+            return ResponseEntity.ok(resultMsg);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
 }
