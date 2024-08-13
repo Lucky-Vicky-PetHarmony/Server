@@ -20,10 +20,9 @@ import org.springframework.web.client.RestClientException;
 @Service
 public class OpenAiServiceImpl implements OpenAiService {
 
-    // OpenAI API 엔드포인트 URL
-    private static final String OPENAI_API_URL = "https://api.openai.com/v1/engines/davinci/completions";
+    // 최신 OpenAI API 엔드포인트 URL
+    private static final String OPENAI_API_URL = "https://api.openai.com/v1/chat/completions";
 
-    // .env 파일에서 API 키를 로드하여 보안적으로 안전하게 관리
     private final Dotenv dotenv = Dotenv.configure()
             .directory("C:/Users/didek/openai-chatbot")
             .filename(".env")
@@ -33,7 +32,6 @@ public class OpenAiServiceImpl implements OpenAiService {
 
     private final RestTemplate restTemplate;
 
-    // 생성자를 통해 RestTemplate을 주입받아 재사용
     public OpenAiServiceImpl(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
@@ -41,12 +39,12 @@ public class OpenAiServiceImpl implements OpenAiService {
     @Override
     public String analyzeSpecialMark(String specialMark) {
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + openAiApiKey); // OpenAI API 인증
-        headers.set("Content-Type", "application/json"); // 요청 본문이 JSON 형식임을 지정
+        headers.set("Authorization", "Bearer " + openAiApiKey);
+        headers.set("Content-Type", "application/json");
 
-        // 요청 본문을 JSON 형식으로 작성
+        // 요청 본문을 JSON 형식으로 작성 (chat 모델용)
         String requestBody = String.format(
-                "{\"prompt\": \"Analyze the following special mark and provide relevant characteristics: '%s'.\", \"max_tokens\": 50}",
+                "{\"model\": \"gpt-4\", \"messages\": [{\"role\": \"user\", \"content\": \"Analyze the following special mark and provide relevant characteristics: '%s'.\"}], \"max_tokens\": 50}",
                 specialMark
         );
 
@@ -63,7 +61,7 @@ public class OpenAiServiceImpl implements OpenAiService {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode root = objectMapper.readTree(response.getBody());
 
-            return root.path("choices").path(0).path("text").asText();
+            return root.path("choices").path(0).path("message").path("content").asText();
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             throw new RuntimeException("OpenAI API returned an error: " + e.getStatusCode() + " " + e.getResponseBodyAsString(), e);
         } catch (RestClientException e) {
