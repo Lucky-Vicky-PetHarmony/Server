@@ -12,4 +12,6 @@ public interface UserService {
     String sendingNumberToFindId(FindIdDTO findIdDTO);
     // 아이디 찾기 2 - 인증번호 확인
     FindIdResponseDTO checkNumberToFindid(FindIdDTO findIdDTO);
+    // 비밀번호 찾기 (임시 비밀번호 발송)
+    String sendingEmailToFindPassword(FindPasswordDTO findPasswordDTO);
 }

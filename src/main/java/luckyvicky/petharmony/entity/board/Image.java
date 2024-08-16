@@ -1,5 +1,6 @@
 package luckyvicky.petharmony.entity.board;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import luckyvicky.petharmony.entity.User;
@@ -19,6 +20,7 @@ public class Image {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "image_id")
     private Long imageId;                // id
 
     @Column(name = "image_name", length = 2048, nullable = false)
@@ -31,6 +33,7 @@ public class Image {
     private String imageUuid;         // 게시물 파일 uuid
 
 //    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonIgnore //직렬화 무시
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id")
     private Board board;                // 게시판 테이블

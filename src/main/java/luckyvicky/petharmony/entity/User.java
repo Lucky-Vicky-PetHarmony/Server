@@ -50,4 +50,8 @@ public class User {
     @Column(name = "user_state", nullable = false)
     private UserState userState;                  // 회원 상태 (ACTIVE, BANNED)
 
+    // 비밀번호 변경
+    public void updatePassword(String password) {
+        this.password = password;
+    }
 }

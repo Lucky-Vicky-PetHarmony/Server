@@ -41,17 +41,23 @@ public class Board {
     private LocalDateTime boardUpdate;   // 게시물 업데이트 날짜
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING) //카테고리 이름을 그대로 저장
     private Category category;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;                  // 유저 테이블
 
-    // Board엔티티에서 Comment에 접근(게시물에 작성된 댓글 조회)
-    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Comment> comments;
+    @OneToMany(mappedBy = "board", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments;  // 댓글 리스트
 
-    // Board엔티티에서 Image에 접근(게시물에 작성된 첨부파일 조회)
-    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Image> images;
+    public void viewCount() {
+        this.view++;
+    }
+
+    public void updateBoard(String newContent, String newTitle, Category category) {
+        this.boardContent = newContent;
+        this.boardTitle = newTitle;
+        this.category = category;
+    }
 }
