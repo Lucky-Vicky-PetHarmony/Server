@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import luckyvicky.petharmony.entity.User;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
@@ -50,6 +51,9 @@ public class Board {
 
     @OneToMany(mappedBy = "board", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;  // 댓글 리스트
+
+    @Formula("(select count(*) from comment c where c.board_id = board_id)")
+    private int commentCount;
 
     public void viewCount() {
         this.view++;
