@@ -28,7 +28,7 @@ while True:
     # 쿼리 파라미터 설정
     queryParams = '?' + parse.quote_plus("serviceKey") + '=' + key + '&' + parse.urlencode({
         parse.quote_plus('bgnde'): '20240101',  # 검색 시작일
-        parse.quote_plus('endde'): '20240811',  # 검색 종료일
+        parse.quote_plus('endde'): '20240817',  # 검색 종료일
         parse.quote_plus('pageNo'): str(page_no),
         parse.quote_plus('numOfRows'): '1000',  # 한 번에 가져올 데이터 수
         parse.quote_plus('_type'): 'xml'

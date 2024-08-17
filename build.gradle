@@ -52,6 +52,9 @@ dependencies {
 
 	// OpenAi키를 활용하기 위한 dotenv
 	implementation 'io.github.cdimascio:dotenv-java:3.0.0'
+
+	// test단위 테스트
+	implementation 'org.mockito:mockito-core:5.7.0'
 }
 
 tasks.named('test') {
