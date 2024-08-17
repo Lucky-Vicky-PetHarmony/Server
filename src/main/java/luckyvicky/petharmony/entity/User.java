@@ -2,8 +2,6 @@ package luckyvicky.petharmony.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import luckyvicky.petharmony.entity.board.Board;
-import luckyvicky.petharmony.entity.board.Comment;
 import luckyvicky.petharmony.security.Role;
 import luckyvicky.petharmony.security.UserState;
 import org.hibernate.annotations.CreationTimestamp;
@@ -49,6 +47,9 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(name = "user_state", nullable = false)
     private UserState userState;                  // 회원 상태 (ACTIVE, BANNED)
+
+    @Column(name = "kakao_id")
+    private Long kakaoId;                         // 카카오 회원 ID
 
     // 비밀번호 변경
     public void updatePassword(String password) {

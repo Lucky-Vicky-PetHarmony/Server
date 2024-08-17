@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @RestController
 @RequiredArgsConstructor
 @Log4j2
@@ -19,7 +21,7 @@ public class UserController {
     /**
      * 회원가입 API 엔드 포인트
      *
-     * @param  signUpDTO
+     * @param signUpDTO
      * @return 성공 시, "PetHarmony에 오신걸 환영합니다."
      */
     @PostMapping("/api/public/signUp")
@@ -36,7 +38,7 @@ public class UserController {
      * 로그인 API 엔드 포인트
      *
      * @param logInDTO
-     * @return LoginResponseDTO(jwtToken, userName(email), role)
+     * @return LoginResponseDTO(jwtToken, userName ( email), role)
      */
     @PostMapping("/api/public/login")
     public ResponseEntity<LoginResponseDTO> login(@RequestBody LogInDTO logInDTO) {
@@ -95,5 +97,27 @@ public class UserController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(null);
         }
+    }
+
+    /**
+     * 카카오 로그인 API 엔드 포인트
+     *
+     * @param payload
+     * @return KakaoLogInResponseDTO
+     */
+    @PostMapping("api/public/kakao")
+    public ResponseEntity<KakaoLogInResponseDTO> kakaoLogin(@RequestBody Map<String, String> payload) {
+        String accessToken = payload.get("accessToken");
+        KakaoInfoDTO kakoInfoDTO = userService.getUserInfoFromKakao(accessToken);
+
+        userService.kakaoLogin(kakoInfoDTO);
+
+        KakaoLogInResponseDTO response = new KakaoLogInResponseDTO(
+                true,
+                kakoInfoDTO.getKakao_account().getEmail(),
+                kakoInfoDTO.getKakao_account().getName()
+        );
+
+        return ResponseEntity.ok(response);
     }
 }

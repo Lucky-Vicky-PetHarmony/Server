@@ -1,5 +1,7 @@
 package luckyvicky.petharmony.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -15,11 +17,14 @@ import luckyvicky.petharmony.security.UserState;
 import luckyvicky.petharmony.util.EmailUtil;
 import luckyvicky.petharmony.util.SmsUtil;
 import net.nurigo.sdk.message.response.SingleMessageSentResponse;
+import org.springframework.http.*;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.Optional;
 
@@ -198,6 +203,85 @@ public class UserServiceImpl implements UserService {
             return "임시 비밀번호가 이메일로 발송되었습니다.";
         } else {
             return "가입되지 않은 이메일입니다.";
+        }
+    }
+
+    /**
+     * 카카오로부터 사용자 정보 조회
+     * <p>
+     * 주어진 액세스 토큰을 사용하여 카카오 API를 호출하고, 사용자의 정보를 가져옵니다.
+     * 응답이 성공적으로 이루어지면 해당 정보를 KakaoInfoDTO 객체로 반환합니다.
+     *
+     * @param accessToken 카카오 API 호출에 사용할 액세스 토큰
+     * @return KakaoInfoDTO 카카오 사용자 정보가 담긴 객체
+     * @throws RuntimeException 카카오 API 호출 실패 또는 응답 처리 중 오류 발생 시
+     */
+    @Override
+    public KakaoInfoDTO getUserInfoFromKakao(String accessToken) {
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + accessToken);
+
+        HttpEntity<String> entity = new HttpEntity<>("", headers);
+        ResponseEntity<String> response;
+
+        try {
+            response = restTemplate.exchange(
+                    "https://kapi.kakao.com/v2/user/me",
+                    HttpMethod.GET,
+                    entity,
+                    String.class
+            );
+        } catch (HttpClientErrorException e) {
+            throw new RuntimeException("카카오 API 호출에 실패했습니다: " + e.getMessage());
+        }
+
+        if (response.getStatusCode() != HttpStatus.OK) {
+            throw new RuntimeException("카카오 API 응답 상태가 좋지 않습니다: " + response.getStatusCode());
+        }
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        KakaoInfoDTO userInfo;
+        try {
+            userInfo = objectMapper.readValue(response.getBody(), KakaoInfoDTO.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("카카오 API 응답을 처리하는 중 오류가 발생했습니다: " + e.getMessage());
+        }
+
+        return userInfo;
+    }
+
+    /**
+     * 카카오 로그인 처리
+     * <p>
+     * 카카오 사용자 정보(KakaoInfoDTO)를 사용하여 로그인 처리를 합니다.
+     * 이미 등록된 카카오 사용자가 있으면 해당 사용자 정보를 반환하고,
+     * 그렇지 않으면 새로운 사용자를 생성하여 저장 후 반환합니다.
+     *
+     * @param kakaoInfoDTO 카카오에서 제공된 사용자 정보가 담긴 DTO
+     * @return User 생성되었거나 기존에 존재하는 사용자 엔티티 객체
+     */
+    @Override
+    public User kakaoLogin(KakaoInfoDTO kakaoInfoDTO) {
+        KakaoAccountDTO account = kakaoInfoDTO.getKakao_account();
+
+        Optional<User> existingUser = userRepository.findByKakaoId(kakaoInfoDTO.getId());
+
+        if (existingUser.isPresent()) {
+            log.info("Kakao ID {}로 이미 등록된 사용자입니다. 로그인 처리를 진행합니다.", kakaoInfoDTO.getId());
+            return existingUser.get();
+        } else {
+            User user = User.builder()
+                    .userName(account.getName())
+                    .email(account.getEmail())
+                    .password("kakao_password")
+                    .phone(account.getPhone_number())
+                    .role(Role.USER)
+                    .userState(UserState.ACTIVE)
+                    .kakaoId(kakaoInfoDTO.getId())
+                    .build();
+
+            return userRepository.save(user);
         }
     }
 }

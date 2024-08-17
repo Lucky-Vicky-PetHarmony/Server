@@ -14,4 +14,8 @@ public interface UserService {
     FindIdResponseDTO checkNumberToFindid(FindIdDTO findIdDTO);
     // 비밀번호 찾기 (임시 비밀번호 발송)
     String sendingEmailToFindPassword(FindPasswordDTO findPasswordDTO);
+    // 카카오 회원 정보 조회
+    KakaoInfoDTO getUserInfoFromKakao(String accessToken);
+    // 카카오 로그인
+    User kakaoLogin(KakaoInfoDTO kakoInfoDTO);
 }
