@@ -4,7 +4,6 @@ import luckyvicky.petharmony.dto.WordClassificationDTO;
 import luckyvicky.petharmony.entity.PetInfo;
 import luckyvicky.petharmony.repository.PetInfoRepository;
 import luckyvicky.petharmony.service.openapi.OpenAiService;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,19 +26,17 @@ public class PetInfoWordService {
 
     /**
      * PetInfoWordService의 생성자
-     * @param petInfoRepository  PetInfo 엔티티와 상호작용하는 리포지토리
-     * @param openAiService      OpenAI API와 통신하는 서비스
+     *
+     * @param petInfoRepository PetInfo 엔티티와 상호작용하는 리포지토리
+     * @param openAiService     OpenAI API와 통신하는 서비스
      */
     public PetInfoWordService(PetInfoRepository petInfoRepository, OpenAiService openAiService) {
         this.petInfoRepository = petInfoRepository;
         this.openAiService = openAiService;
     }
 
-    /**
-     * 모든 PetInfo 레코드를 처리합니다.
-     * 페이징을 사용하여 한 번에 PAGE_SIZE만큼의 레코드를 처리하며,
-     * 각 레코드에 대해 processPetInfo 메서드를 호출하여 처리합니다.
-     */
+    // 기존 코드는 주석처리하여 비활성화
+    /*
     @Transactional
     public void processAllPetInfo() {
         int page = 0;
@@ -52,6 +49,29 @@ public class PetInfoWordService {
             petInfoList.forEach(this::processPetInfo);
             page++;
         } while (resultPage.hasNext());
+    }
+    */
+
+    /**
+     * 상위 5개의 PetInfo 레코드를 처리합니다.
+     */
+    @Transactional
+    public void processTop5PetInfo() {
+        // 상위 5개의 PetInfo 데이터를 가져옴
+        List<PetInfo> top5PetInfoList = petInfoRepository.findAll(PageRequest.of(0, 5)).getContent();
+
+        for (PetInfo petInfo : top5PetInfoList) {
+            // desertionNo가 null인 경우 스킵
+            if (petInfo.getDesertionNo() == null) {
+                continue;
+            }
+
+            // PetInfo 엔티티를 분석하고 업데이트
+            processPetInfo(petInfo);
+
+            // 결과 출력
+            System.out.println("저장된 words 필드 값 (desertionNo: " + petInfo.getDesertionNo() + "): " + petInfo.getWords());
+        }
     }
 
     /**
@@ -85,8 +105,9 @@ public class PetInfoWordService {
 
     /**
      * PetInfo 엔티티를 WordClassificationDTO로 변환합니다.
+     *
      * @param petInfo 변환할 PetInfo 엔티티
-     * @return        변환된 WordClassificationDTO 객체
+     * @return 변환된 WordClassificationDTO 객체
      */
     private WordClassificationDTO convertToDTO(PetInfo petInfo) {
         return new WordClassificationDTO(
@@ -103,7 +124,7 @@ public class PetInfoWordService {
      * 분석 결과는 특정 조건에 따라 다양한 Words로 매핑됩니다.
      *
      * @param dto WordClassificationDTO 객체, 분석할 specialMark 필드를 포함
-     * @return    분석 결과에 따라 선택된 Words들 중 최대 5개의 단어 ID를 콤마로 연결한 문자열
+     * @return 분석 결과에 따라 선택된 Words들 중 최대 5개의 단어 ID를 콤마로 연결한 문자열
      */
     private String analyzeSpecialMark(WordClassificationDTO dto) {
         List<String> wordIds = new ArrayList<>();
@@ -146,39 +167,33 @@ public class PetInfoWordService {
             }
         }
 
-        // special_mark 필드를 OpenAiService를 통해 분석
+// special_mark 필드를 OpenAiService를 통해 분석
         String specialMark = dto.getSpecialMark();
         if (specialMark != null && !specialMark.isEmpty()) {
             String openAiAnalysis = openAiService.analyzeSpecialMark(specialMark);
 
             if (openAiAnalysis != null && !openAiAnalysis.isEmpty()) {
                 // 분석된 결과에 따라 Words 추가
-                if (openAiAnalysis.contains("특별한")) {
-                    wordIds.add("17"); // 특별한
-                }
-                if (openAiAnalysis.contains("내성적인")) {
-                    wordIds.add("10"); // 내성적인
-                }
-                if (openAiAnalysis.contains("순함")) {
-                    wordIds.add("7"); // 순함
-                }
                 if (openAiAnalysis.contains("건강한")) {
                     wordIds.add("1"); // 건강한
                 }
-                if (openAiAnalysis.contains("약한")) {
-                    wordIds.add("2"); // 약한
+                if (openAiAnalysis.contains("회복중인") || openAiAnalysis.contains("약한")) {
+                    wordIds.add("2"); // 회복중인, 약한
                 }
-                if (openAiAnalysis.contains("회복중인")) {
-                    wordIds.add("3"); // 회복중인
+                if (openAiAnalysis.contains("온순한")) {
+                    wordIds.add("3"); // 온순한
                 }
                 if (openAiAnalysis.contains("튼튼한")) {
                     wordIds.add("4"); // 튼튼한
                 }
-                if (openAiAnalysis.contains("호기심많음")) {
-                    wordIds.add("8"); // 호기심많음
+                if (openAiAnalysis.contains("호기심많은")) {
+                    wordIds.add("8"); // 호기심많은
                 }
                 if (openAiAnalysis.contains("사교적인")) {
                     wordIds.add("9"); // 사교적인
+                }
+                if (openAiAnalysis.contains("내성적인")) {
+                    wordIds.add("10"); // 내성적인
                 }
                 if (openAiAnalysis.contains("사랑스러운")) {
                     wordIds.add("15"); // 사랑스러운
@@ -186,19 +201,22 @@ public class PetInfoWordService {
                 if (openAiAnalysis.contains("조용한")) {
                     wordIds.add("16"); // 조용한
                 }
+                if (openAiAnalysis.contains("특별한")) {
+                    wordIds.add("17"); // 특별한
+                }
                 if (openAiAnalysis.contains("독특한")) {
                     wordIds.add("18"); // 독특한
                 }
                 if (openAiAnalysis.contains("일반적인")) {
                     wordIds.add("19"); // 일반적인
                 }
-                if (openAiAnalysis.contains("눈에띄는")) {
-                    wordIds.add("20"); // 눈에띄는
+                if (openAiAnalysis.contains("윤기나는")) {
+                    wordIds.add("20"); // 윤기나는
                 }
             }
         }
 
         // 중복된 단어를 제거하고 최대 5개의 단어만 선택하여 반환
-        return wordIds.stream().distinct().limit(5).collect(Collectors.joining(","));
+        return wordIds.stream().distinct().limit(10).collect(Collectors.joining(","));
     }
 }
