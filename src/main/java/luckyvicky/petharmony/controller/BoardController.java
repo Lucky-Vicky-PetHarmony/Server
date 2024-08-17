@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -106,6 +107,24 @@ public class BoardController {
                 .build();
 
         return boardService.boardList(boardListRequestDTO);
+    }
+
+    /**
+     * 게시글 검색 - 제목, 내용/ 검색어
+     *
+     * @param
+     * @return
+     * @throws
+     */
+    @GetMapping("/search")
+    public Page<BoardListResponseDTO> boardSearch(@RequestParam String category,
+                                                  @RequestParam String sortBy,
+                                                  @RequestParam String keyword,
+                                                  @RequestParam String searchType, // "title" 또는 "content"
+                                                  @RequestParam int page,
+                                                  @RequestParam int size){
+
+        return boardService.boardSearch(category,sortBy, keyword, searchType, page, size);
     }
 
 

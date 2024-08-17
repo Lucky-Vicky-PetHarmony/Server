@@ -68,7 +68,6 @@ public class BoardServiceImpl implements BoardService {
         return getBoardDetailResponseDTO(board);
     }
 
-
     /**
      * 게시물 수정
      *
@@ -190,27 +189,79 @@ public class BoardServiceImpl implements BoardService {
             }
         }
 
-        // Board 엔티티를 BoardListResponseDTO로 변환
-        Page<BoardListResponseDTO> responsePage = boardPage.map(board -> {
-            // 댓글 수 조회
-            int commentCount = commentRepository.countByBoard_BoardId(board.getBoardId());
+        return boardPage.map(this::buildBoardListResponseDTO);
+    }
 
-            // 이미지 유무 조회
-            boolean hasImage = imageRepository.existsByBoard_BoardId(board.getBoardId());
+    /**
+     * @param keyword 검색어
+     * @param searchType 검색타입
+     * @param page
+     * @param size
+     * @return
+     */
+    @Override
+    public Page<BoardListResponseDTO> boardSearch(String category, String sortBy, String keyword, String searchType, int page, int size) {
+        // 정렬 방식 설정(filter)
+        Sort sort;
+        if ("comments".equalsIgnoreCase(sortBy)) {
+            sort = Sort.by(Sort.Direction.DESC, "commentCount");
+        } else if ("views".equalsIgnoreCase(sortBy)) {
+            sort = Sort.by(Sort.Direction.DESC, "view");
+        } else {
+            sort = Sort.by(Sort.Direction.DESC, "boardUpdate"); // 기본 정렬: 최신순
+        }
 
-            return BoardListResponseDTO.builder()
-                            .boardId(board.getBoardId())
-                            .boardTitle(board.getBoardTitle())
-                            .category(board.getCategory())
-                            .viewCount(board.getView())
-                            .commentCount(commentCount)
-                            .image(hasImage)
-                            .boardCreate(board.getBoardCreate().format(formatter))
-                            .boardUpdate(board.getBoardUpdate().format(formatter))
-                            .build();
-                });
+        PageRequest pageRequest = PageRequest.of(page, size, sort);
+        Page<Board> boards;
 
-        return responsePage;
+        // 검색 및 카테고리 필터링 적용
+        if (Objects.equals(category, "ALL")) {
+            if ("title".equals(searchType)) {
+                boards = boardRepository.findByBoardTitleContainingIgnoreCase(keyword, pageRequest);
+            } else if ("content".equals(searchType)) {
+                boards = boardRepository.findByBoardContentContainingIgnoreCase(keyword, pageRequest);
+            } else {
+                boards = boardRepository.findByBoardTitleContainingIgnoreCaseOrBoardContentContainingIgnoreCase(
+                        keyword, keyword, pageRequest);
+            }
+        } else {
+            Category categoryEnum = Category.valueOf(category);
+            log.info("$$$$$$$$$"+categoryEnum);
+            if ("title".equals(searchType)) {
+                boards = boardRepository.findByCategoryAndBoardTitleContainingIgnoreCase(categoryEnum, keyword, pageRequest);
+            } else if ("content".equals(searchType)) {
+                boards = boardRepository.findByCategoryAndBoardContentContainingIgnoreCase(categoryEnum, keyword, pageRequest);
+            } else {
+                boards = boardRepository.findByCategoryAndBoardTitleContainingIgnoreCaseOrBoardContentContainingIgnoreCase(
+                        categoryEnum, keyword, keyword, pageRequest);
+            }
+        }
+
+        return boards.map(this::buildBoardListResponseDTO);
+    }
+
+    /**
+     * Board 엔티티를 BoardListResponseDTO로 변환하는 메서드
+     *
+     * @param board
+     * @return
+     */
+    private BoardListResponseDTO buildBoardListResponseDTO(Board board) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        // 이미지 유무 조회
+        boolean hasImage = imageRepository.existsByBoard_BoardId(board.getBoardId());
+
+        return BoardListResponseDTO.builder()
+                .boardId(board.getBoardId())
+                .boardTitle(board.getBoardTitle())
+                .category(board.getCategory())
+                .viewCount(board.getView())
+                .commentCount(board.getCommentCount())
+                .image(hasImage)
+                .boardCreate(board.getBoardCreate().format(formatter))
+                .boardUpdate(board.getBoardUpdate().format(formatter))
+                .build();
     }
 
 
