@@ -140,7 +140,7 @@ public class BoardController {
     @PostMapping("/pinned")
     public ResponseEntity<String> boardPinned(@RequestBody BoardPinDTO boardPinDTO) throws IOException {
 
-        String pinResponse = boardPinService.boardPinned(boardPinDTO.getPinStatus(),
+        String pinResponse = boardPinService.boardPinned(boardPinDTO.getPinAction(),
                                                          boardPinDTO.getUserId(),
                                                          boardPinDTO.getBoardId());
         if (Objects.equals(pinResponse, "Pin Registration") || Objects.equals(pinResponse, "Pin Canceled")) {

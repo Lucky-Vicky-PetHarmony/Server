@@ -12,5 +12,5 @@ import lombok.NoArgsConstructor;
 public class BoardPinDTO {
     private Long userId;
     private Long boardId;
-    private String pinStatus;
+    private String pinAction;
 }
