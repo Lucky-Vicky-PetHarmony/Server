@@ -58,7 +58,7 @@ public class PetInfoWordService {
     @Transactional
     public void processTop5PetInfo() {
         // 상위 5개의 PetInfo 데이터를 가져옴
-        List<PetInfo> top5PetInfoList = petInfoRepository.findAll(PageRequest.of(0, 10)).getContent();
+        List<PetInfo> top5PetInfoList = petInfoRepository.findAll(PageRequest.of(0, 50)).getContent();
 
         for (PetInfo petInfo : top5PetInfoList) {
             // desertionNo가 null인 경우 스킵
