@@ -68,11 +68,14 @@ public class OpenAiServiceImpl implements OpenAiService {
             // 요청 본문을 JSON 형식으로 작성합니다.
             String requestBody = String.format(
                     "{\"model\": \"gpt-4\", \"messages\": [{\"role\": \"user\", \"content\": " +
-                            "\"다음 특이사항을 분석하여 " +
-                            "\\\"건강한, 회복중인, 온순한, 사나운, 활발한, 차분한, 겁많은, 호기심많은, 사교적인, 내성적인, 예쁜, 귀여운, 멋진, 평범한, 순종적인, 독립적인, 특별한, 독특한, 일반적인, 윤기나는\\\" " +
-                            "중 관련된 특성을 제공하세요: '%s'.\"}], \"max_tokens\": 50}",
+                            "\"제공하는 특이사항을 분석하여 다음의 단어들 중 연관되는 것을 매칭하여 이유와 함께 제공하라. " +
+                            "단, 다음의 단어가 포함 되어있는 경우 분석하지말고 매칭된 키워드로 바로 반환하라" +
+                            "\\\"건강한, 회복중인, 온순한, 사나운, 활발한, 차분한, 겁많은, 호기심많은, 사교적인, 내성적인, 예쁜, 돌봄이 필요한, 멋진, 평범한, 순종적인, 독립적인, 특별한, 독특한, 일반적인, 윤기나는\\\" " +
+                            "특이사항 분석 후 매칭된 단어를 이유와 함께 제공하세요: '%s'.\"}], \"max_tokens\": 50}",
                     sentence.trim()
             );
+
+
 
 
             // HTTP 요청 엔터티를 생성합니다.
@@ -121,10 +124,16 @@ public class OpenAiServiceImpl implements OpenAiService {
      */
     private String categorizeResponse(String response) {
         // 응답에서 특정 키워드를 찾아서 카테고리로 매핑합니다.
-        if (response.contains("온순") || response.contains("활동적")) {
-            return "사교적인";
-        } else if (response.contains("차분한") || response.contains("조용한")) {
-            return "차분한";
+        if (response.contains("크레스티드 게코")) {
+            return "독특한";
+        } else if (response.contains("외상안보임") || response.contains("외상없음") || response.contains("외상 없음")) {
+            return "건강한";
+        } else if (response.contains("털엄킴") || response.contains("엉킴")) {
+            return "돌봄이 필요한";
+        } else if (response.contains("털상태양호")) {
+            return "윤기나는";
+        } else if (response.contains("몸무게 추정") || response.contains("몸무게 추정") || response.contains("색") || response.contains("단미") || response.contains("털때탐")) {
+            return null;
         }
         // 추가적인 카테고리 매핑 로직을 작성할 수 있습니다.
         return response;

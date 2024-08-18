@@ -58,7 +58,7 @@ public class PetInfoWordService {
     @Transactional
     public void processTop5PetInfo() {
         // 상위 5개의 PetInfo 데이터를 가져옴
-        List<PetInfo> top5PetInfoList = petInfoRepository.findAll(PageRequest.of(0, 5)).getContent();
+        List<PetInfo> top5PetInfoList = petInfoRepository.findAll(PageRequest.of(0, 3)).getContent();
 
         for (PetInfo petInfo : top5PetInfoList) {
             // desertionNo가 null인 경우 스킵
@@ -156,7 +156,6 @@ public class PetInfoWordService {
                     wordIds.add("11"); // 예쁜
                     break;
                 case "Q":
-                    wordIds.add("12"); // 귀여운
                     break;
                 case "F":
                     wordIds.add("13"); // 멋진
@@ -167,7 +166,7 @@ public class PetInfoWordService {
             }
         }
 
-// special_mark 필드를 OpenAiService를 통해 분석
+        // special_mark 필드를 OpenAiService를 통해 분석
         String specialMark = dto.getSpecialMark();
         if (specialMark != null && !specialMark.isEmpty()) {
             String openAiAnalysis = openAiService.analyzeSpecialMark(specialMark);
@@ -175,43 +174,58 @@ public class PetInfoWordService {
             if (openAiAnalysis != null && !openAiAnalysis.isEmpty()) {
                 // 분석된 결과에 따라 Words 추가
                 if (openAiAnalysis.contains("건강한")) {
-                    wordIds.add("1"); // 건강한
+                    wordIds.add("1");
                 }
-                if (openAiAnalysis.contains("회복중인") || openAiAnalysis.contains("약한")) {
-                    wordIds.add("2"); // 회복중인, 약한
+                if (openAiAnalysis.contains("회복중인")) {
+                    wordIds.add("2");
                 }
                 if (openAiAnalysis.contains("온순한")) {
-                    wordIds.add("3"); // 온순한
+                    wordIds.add("3");
                 }
                 if (openAiAnalysis.contains("튼튼한")) {
-                    wordIds.add("4"); // 튼튼한
+                    wordIds.add("4");
+                }
+                if (openAiAnalysis.contains("활발한")) {
+                    wordIds.add("5");
+                }
+                if (openAiAnalysis.contains("차분한")) {
+                    wordIds.add("6");
+                }
+                if (openAiAnalysis.contains("겁많은")) {
+                    wordIds.add("7");
                 }
                 if (openAiAnalysis.contains("호기심많은")) {
-                    wordIds.add("8"); // 호기심많은
+                    wordIds.add("8");
                 }
                 if (openAiAnalysis.contains("사교적인")) {
-                    wordIds.add("9"); // 사교적인
+                    wordIds.add("9");
                 }
                 if (openAiAnalysis.contains("내성적인")) {
-                    wordIds.add("10"); // 내성적인
+                    wordIds.add("10");
                 }
-                if (openAiAnalysis.contains("사랑스러운")) {
-                    wordIds.add("15"); // 사랑스러운
+                if (openAiAnalysis.contains("돌봄이 필요한")) {
+                    wordIds.add("12");
                 }
-                if (openAiAnalysis.contains("조용한")) {
-                    wordIds.add("16"); // 조용한
+                if (openAiAnalysis.contains("평범한")) {
+                    wordIds.add("13");
+                }
+                if (openAiAnalysis.contains("순종적인")) {
+                    wordIds.add("15");
+                }
+                if (openAiAnalysis.contains("독립적인")) {
+                    wordIds.add("16");
                 }
                 if (openAiAnalysis.contains("특별한")) {
-                    wordIds.add("17"); // 특별한
+                    wordIds.add("17");
                 }
                 if (openAiAnalysis.contains("독특한")) {
-                    wordIds.add("18"); // 독특한
+                    wordIds.add("18");
                 }
                 if (openAiAnalysis.contains("일반적인")) {
-                    wordIds.add("19"); // 일반적인
+                    wordIds.add("19");
                 }
                 if (openAiAnalysis.contains("윤기나는")) {
-                    wordIds.add("20"); // 윤기나는
+                    wordIds.add("20");
                 }
             }
         }
