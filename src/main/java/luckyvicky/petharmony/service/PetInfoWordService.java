@@ -58,7 +58,7 @@ public class PetInfoWordService {
     @Transactional
     public void processTop5PetInfo() {
         // 상위 5개의 PetInfo 데이터를 가져옴
-        List<PetInfo> top5PetInfoList = petInfoRepository.findAll(PageRequest.of(0, 3)).getContent();
+        List<PetInfo> top5PetInfoList = petInfoRepository.findAll(PageRequest.of(0, 10)).getContent();
 
         for (PetInfo petInfo : top5PetInfoList) {
             // desertionNo가 null인 경우 스킵
@@ -91,6 +91,12 @@ public class PetInfoWordService {
 
         // PetInfo 엔티티를 DTO로 변환
         WordClassificationDTO dto = convertToDTO(petInfo);
+
+        // Words 열에 이미 데이터가 있는 경우, OpenAI 호출을 건너뜀
+        if (petInfo.getWords() != null && !petInfo.getWords().isEmpty()) {
+            System.out.println("words 필드에 이미 데이터가 있습니다. OpenAI 호출을 건너뜁니다.");
+            return;
+        }
 
         // 특성(specialMark)을 분석하여 관련된 Words를 결정
         String analyzedWords = analyzeSpecialMark(dto);
@@ -129,43 +135,6 @@ public class PetInfoWordService {
     private String analyzeSpecialMark(WordClassificationDTO dto) {
         List<String> wordIds = new ArrayList<>();
 
-        // 나이에 따른 분류
-        String age = dto.getAge();
-        if (age != null) {
-            if (age.contains("60일미만")) {
-                wordIds.add("5"); // 활발한
-            } else {
-                // 연도 추출 후 최근 연도 판단
-                String yearString = age.replaceAll("[^0-9]", ""); // 숫자만 추출
-                if (!yearString.isEmpty()) {
-                    int year = Integer.parseInt(yearString);
-                    if (year >= 2018) {
-                        wordIds.add("5"); // 활발한 (2018년 이후)
-                    } else {
-                        wordIds.add("6"); // 차분한 (2017년 이전)
-                    }
-                }
-            }
-        }
-
-        // 성별에 따른 분류
-        String sexCd = dto.getSexCd();
-        if (sexCd != null) {
-            switch (sexCd) {
-                case "M":
-                    wordIds.add("11"); // 예쁜
-                    break;
-                case "Q":
-                    break;
-                case "F":
-                    wordIds.add("13"); // 멋진
-                    break;
-                default:
-                    // 성별 코드가 예상치 못한 경우 아무 값도 추가하지 않음
-                    break;
-            }
-        }
-
         // special_mark 필드를 OpenAiService를 통해 분석
         String specialMark = dto.getSpecialMark();
         if (specialMark != null && !specialMark.isEmpty()) {
@@ -203,11 +172,17 @@ public class PetInfoWordService {
                 if (openAiAnalysis.contains("내성적인")) {
                     wordIds.add("10");
                 }
+                if (openAiAnalysis.contains("예쁜")) {
+                    wordIds.add("11");
+                }
                 if (openAiAnalysis.contains("돌봄이 필요한")) {
                     wordIds.add("12");
                 }
                 if (openAiAnalysis.contains("평범한")) {
                     wordIds.add("13");
+                }
+                if (openAiAnalysis.contains("멋진")) {
+                    wordIds.add("14");
                 }
                 if (openAiAnalysis.contains("순종적인")) {
                     wordIds.add("15");

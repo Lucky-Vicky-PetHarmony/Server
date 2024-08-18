@@ -67,16 +67,12 @@ public class OpenAiServiceImpl implements OpenAiService {
 
             // 요청 본문을 JSON 형식으로 작성합니다.
             String requestBody = String.format(
-                    "{\"model\": \"gpt-4\", \"messages\": [{\"role\": \"user\", \"content\": " +
-                            "\"제공하는 특이사항을 분석하여 다음의 단어들 중 연관되는 것을 매칭하여 이유와 함께 제공하라. " +
-                            "단, 다음의 단어가 포함 되어있는 경우 분석하지말고 매칭된 키워드로 바로 반환하라" +
+                    "{\"model\": \"gpt-4o-mini\", \"messages\": [{\"role\": \"user\", \"content\": " +
+                            "\"단, 다음의 단어가 포함 되어있는 경우 분석하지말고 매칭된 키워드로 바로 반환" +
                             "\\\"건강한, 회복중인, 온순한, 사나운, 활발한, 차분한, 겁많은, 호기심많은, 사교적인, 내성적인, 예쁜, 돌봄이 필요한, 멋진, 평범한, 순종적인, 독립적인, 특별한, 독특한, 일반적인, 윤기나는\\\" " +
-                            "특이사항 분석 후 매칭된 단어를 이유와 함께 제공하세요: '%s'.\"}], \"max_tokens\": 50}",
+                            "특이사항 분석 후 매칭된 단어 반환: '%s'.\"}], \"max_tokens\": 50}",
                     sentence.trim()
             );
-
-
-
 
             // HTTP 요청 엔터티를 생성합니다.
             HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
