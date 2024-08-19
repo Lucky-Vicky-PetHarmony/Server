@@ -3,6 +3,7 @@ package luckyvicky.petharmony.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import luckyvicky.petharmony.dto.board.BoardPinResponseDTO;
 import luckyvicky.petharmony.entity.User;
 import luckyvicky.petharmony.entity.board.Board;
 import luckyvicky.petharmony.entity.board.BoardPin;
@@ -31,7 +32,7 @@ public class BoardPinServiceImpl implements BoardPinService {
      * @param boardId 좋아요 당한 게시물
      */
     @Override
-    public String boardPinned(String pinStatus, Long userId, Long boardId) {
+    public BoardPinResponseDTO boardPinned(String pinStatus, Long userId, Long boardId) {
         Board board = boardRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("유효하지않은 user"));
         User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("유효하지않은 board"));
 
@@ -42,17 +43,24 @@ public class BoardPinServiceImpl implements BoardPinService {
                     .user(user)
                     .build();
             boardPinRepository.save(boardPin);
-            return "Pin Registration";
+            return BoardPinResponseDTO.builder()
+                    .boardId(boardPin.getBoard().getBoardId())
+                    .pinStatus(true)
+                    .build();
         }
         // 게시물 좋아요 취소
         else if (Objects.equals(pinStatus, "unlike") && board != null && user != null) {
-            BoardPin boardPin = boardPinRepository.findByBoard_BoardIdAndUser_UserId(boardId, userId).orElseThrow(() -> new IllegalArgumentException("유효하지않은 boardPin"));
-            if(boardPin != null) {
-                boardPinRepository.delete(boardPin);
-            }
-            return "Pin Canceled";
-        }else {
-            return "Board Pinning Error";
+            BoardPin boardPin = boardPinRepository.findByBoard_BoardIdAndUser_UserId(boardId, userId)
+                    .orElseThrow(() -> new IllegalArgumentException("유효하지않은 boardPin"));
+            boardPinRepository.delete(boardPin);
+            return BoardPinResponseDTO.builder()
+                    .boardId(boardPin.getBoard().getBoardId())
+                    .pinStatus(false)
+                    .build();
+        }
+        //예외
+        else {
+            throw new IllegalArgumentException("유효하지 않은 요청입니다: pinStatus = " + pinStatus);
         }
     }
 }

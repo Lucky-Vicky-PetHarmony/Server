@@ -1,6 +1,8 @@
 package luckyvicky.petharmony.service;
 
+import luckyvicky.petharmony.dto.board.BoardPinResponseDTO;
+
 public interface BoardPinService {
 
-    String boardPinned(String pinStatus, Long userId, Long boardId);
+    BoardPinResponseDTO boardPinned(String pinStatus, Long userId, Long boardId);
 }

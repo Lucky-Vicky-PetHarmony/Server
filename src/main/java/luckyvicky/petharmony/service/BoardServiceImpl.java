@@ -6,19 +6,14 @@ import lombok.extern.log4j.Log4j2;
 import luckyvicky.petharmony.dto.board.*;
 import luckyvicky.petharmony.dto.comment.CommentResponseDTO;
 import luckyvicky.petharmony.entity.User;
-import luckyvicky.petharmony.entity.board.Board;
-import luckyvicky.petharmony.entity.board.Category;
-import luckyvicky.petharmony.entity.board.Comment;
-import luckyvicky.petharmony.entity.board.Image;
-import luckyvicky.petharmony.repository.BoardRepository;
-import luckyvicky.petharmony.repository.CommentRepository;
-import luckyvicky.petharmony.repository.ImageRepository;
-import luckyvicky.petharmony.repository.UserRepository;
+import luckyvicky.petharmony.entity.board.*;
+import luckyvicky.petharmony.repository.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
@@ -36,8 +31,7 @@ public class BoardServiceImpl implements BoardService {
     private final ImageService imageService;
     private final ImageRepository imageRepository;
     private final CommentRepository commentRepository;
-
-    private final CommentService commentService;
+    private final BoardPinRepository boardPinRepository;
 
 
     /**
@@ -65,7 +59,7 @@ public class BoardServiceImpl implements BoardService {
         if (boardPostDTO.getImages() != null && !boardPostDTO.getImages().isEmpty()) {
             imageService.addImage(board, boardPostDTO.getImages());
         }
-        return getBoardDetailResponseDTO(board);
+        return getBoardDetailResponseDTO(userId, board);
     }
 
     /**
@@ -97,7 +91,7 @@ public class BoardServiceImpl implements BoardService {
             imageService.addImage(board, boardUpdateDTO.getUpdateImages());
         }
 
-        return getBoardDetailResponseDTO(board);
+        return getBoardDetailResponseDTO(board.getUser().getUserId(), board);
     }
 
     /**
@@ -140,53 +134,27 @@ public class BoardServiceImpl implements BoardService {
             board.viewCount();
         }
 
-        return getBoardDetailResponseDTO(board);
+        return getBoardDetailResponseDTO(userId, board);
     }
 
     /**
      * 게시물 리스트 조회
-     *
-     * @param boardListRequestDTO
-     * @return
      */
     @Override
-    public Page<BoardListResponseDTO> boardList(BoardListRequestDTO boardListRequestDTO) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    public Page<BoardListResponseDTO> boardList(String category, String sortBy, int page, int size) {
 
-        // 기본적으로 날짜 기준으로 내림차순 정렬
-        Sort sort = Sort.by(Sort.Direction.ASC, "boardUpdate");
+        //정렬
+        Sort sort = getSortBy(sortBy);
 
         // Pageable 객체 생성
-        Pageable pageable = PageRequest.of(
-                boardListRequestDTO.getPage(), //요청페이지
-                boardListRequestDTO.getSize(), //
-                sort
-        );
-
-        // 카테고리 필터링을 위한 조건을 생성
-        String categoryFilter = boardListRequestDTO.getCategory();
+        Pageable pageable = PageRequest.of(page, size, sort);
         Page<Board> boardPage;
 
-        // 정렬 기준에 따라 다른 쿼리를 사용
-        if ("comments".equalsIgnoreCase(boardListRequestDTO.getSortBy())) {
-            if (Objects.equals(categoryFilter, "ALL")) {
-                boardPage = boardRepository.findAllOrderByCommentCountDesc(pageable);
-            } else {
-                boardPage = boardRepository.findByCategoryOrderByCommentCountDesc(Category.valueOf(categoryFilter), pageable);
-            }
-        } else if ("views".equalsIgnoreCase(boardListRequestDTO.getSortBy())) {
-            if (Objects.equals(categoryFilter, "ALL")) {
-                boardPage = boardRepository.findAllOrderByViewDesc(pageable);
-            } else {
-                boardPage = boardRepository.findByCategoryOrderByViewDesc(Category.valueOf(categoryFilter), pageable);
-            }
+        // 검색 및 카테고리 필터링 적용
+        if (Objects.equals(category, "ALL")) {
+            boardPage = boardRepository.findAll(pageable);
         } else {
-            // 기본적으로 날짜 기준으로 정렬
-            if (Objects.equals(categoryFilter, "ALL")) {
-                boardPage = boardRepository.findAllOrderByBoardUpdateDesc(pageable);
-            } else {
-                boardPage = boardRepository.findByCategoryOrderByBoardUpdateDesc(Category.valueOf(categoryFilter), pageable);
-            }
+            boardPage = boardRepository.findByCategory(Category.valueOf(category), pageable);
         }
 
         return boardPage.map(this::buildBoardListResponseDTO);
@@ -201,16 +169,11 @@ public class BoardServiceImpl implements BoardService {
      */
     @Override
     public Page<BoardListResponseDTO> boardSearch(String category, String sortBy, String keyword, String searchType, int page, int size) {
-        // 정렬 방식 설정(filter)
-        Sort sort;
-        if ("comments".equalsIgnoreCase(sortBy)) {
-            sort = Sort.by(Sort.Direction.DESC, "commentCount");
-        } else if ("views".equalsIgnoreCase(sortBy)) {
-            sort = Sort.by(Sort.Direction.DESC, "view");
-        } else {
-            sort = Sort.by(Sort.Direction.DESC, "boardUpdate"); // 기본 정렬: 최신순
-        }
 
+        //정렬
+        Sort sort = getSortBy(sortBy);
+
+        // Pageable 객체 생성
         PageRequest pageRequest = PageRequest.of(page, size, sort);
         Page<Board> boards;
 
@@ -226,7 +189,6 @@ public class BoardServiceImpl implements BoardService {
             }
         } else {
             Category categoryEnum = Category.valueOf(category);
-            log.info("$$$$$$$$$"+categoryEnum);
             if ("title".equals(searchType)) {
                 boards = boardRepository.findByCategoryAndBoardTitleContainingIgnoreCase(categoryEnum, keyword, pageRequest);
             } else if ("content".equals(searchType)) {
@@ -261,13 +223,30 @@ public class BoardServiceImpl implements BoardService {
                 .image(hasImage)
                 .boardCreate(board.getBoardCreate().format(formatter))
                 .boardUpdate(board.getBoardUpdate().format(formatter))
+                .pinCount(board.getPinCount())
                 .build();
+    }
+
+    // 정렬 방식 설정(filter)
+    private Sort getSortBy(String sortBy) {
+        if ("comments".equalsIgnoreCase(sortBy)) {
+            return Sort.by(Sort.Direction.DESC, "commentCount"); //댓글순
+        } else if ("views".equalsIgnoreCase(sortBy)) {
+            return Sort.by(Sort.Direction.DESC, "view"); //조회순
+        } else if ("pin".equalsIgnoreCase(sortBy)) {
+            return Sort.by(Sort.Direction.DESC, "pinCount"); //좋아요순
+        } else {
+            return Sort.by(Sort.Direction.DESC, "boardUpdate"); // 기본 정렬: 최신순
+        }
     }
 
 
     // board엔티티를 클라이언트 응답할 DTO로 변환
-    private BoardDetailResponseDTO getBoardDetailResponseDTO(Board board) {
-        User user = board.getUser();
+    private BoardDetailResponseDTO getBoardDetailResponseDTO(Long userId, Board board) {
+        //조회하는 사람이 게시물에 좋아요 눌렀는지 여부
+        BoardPin boardPin = boardPinRepository.findByBoard_BoardIdAndUser_UserId(board.getBoardId(), userId).orElse(null);
+
+        User user = board.getUser(); //게시글 작성자
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
         List<Image> images = imageRepository.findByBoard_BoardId(board.getBoardId());
@@ -283,6 +262,7 @@ public class BoardServiceImpl implements BoardService {
                 .updateTime(board.getBoardUpdate().format(formatter))
                 .views(board.getView())
                 .images(images)
+                .pinStatus(boardPin != null)
                 .build();
     }
 }

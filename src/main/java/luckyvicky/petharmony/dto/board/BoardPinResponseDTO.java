@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BoardDetailRequestDTO {
-    private Long userId; //로그인 한 유저
+public class BoardPinResponseDTO {
     private Long boardId;
+    private Boolean pinStatus;
 }

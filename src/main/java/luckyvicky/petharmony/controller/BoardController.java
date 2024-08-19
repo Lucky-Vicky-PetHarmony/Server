@@ -102,14 +102,7 @@ public class BoardController {
                                                 @RequestParam int page,
                                                 @RequestParam int size){
 
-        BoardListRequestDTO boardListRequestDTO = BoardListRequestDTO.builder()
-                .category(category)
-                .sortBy(sortBy)
-                .page(page)
-                .size(size)
-                .build();
-
-        return boardService.boardList(boardListRequestDTO);
+        return boardService.boardList(category, sortBy, page, size);
     }
 
     /**
@@ -138,14 +131,14 @@ public class BoardController {
      * @throws IOException 입출력 예외 발생 시 던지는 예외
      */
     @PostMapping("/pinned")
-    public ResponseEntity<String> boardPinned(@RequestBody BoardPinDTO boardPinDTO) throws IOException {
+    public ResponseEntity<BoardPinResponseDTO> boardPinned(@RequestBody BoardPinDTO boardPinDTO) throws IOException {
 
-        String pinResponse = boardPinService.boardPinned(boardPinDTO.getPinAction(),
+        BoardPinResponseDTO boardPinResponseDTO = boardPinService.boardPinned(boardPinDTO.getPinAction(),
                                                          boardPinDTO.getUserId(),
                                                          boardPinDTO.getBoardId());
-        if (Objects.equals(pinResponse, "Pin Registration") || Objects.equals(pinResponse, "Pin Canceled")) {
-            return ResponseEntity.ok(pinResponse);
-        } else{
+        if(boardPinResponseDTO!=null){
+            return ResponseEntity.ok(boardPinResponseDTO);
+        }else {
             return ResponseEntity.badRequest().build();
         }
     }

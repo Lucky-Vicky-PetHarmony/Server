@@ -55,6 +55,9 @@ public class Board {
     @Formula("(select count(*) from comment c where c.board_id = board_id)")
     private int commentCount;
 
+    @Formula("(select count(*) from board_pin bc where bc.board_id = board_id)")
+    private int pinCount;
+
     public void viewCount() {
         this.view++;
     }
