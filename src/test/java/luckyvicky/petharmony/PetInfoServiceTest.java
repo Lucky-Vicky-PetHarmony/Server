@@ -3,6 +3,7 @@ package luckyvicky.petharmony;
 import luckyvicky.petharmony.entity.PetInfo;
 import luckyvicky.petharmony.entity.User;
 import luckyvicky.petharmony.repository.PetInfoRepository;
+import luckyvicky.petharmony.repository.UserWordRepository;
 import luckyvicky.petharmony.service.PetInfoService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.Mockito.when;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -22,24 +24,22 @@ public class PetInfoServiceTest {
 
     @Mock
     private PetInfoRepository petInfoRepository;
-
+    @Mock
+    private UserWordRepository userWordRepository;
     @InjectMocks
     private PetInfoService petInfoService;
 
-    private User testUser;
+    private Long testUserId = 27L;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this); // Mock 객체 초기화
-        testUser = new User();
-        testUser.setUserId(27L);
-        testUser.setUserName("Test User");
-        testUser.setEmail("testuser@example.com");
+        MockitoAnnotations.openMocks(this); // Mock객체 초기화
     }
 
     @Test
     public void testGetTop12PetInfosByUserWord() {
-        // Mock 데이터를 준비
+
+        List<Long> mockWordIds = List.of(1L, 3L, 5L, 20L);
         List<PetInfo> mockPetInfos = new ArrayList<>();
         PetInfo petInfo1 = new PetInfo();
         petInfo1.setDesertionNo("123456789");
@@ -51,12 +51,16 @@ public class PetInfoServiceTest {
         petInfo2.setWords("활발한, 사교적인");
         mockPetInfos.add(petInfo2);
 
-        // Mocking: petInfoRepository.findTop12ByUserWord 호출 시 mockPetInfos 반환
-        when(petInfoRepository.findTop12ByUserWord(any(User.class), any(PageRequest.class)))
+        // Mocking: userWordRepository.findWordIdsByUserId 호출 시 mockWordIds반환
+        when(userWordRepository.findWordIdsByUserId(any(Long.class)))
+                .thenReturn(mockWordIds);
+
+        // Mocking: petInfoRepository.findTop12ByWordIds 호출 시 mockPetInfos반화
+        when(petInfoRepository.findTop12ByWordIds(any(List.class), any(PageRequest.class)))
                 .thenReturn(mockPetInfos);
 
         // 실제 테스트 수행
-        List<PetInfo> petInfos = petInfoService.getTop12PetInfosByUserWord(testUser);
+        List<PetInfo> petInfos = petInfoService.getTop12PetInfosByUserWord(testUserId);
 
         // 검증: 반환된 결과가 예상과 일치하는지 확인
         assertThat(petInfos).isNotNull();

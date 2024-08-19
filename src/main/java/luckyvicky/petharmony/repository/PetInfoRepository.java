@@ -3,6 +3,7 @@ package luckyvicky.petharmony.repository;
 import luckyvicky.petharmony.dto.WordClassificationDTO;
 import luckyvicky.petharmony.entity.PetInfo;
 import luckyvicky.petharmony.entity.User;
+import luckyvicky.petharmony.entity.UserWord;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -36,17 +37,10 @@ public interface PetInfoRepository extends JpaRepository<PetInfo, String> {
 
     /**
      * 사용자가 선택한 단어에 매칭되는 PetInfo를 가져오는 쿼리
-     * UserWord와 연관된 단어가 PetInfo의 words 필드에 포함된 경우를 찾아 PetInfo를 단어 매칭 수에 따라 내림차순으로 정렬
-     * 동일한 매칭 수의 경우 발생일자(happen_dt) 기준으로 최신순으로 정렬
-     *
-     * @param user      현재 로그인된 사용자
-     * @param pageable  페이징 요청 (상위 12개의 결과만 가져오기 위함)
-     * @return          사용자가 선택한 단어와 매칭된 상위 12개의 PetInfo 리스트
+     * UserWord와 연관된 단어가 PetInfo의 words 필드에 포함된 경우를 찾아 PetInfo를 반환
      */
     @Query("SELECT p FROM PetInfo p " +
-            "JOIN UserWord uw ON p.words LIKE CONCAT('%', uw.word.wordSelect, '%') " +
-            "WHERE uw.userId = :userId " +
-            "GROUP BY p " +
-            "ORDER BY COUNT(uw.word.wordId) DESC, p.happenDt DESC")
-    List<PetInfo> findTop12ByUserWord(@Param("user") User user, Pageable pageable);
+            "WHERE p.words IN :wordIds " +
+            "ORDER BY SIZE(p.words) DESC, p.happenDt DESC")
+    List<PetInfo> findTop12ByWordIds(@Param("wordIds") List<Long> wordIds, Pageable pageable);
 }
