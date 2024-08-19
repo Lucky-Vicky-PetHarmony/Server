@@ -43,24 +43,26 @@ public class BoardPinServiceImpl implements BoardPinService {
                     .user(user)
                     .build();
             boardPinRepository.save(boardPin);
-            return BoardPinResponseDTO.builder()
-                    .boardId(boardPin.getBoard().getBoardId())
-                    .pinStatus(true)
-                    .build();
         }
         // 게시물 좋아요 취소
         else if (Objects.equals(pinStatus, "unlike") && board != null && user != null) {
             BoardPin boardPin = boardPinRepository.findByBoard_BoardIdAndUser_UserId(boardId, userId)
                     .orElseThrow(() -> new IllegalArgumentException("유효하지않은 boardPin"));
             boardPinRepository.delete(boardPin);
-            return BoardPinResponseDTO.builder()
-                    .boardId(boardPin.getBoard().getBoardId())
-                    .pinStatus(false)
-                    .build();
         }
         //예외
         else {
             throw new IllegalArgumentException("유효하지 않은 요청입니다: pinStatus = " + pinStatus);
         }
+
+        boardPinRepository.flush();
+        // Board 엔티티를 다시 불러와서 업데이트된 핀 카운트를 가져옴
+        int updatedPinCount = boardPinRepository.countByBoard_BoardId(boardId);
+
+        return BoardPinResponseDTO.builder()
+                .boardId(board.getBoardId())
+                .pinStatus("like".equals(pinStatus))
+                .pinCount(updatedPinCount) // 업데이트된 핀 카운트를 반영
+                .build();
     }
 }

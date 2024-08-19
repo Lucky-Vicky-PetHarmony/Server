@@ -263,6 +263,7 @@ public class BoardServiceImpl implements BoardService {
                 .views(board.getView())
                 .images(images)
                 .pinStatus(boardPin != null)
+                .pinCount(board.getPinCount())
                 .build();
     }
 }

@@ -38,6 +38,8 @@ public class BoardDetailResponseDTO {
     //이미지
     private List<Image> images = new ArrayList<>(); //빈리스트
 
+    private Integer pinCount; //pin
+
     //좋아요 여부
     private Boolean pinStatus = Boolean.FALSE;
 }

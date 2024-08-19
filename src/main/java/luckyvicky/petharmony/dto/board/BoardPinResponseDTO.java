@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 public class BoardPinResponseDTO {
     private Long boardId;
     private Boolean pinStatus;
+    private Integer pinCount;
 }
