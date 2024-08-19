@@ -23,13 +23,12 @@ public class PetInfoService {
     }
 
     /**
-     * 사용자가 선호하는 단어에 따라 상위 12개의 PetInfo를 반환하는 메서드
+     * 사용자가 선택한 단어에 따라 상위 12개의 PetInfo를 반환하는 메서드
      *
      * @param user 현재 로그인된 사용자
-     * @return     사용자가 선호하는 단어와 매칭된 상위 12개의 PetInfo 리스트
+     * @return     사용자가 선택한 단어와 매칭된 상위 12개의 PetInfo 리스트
      */
     public List<PetInfo> getTop12PetInfosByUserWord(User user) {
-        // PageRequest를 사용하여 항상 상위 12개의 결과만 가져옴
         return petInfoRepository.findTop12ByUserWord(user, PageRequest.of(0, 12));
     }
 }
