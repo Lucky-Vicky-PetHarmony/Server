@@ -29,4 +29,6 @@ public class BoardListResponseDTO {
     private Integer commentCount;
 
     private boolean image; //첨부파일 여부를 보여줌
+
+    private Integer pinCount;
 }

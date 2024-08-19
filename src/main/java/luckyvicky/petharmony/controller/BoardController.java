@@ -5,6 +5,7 @@ import lombok.extern.log4j.Log4j2;
 import luckyvicky.petharmony.dto.board.*;
 import luckyvicky.petharmony.dto.comment.CommentResponseDTO;
 import luckyvicky.petharmony.entity.board.Board;
+import luckyvicky.petharmony.service.BoardPinService;
 import luckyvicky.petharmony.service.BoardService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,6 +22,7 @@ import java.util.List;
 public class BoardController {
 
     private final BoardService boardService;
+    private final BoardPinService boardPinService;
 
     /**
      * 게시글 작성
@@ -99,14 +102,7 @@ public class BoardController {
                                                 @RequestParam int page,
                                                 @RequestParam int size){
 
-        BoardListRequestDTO boardListRequestDTO = BoardListRequestDTO.builder()
-                .category(category)
-                .sortBy(sortBy)
-                .page(page)
-                .size(size)
-                .build();
-
-        return boardService.boardList(boardListRequestDTO);
+        return boardService.boardList(category, sortBy, page, size);
     }
 
     /**
@@ -127,5 +123,23 @@ public class BoardController {
         return boardService.boardSearch(category,sortBy, keyword, searchType, page, size);
     }
 
+    /**
+     * 게시글 좋아요 - 상태에 따라 취소/등록
+     *
+     * @param boardPinDTO 사용자가 좋아요를 누른 상태와 게시물 및 사용자 정보를 담고 있는 DTO
+     * @return 상태에 따른 처리 결과 메시지 (예: "좋아요가 등록되었습니다.", "좋아요가 취소되었습니다.")
+     * @throws IOException 입출력 예외 발생 시 던지는 예외
+     */
+    @PostMapping("/pinned")
+    public ResponseEntity<BoardPinResponseDTO> boardPinned(@RequestBody BoardPinDTO boardPinDTO) throws IOException {
 
+        BoardPinResponseDTO boardPinResponseDTO = boardPinService.boardPinned(boardPinDTO.getPinAction(),
+                                                         boardPinDTO.getUserId(),
+                                                         boardPinDTO.getBoardId());
+        if(boardPinResponseDTO!=null){
+            return ResponseEntity.ok(boardPinResponseDTO);
+        }else {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }

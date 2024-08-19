@@ -21,7 +21,10 @@ public interface BoardService {
     BoardDetailResponseDTO boardDetail(Long userId, Long boardId) throws IOException;
 
     //게시물리스트 조회
-    Page<BoardListResponseDTO> boardList(BoardListRequestDTO boardListRequestDTO);
+    Page<BoardListResponseDTO> boardList(String category,
+                                         String sortBy,
+                                         int page,
+                                         int size);
 
     //게시물 검색
     Page<BoardListResponseDTO> boardSearch(String category, String sortBy, String keyword, String searchType, int page, int size);
