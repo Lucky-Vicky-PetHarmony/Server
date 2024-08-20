@@ -2,6 +2,7 @@ package luckyvicky.petharmony.service;
 
 import luckyvicky.petharmony.dto.user.*;
 import luckyvicky.petharmony.entity.User;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 public interface UserService {
     // 회원가입
@@ -17,5 +18,5 @@ public interface UserService {
     // 카카오 회원 정보 조회
     KakaoInfoDTO getUserInfoFromKakao(String accessToken);
     // 카카오 로그인
-    User kakaoLogin(KakaoInfoDTO kakoInfoDTO);
+    User kakaoLogin(KakaoInfoDTO kakaoInfoDTO);
 }

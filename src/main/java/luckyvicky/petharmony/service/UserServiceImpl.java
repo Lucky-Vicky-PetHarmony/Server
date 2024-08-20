@@ -42,7 +42,7 @@ public class UserServiceImpl implements UserService {
     private final EmailUtil emailUtil;
 
     /**
-     * 회원가입
+     * 자체 회원가입
      * <p>
      * 사용자가 제공한 정보로 새로운 사용자를 생성하고, Role은 기본적으로 USER로 설정됩니다.
      * UserState는 ACTIVE로 설정됩니다.
@@ -58,10 +58,8 @@ public class UserServiceImpl implements UserService {
         if (userRepository.findByEmail(signUpDTO.getEmail()).isPresent()) {
             throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
         }
-
         // 비밀번호 암호화
         String encodedPassword = passwordEncoder.encode(signUpDTO.getPassword());
-
         // User 객체 생성 및 저장
         User user = User.builder()
                 .userName(signUpDTO.getUserName())
@@ -76,7 +74,7 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * 로그인
+     * 자체 로그인
      * <p>
      * 주어진 이메일과 비밀번호를 사용하여 사용자를 인증합니다.
      * 인증이 성공하면 JWT 토큰을 생성하여 반환합니다.
@@ -93,10 +91,9 @@ public class UserServiceImpl implements UserService {
                         logInDTO.getPassword()
                 )
         );
-
+        // 인증된 사용자 정보를 CustomUserDetails로 캐스팅하여 가져옴
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-
-        // 인증 성공 시 JWT 토큰 생성 및 반환
+        // 인증 성공 시 JWT 토큰 생성 및 LoginResponseDTO 반환
         String jwtToken = jwtTokenProvider.generateToken(authentication);
         return LoginResponseDTO.builder()
                 .jwtToken(jwtToken)
@@ -118,13 +115,13 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public String sendingNumberToFindId(FindIdDTO findIdDTO) {
-        // 사용자 확인
+        // 전화번호로 사용자 조회
         Optional<User> optionalUser = userRepository.findByPhone(findIdDTO.getPhone());
-
+        // 사용자가 존재하면 4자리 랜덤 인증번호 생성 -> SMS를 통해 인증번호 전송
         if (optionalUser.isPresent()) {
             String certificationNumber = String.format("%04d", (int) (Math.random() * 10000));
             SingleMessageSentResponse response = smsUtil.sendOne(optionalUser.get().getPhone(), certificationNumber);
-
+            // SMS 전송이 성공하면 인증번호 Certification 엔티티로 저장
             if (response != null && response.getStatusCode().equals("2000")) {
                 Certification certification = Certification.builder()
                         .phone(findIdDTO.getPhone())
@@ -152,11 +149,13 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public FindIdResponseDTO checkNumberToFindid(FindIdDTO findIdDTO) {
+        // findIdDTO의 전화번호를 사용해, 해당 번호로 가장 최근에 생성된 Certification 객체를 조회
         Optional<Certification> optionalCertification = certificationRepository.findTopByPhoneOrderByCreateDateDesc(findIdDTO.getPhone());
-
+        // Certification 객체가 존재하고, 그 인증번호가 사용자가 입력한 인증번호와 일치하는지 확인
         if (optionalCertification.isPresent() && optionalCertification.get().getCertificationNumber().equals(findIdDTO.getCertificationNumber())) {
+            // 전화번호를 사용해 사용자 조회
             Optional<User> optionalUser = userRepository.findByPhone(findIdDTO.getPhone());
-
+            // 사용자가 존재하면 User 객체를 가져와 이메일과 가입날짜를 반환하는 FindIdResponseDTO 객체 반환
             if (optionalUser.isPresent()) {
                 User user = optionalUser.get();
                 return new FindIdResponseDTO(user.getEmail(), user.getCreateDate(), null);
@@ -180,27 +179,28 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public String sendingEmailToFindPassword(FindPasswordDTO findPasswordDTO) {
+        // findPasswordDTO의 이메일을 사용해 사용자 조회
         Optional<User> optionalUser = userRepository.findByEmail(findPasswordDTO.getEmail());
-
+        // 사용자가 존재하면, 임시 비밀번호로 사용할 8자리의 랜덤 숫자 생성
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
             String certificationCode = String.format("%08d", (int) (Math.random() * 100000000));
-
+            // 생성된 임시 비밀번호 암호화
             String encodedPassword = passwordEncoder.encode(certificationCode);
-
+            // User 객체 password 업데이트
             user.updatePassword(encodedPassword);
-
+            // 변경된 사용자 정보 DB에 저장
             userRepository.save(user);
-
+            // 이메일 제목
             String title = "[PetHarmony] 임시 비밀번호 알림";
-
+            // 이메일 내용
             String content = String.format(
                     "안녕하세요. PetHarmony 입니다 🐶" +
                             "\n%s님의 임시 비밀번호는 %s입니다." +
                             "\n임시 비밀번호로 로그인 후 꼭 비밀번호를 재설정 해주시길 바랍니다.",
                     user.getUserName(), certificationCode
             );
-
+            // 작성된 이메일을 사용자의 이메일로 전송
             emailUtil.sendEmail(user.getEmail(), title, content);
             return "임시 비밀번호가 이메일로 발송되었습니다.";
         } else {
@@ -220,13 +220,15 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public KakaoInfoDTO getUserInfoFromKakao(String accessToken) {
+        // RestTemplate 객체를 생성하여 HTTP 요청 준비
         RestTemplate restTemplate = new RestTemplate();
+        // HttpHeaders 객체를 생성하고, 액세스 토큰을 포함한 Authorization 헤더 설정
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + accessToken);
-
+        // HttpEntity 객체를 생성하여 요청에 필요한 헤더 정보를 포함
         HttpEntity<String> entity = new HttpEntity<>("", headers);
         ResponseEntity<String> response;
-
+        // 카카오 API를 호출하여 사용자 정보를 가져온다.
         try {
             response = restTemplate.exchange(
                     "https://kapi.kakao.com/v2/user/me",
@@ -237,11 +239,11 @@ public class UserServiceImpl implements UserService {
         } catch (HttpClientErrorException e) {
             throw new RuntimeException("카카오 API 호출에 실패했습니다: " + e.getMessage());
         }
-
+        // API 응답이 OK(200)이 아닌 경우, 예외 발생
         if (response.getStatusCode() != HttpStatus.OK) {
             throw new RuntimeException("카카오 API 응답 상태가 좋지 않습니다: " + response.getStatusCode());
         }
-
+        // ObjectMapper를 사용해 응답을 KakoInfoDTO 객체로 변환
         ObjectMapper objectMapper = new ObjectMapper();
         KakaoInfoDTO userInfo;
         try {
@@ -265,10 +267,10 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public User kakaoLogin(KakaoInfoDTO kakaoInfoDTO) {
+        // KakoInfoDTO에서 KakaoAccountDTO 객체를 가져온다.
         KakaoAccountDTO account = kakaoInfoDTO.getKakao_account();
-
+        // 카카오 ID 기반으로 DB에 사용자 있는지 확인
         Optional<User> existingUser = userRepository.findByKakaoId(kakaoInfoDTO.getId());
-
         if (existingUser.isPresent()) {
             log.info("Kakao ID {}로 이미 등록된 사용자입니다. 로그인 처리를 진행합니다.", kakaoInfoDTO.getId());
             return existingUser.get();
@@ -276,7 +278,7 @@ public class UserServiceImpl implements UserService {
             User user = User.builder()
                     .userName(account.getName())
                     .email(account.getEmail())
-                    .password("kakao_password")
+                    .password("kakao#password")
                     .phone(account.getPhone_number())
                     .role(Role.USER)
                     .userState(UserState.ACTIVE)
