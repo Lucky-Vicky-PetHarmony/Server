@@ -70,7 +70,7 @@ public class PetInfoWordService {
             processPetInfo(petInfo);
 
             // 결과 출력
-            System.out.println("저장된 words 필드 값 (desertionNo: " + petInfo.getDesertionNo() + "): " + petInfo.getWords());
+            //System.out.println("저장된 words 필드 값 (desertionNo: " + petInfo.getDesertionNo() + "): " + petInfo.getWords());
         }
     }
 
@@ -91,7 +91,7 @@ public class PetInfoWordService {
 
         // words 열에 이미 데이터가 있는 경우, OpenAI 호출을 건너뜀
         if (petInfo.getWords() != null && !petInfo.getWords().isEmpty()) {
-            System.out.println("words 필드에 이미 데이터가 있습니다. OpenAI 호출을 건너뜁니다.");
+            //System.out.println("words 필드에 이미 데이터가 있습니다. OpenAI 호출을 건너뜁니다.");
             return;
         }
 
