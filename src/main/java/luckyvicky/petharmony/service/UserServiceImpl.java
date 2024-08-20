@@ -186,7 +186,9 @@ public class UserServiceImpl implements UserService {
             User user = optionalUser.get();
             String certificationCode = String.format("%08d", (int) (Math.random() * 100000000));
 
-            user.updatePassword(certificationCode);
+            String encodedPassword = passwordEncoder.encode(certificationCode);
+
+            user.updatePassword(encodedPassword);
 
             userRepository.save(user);
 
