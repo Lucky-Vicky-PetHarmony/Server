@@ -23,13 +23,10 @@ public interface PetInfoRepository extends JpaRepository<PetInfo, String> {
      * 특정 연령(age)과 성별(sexCd)에 따라 필터링된 PetInfo 데이터를 조회하고,
      * 이를 WordClassificationDTO로 매핑하여 반환하는 커스텀 쿼리 메서드
      *
-     * 주요 동작:
-     * JPQL(Java Persistence Query Language)을 사용하여 쿼리를 수행
-     * PetInfo 엔티티에서 age와 sexCd 조건에 맞는 레코드를 필터링
-     * 필터링된 레코드들을 WordClassificationDTO 객체로 매핑
-     *    이때, WordClassificationDTO의 wordId 필드는 빈 문자열('')로 설정
-     * 페이징 처리된 결과를 Page<WordClassificationDTO> 형태로 반환
-     *    Page 객체는 데이터 리스트와 함께 페이지 정보(전체 페이지 수, 현재 페이지, 총 아이템 수 등)를 포함
+     * @param age  필터링할 반려동물의 연령
+     * @param sexCd  필터링할 반려동물의 성별 코드
+     * @param pageable  페이징 정보를 포함한 Pageable 객체
+     * @return 필터링된 PetInfo 데이터를 기반으로 생성된 WordClassificationDTO의 페이지
      */
     @Query("SELECT new luckyvicky.petharmony.dto.WordClassificationDTO(p.desertionNo, p.specialMark, p.age, p.sexCd, '') " +
             "FROM PetInfo p WHERE p.age = :age AND p.sexCd = :sexCd")
@@ -38,6 +35,10 @@ public interface PetInfoRepository extends JpaRepository<PetInfo, String> {
     /**
      * 사용자가 선택한 단어에 매칭되는 PetInfo를 가져오는 쿼리
      * UserWord와 연관된 단어가 PetInfo의 words 필드에 포함된 경우를 찾아 PetInfo를 반환
+     *
+     * @param wordIds 사용자가 선택한 word_id의 리스트
+     * @param pageable 페이징 정보를 포함한 Pageable 객체
+     * @return 사용자가 선택한 단어와 매칭되는 상위 12개의 PetInfo 리스트
      */
     @Query("SELECT p FROM PetInfo p " +
             "WHERE p.words IN :wordIds " +

@@ -89,14 +89,14 @@ public class PetInfoWordService {
             return;
         }
 
-        // PetInfo 엔티티를 DTO로 변환
-        WordClassificationDTO dto = convertToDTO(petInfo);
-
-        // Words 열에 이미 데이터가 있는 경우, OpenAI 호출을 건너뜀
+        // words 열에 이미 데이터가 있는 경우, OpenAI 호출을 건너뜀
         if (petInfo.getWords() != null && !petInfo.getWords().isEmpty()) {
             System.out.println("words 필드에 이미 데이터가 있습니다. OpenAI 호출을 건너뜁니다.");
             return;
         }
+
+        // PetInfo 엔티티를 DTO로 변환
+        WordClassificationDTO dto = convertToDTO(petInfo);
 
         // 특성(specialMark)을 분석하여 관련된 Words를 결정
         String analyzedWords = analyzeSpecialMark(dto);
@@ -205,7 +205,7 @@ public class PetInfoWordService {
             }
         }
 
-        // 중복된 단어를 제거하고 최대 5개의 단어만 선택하여 반환
+        // 중복된 단어를 제거하고 최대 10개의 단어만 선택하여 반환
         return wordIds.stream().distinct().limit(10).collect(Collectors.joining(","));
     }
 }
