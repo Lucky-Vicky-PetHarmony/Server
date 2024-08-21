@@ -9,7 +9,7 @@ import lombok.*;
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class KakaoInfoDTO {
-    private Long id;
+    private String id;
 
     private KakaoAccountDTO kakao_account;
 }

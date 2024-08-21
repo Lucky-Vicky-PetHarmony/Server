@@ -1,18 +1,17 @@
 package luckyvicky.petharmony.dto.user;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class KakaoLogInResponseDTO {
-    private boolean success;
+    private String jwtToken;
 
     private String email;
 
     private String userName;
+
+    private String role;
 }
