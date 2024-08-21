@@ -7,7 +7,7 @@ public interface UserService {
     // 자체 회원가입 메서드
     User signUp(SignUpDTO signUpDTO);
     // 자체 로그인 메서드
-    LoginResponseDTO login(LogInDTO logInDTO);
+    LogInResponseDTO login(LogInDTO logInDTO);
     // 아이디 찾기를 위한 인증번호 전송 메서드
     String sendingNumberToFindId(FindIdDTO findIdDTO);
     // 아이디 찾기 시 인증번호 확인 메서드
