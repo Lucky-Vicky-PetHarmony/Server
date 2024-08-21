@@ -1,7 +1,7 @@
 package luckyvicky.petharmony.controller;
 
 import luckyvicky.petharmony.entity.PetInfo;
-import luckyvicky.petharmony.service.MatchingService;
+import luckyvicky.petharmony.service.WordMatchingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -10,17 +10,18 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-public class MatchingController {
+public class WordMatchingController {
 
-    private final MatchingService matchingService;
+    private final WordMatchingService wordMatchingService;
 
     @Autowired
-    public MatchingController(MatchingService matchingService) {
-        this.matchingService = matchingService;
+    public WordMatchingController(WordMatchingService wordMatchingService) {
+        this.wordMatchingService = wordMatchingService;
     }
 
-    @GetMapping("/pets/top12/{userId}")
+    @GetMapping("/user/top12/{userId}")
     public List<PetInfo> getTop12PetsByUserWord(@PathVariable Long userId) {
-        return matchingService.getTop12PetInfosByUserWord(userId);
+        return wordMatchingService.getTop12PetInfosByUserWord(userId);
     }
+
 }

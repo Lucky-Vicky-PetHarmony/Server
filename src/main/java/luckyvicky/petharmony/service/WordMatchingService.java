@@ -10,13 +10,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class MatchingService {
+public class WordMatchingService {
 
     private final PetInfoRepository petInfoRepository;
     private final UserWordRepository userWordRepository;
 
     @Autowired
-    public MatchingService(PetInfoRepository petInfoRepository, UserWordRepository userWordRepository) {
+    public WordMatchingService(PetInfoRepository petInfoRepository, UserWordRepository userWordRepository) {
         this.petInfoRepository = petInfoRepository;
         this.userWordRepository = userWordRepository;
     }

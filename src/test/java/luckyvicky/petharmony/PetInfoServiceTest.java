@@ -3,7 +3,7 @@ package luckyvicky.petharmony;
 import luckyvicky.petharmony.entity.PetInfo;
 import luckyvicky.petharmony.repository.PetInfoRepository;
 import luckyvicky.petharmony.repository.UserWordRepository;
-import luckyvicky.petharmony.service.MatchingService;
+import luckyvicky.petharmony.service.WordMatchingService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -27,7 +27,7 @@ public class PetInfoServiceTest {
     private UserWordRepository userWordRepository;
 
     @InjectMocks
-    private MatchingService matchingService;
+    private WordMatchingService wordMatchingService;
 
     @BeforeEach
     void setUp() {
@@ -60,7 +60,7 @@ public class PetInfoServiceTest {
         when(petInfoRepository.findAll()).thenReturn(mockPetInfos);
 
         // 실제 테스트 수행: 서비스 메서드 호출
-        List<PetInfo> top12PetInfos = matchingService.getTop12PetInfosByUserWord(userId);
+        List<PetInfo> top12PetInfos = wordMatchingService.getTop12PetInfosByUserWord(userId);
 
         // 검증: 반환된 리스트가 null이 아니고, 12개 이하의 PetInfo를 포함하는지 확인
         assertThat(top12PetInfos).isNotNull();
