@@ -4,7 +4,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import luckyvicky.petharmony.dto.board.*;
-import luckyvicky.petharmony.dto.comment.CommentResponseDTO;
 import luckyvicky.petharmony.entity.User;
 import luckyvicky.petharmony.entity.board.*;
 import luckyvicky.petharmony.repository.*;
@@ -13,7 +12,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;

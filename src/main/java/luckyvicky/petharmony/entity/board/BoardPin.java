@@ -9,7 +9,6 @@ import luckyvicky.petharmony.entity.User;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 @Table(name = "board_pin")
 public class BoardPin {
 

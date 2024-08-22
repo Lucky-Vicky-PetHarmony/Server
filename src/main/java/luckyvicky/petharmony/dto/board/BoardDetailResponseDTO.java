@@ -4,11 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import luckyvicky.petharmony.dto.comment.CommentResponseDTO;
 import luckyvicky.petharmony.entity.board.Category;
 import luckyvicky.petharmony.entity.board.Image;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
