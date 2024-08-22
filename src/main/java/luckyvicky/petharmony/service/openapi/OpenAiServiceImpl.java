@@ -1,6 +1,8 @@
 package luckyvicky.petharmony.service.openapi;
 
 import io.github.cdimascio.dotenv.Dotenv;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.HttpEntity;
@@ -23,21 +25,39 @@ public class OpenAiServiceImpl implements OpenAiService {
     // OpenAI API의 엔드포인트 URL
     private static final String OPENAI_API_URL = "https://api.openai.com/v1/chat/completions";
 
-    // 환경 변수를 사용하여 API 키를 불러옵니다.
-    private final Dotenv dotenv = Dotenv.configure()
-            .directory("C:/Users/didek/openai-chatbot")
-            .filename(".env")
-            .load();
-
-    // 환경 변수에서 API 키를 불러옵니다.
-    private final String openAiApiKey = dotenv.get("OPENAI_API_KEY");
-
     // RestTemplate은 HTTP 요청을 보내기 위한 스프링의 편리한 도구입니다.
     private final RestTemplate restTemplate;
+
+    // 실제 환경 변수 로딩을 위한 Dotenv 객체
+    private Dotenv dotenv;
+
+    // 스프링 환경 변수로 경로를 주입 받습니다.
+    @Value("${dotenv.filepath}")
+    private String dotenvFilePath;
 
     // 생성자 주입을 통해 RestTemplate을 주입받습니다.
     public OpenAiServiceImpl(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
+    }
+
+    // @PostConstruct를 이용해 Dotenv 초기화
+    @PostConstruct
+    private void initializeDotenv() {
+        if (dotenvFilePath != null && !dotenvFilePath.isEmpty()) {
+            this.dotenv = Dotenv.configure()
+                    .directory(dotenvFilePath)
+                    .filename(".env")
+                    .load();
+        } else {
+            this.dotenv = Dotenv.configure()
+                    .ignoreIfMissing()
+                    .load();
+        }
+    }
+
+    // 환경 변수에서 API 키를 불러옵니다.
+    private String getOpenAiApiKey() {
+        return dotenv.get("OPENAI_API_KEY");
     }
 
     /**
@@ -50,7 +70,7 @@ public class OpenAiServiceImpl implements OpenAiService {
     public String analyzeSpecialMark(String specialMark) {
         // HTTP 요청 헤더를 설정합니다.
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + openAiApiKey); // OpenAI API 인증을 위한 Bearer 토큰 설정
+        headers.set("Authorization", "Bearer " + getOpenAiApiKey()); // OpenAI API 인증을 위한 Bearer 토큰 설정
         headers.set("Content-Type", "application/json"); // 요청 본문이 JSON 형식임을 지정
 
         // 특이사항 문자열을 온점(.) 또는 쉼표(,)로 분리하여 배열로 만듭니다.
