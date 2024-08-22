@@ -15,4 +15,8 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
     List<Report> findByBoard_BoardIdAndReportIdNot(Long boardId, Long reportId);
 
     List<Report> findByComment_CommIdAndReportIdNot(Long commId, Long reportId);
+
+    List<Report> findByBoard_BoardId(Long boardId);
+
+    List<Report> findByComment_CommId(Long commId);
 }

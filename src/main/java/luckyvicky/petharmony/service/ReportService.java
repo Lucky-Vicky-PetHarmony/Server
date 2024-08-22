@@ -5,6 +5,8 @@ import luckyvicky.petharmony.dto.report.ReportPostDTO;
 import luckyvicky.petharmony.dto.report.ReportListResponseDTO;
 import org.springframework.data.domain.Page;
 
+import java.io.IOException;
+
 public interface ReportService {
 
     //신고
@@ -15,4 +17,7 @@ public interface ReportService {
 
     //신고 상세
     ReportDetailDTO reportDetail(Long reportId);
+
+    //신고처리
+    String reportPrecessing(Long reportId, String precessing) throws IOException;
 }

@@ -57,6 +57,14 @@ public class Board {
     @Formula("(select count(*) from board_pin bc where bc.board_id = board_id)")
     private int pinCount;
 
+    @Builder.Default
+    @Column(name = "is_deleted")
+    private Boolean isDeleted = false;
+
+    public void isDeleteActive() {
+        this.isDeleted = true;
+    }
+
     public void viewCount() {
         this.view++;
     }

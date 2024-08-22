@@ -19,8 +19,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @Log4j2
@@ -32,6 +36,7 @@ public class ReportServiceImpl implements ReportService {
     private final UserRepository userRepository;
     private final BoardRepository boardRepository;
     private final CommentRepository commentRepository;
+    private final ImageService imageService;
 
     /**
      * 신고하기
@@ -164,6 +169,56 @@ public class ReportServiceImpl implements ReportService {
                 .build();
     }
 
+    /**
+     * 신고처리
+     *
+     * @param reportId 처리할 reportId
+     * @return 처리여부
+     */
+    @Override
+    public String reportPrecessing(Long reportId, String processing) throws IOException {
+
+        // 요청받은 reportId에 해당하는 Report객체
+        Report report = reportRepository.findById(reportId)
+                .orElseThrow(() -> new IllegalArgumentException("유효하지않은 reportID"+reportId));
+
+        if(Objects.equals(processing, "DELETE_POST")){
+
+            // 실제 데이터에서 지우는 것이 아닌 논리적 삭제
+            if(report.getBoard()!=null){
+                Board board = report.getBoard();
+                board.isDeleteActive();
+            }else {
+                Comment comment = report.getComment();
+                comment.isDeleteActive();
+            }
+        }else if(Objects.equals(processing, "THREE_DAY_SUSPENSION")){
+            //TODO: 3일정지
+        }else if(Objects.equals(processing, "ACCOUNT_TERMINATION")){
+            //TODO: 회원탈퇴
+        }
+
+        //해당 신고를 제외한 신고목록
+        List<Report> otherReports = new ArrayList<>();
+        if(report.getBoard()!=null){
+            otherReports = reportRepository.findByBoard_BoardId(report.getBoard().getBoardId());
+        }else {
+            otherReports = reportRepository.findByComment_CommId(report.getComment().getCommId());
+        }
+        //신고목록들 처리상태 업데이트
+        List<Report> updatedReports = otherReports.stream()
+                .map(otherReport -> otherReport.toBuilder()
+                        .reportProcessing(ReportProcess.valueOf(processing))  // 새로운 처리상태로 변경
+                        .processingDate(LocalDate.now())
+                        .build())
+                .collect(Collectors.toList());
+
+        // 변경된 객체들을 저장
+        reportRepository.saveAll(updatedReports);
+        return "report precessing success";
+    }
+
+    //report -> ReportDetailListDTO
     private ReportDetailListDTO buildReportDetailListDTO(Report report) {
         return ReportDetailListDTO.builder()
                 .reportId(report.getReportId())

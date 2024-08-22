@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.Objects;
 
 @RestController
@@ -41,11 +42,25 @@ public class ReportController {
     }
 
     @GetMapping("/detail/{reportId}")
-    public ResponseEntity<ReportDetailDTO> reportList(@PathVariable Long reportId){
+    public ResponseEntity<ReportDetailDTO> reportDetail(@PathVariable Long reportId){
         ReportDetailDTO reportDetailDTO = reportService.reportDetail(reportId);
         if(reportDetailDTO == null) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(reportDetailDTO);
     }
+
+    @PutMapping("/precessing/{reportId}")
+    public ResponseEntity<String> reportPrecessing(@PathVariable Long reportId,
+                                                            @RequestParam String processing) throws IOException {
+        String processingResult = reportService.reportPrecessing(reportId, processing);
+        if(processingResult == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok("report processing success");
+    }
 }
+
+
+
+

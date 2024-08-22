@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@Builder(toBuilder = true)
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "comment")
@@ -39,6 +39,14 @@ public class Comment {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;                  // 유저 테이블
+
+    @Builder.Default
+    @Column(name = "is_deleted")
+    private Boolean isDeleted = false;
+
+    public void isDeleteActive() {
+        this.isDeleted = true;
+    }
 
     public void updateContent(String newContent) {
         this.commContent = newContent;
