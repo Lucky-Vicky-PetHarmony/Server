@@ -15,14 +15,16 @@ import java.util.stream.Collectors;
 @Service
 public class UserWordService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final WordRepository wordRepository;
+    private final UserWordRepository userWordRepository;
 
     @Autowired
-    private WordRepository wordRepository;
-
-    @Autowired
-    private UserWordRepository userWordRepository;
+    public UserWordService(UserRepository userRepository, WordRepository wordRepository, UserWordRepository userWordRepository) {
+        this.userRepository = userRepository;
+        this.wordRepository = wordRepository;
+        this.userWordRepository = userWordRepository;
+    }
 
     /**
      * 사용자가 선택한 선호 단어들을 UserWord 테이블에 저장하는 메서드
@@ -51,8 +53,8 @@ public class UserWordService {
      * @return 사용자가 선택한 UserWordDTO 목록
      */
     public List<UserWordDTO> getUserWords(Long userId) {
-        return userWordRepository.findByUserUserId(userId).stream()
-                .map(userWord -> new UserWordDTO(userWord.getUser().getUserId(), userWord.getWord().getWordId()))
+        return userWordRepository.findWordIdsByUserId(userId).stream()
+                .map(wordId -> new UserWordDTO(null, userId, wordId)) // userWordId를 null로 설정
                 .collect(Collectors.toList());
     }
 }
