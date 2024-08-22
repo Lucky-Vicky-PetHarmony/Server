@@ -50,6 +50,7 @@ public class BoardServiceImpl implements BoardService {
                 .boardContent(boardPostDTO.getContent())
                 .category(boardPostDTO.getCategory())
                 .user(user)
+
                 .build();
         boardRepository.save(board);
 
@@ -150,9 +151,9 @@ public class BoardServiceImpl implements BoardService {
 
         // 검색 및 카테고리 필터링 적용
         if (Objects.equals(category, "ALL")) {
-            boardPage = boardRepository.findAll(pageable);
+            boardPage = boardRepository.findAllByIsDeletedFalse(pageable);
         } else {
-            boardPage = boardRepository.findByCategory(Category.valueOf(category), pageable);
+            boardPage = boardRepository.findByCategoryAndIsDeletedFalse(Category.valueOf(category), pageable);
         }
 
         return boardPage.map(this::buildBoardListResponseDTO);
@@ -178,21 +179,25 @@ public class BoardServiceImpl implements BoardService {
         // 검색 및 카테고리 필터링 적용
         if (Objects.equals(category, "ALL")) {
             if ("title".equals(searchType)) {
-                boards = boardRepository.findByBoardTitleContainingIgnoreCase(keyword, pageRequest);
+                boards = boardRepository.findByBoardTitleContainingIgnoreCaseAndIsDeletedFalse(keyword, pageRequest);
             } else if ("content".equals(searchType)) {
-                boards = boardRepository.findByBoardContentContainingIgnoreCase(keyword, pageRequest);
+                boards = boardRepository.findByBoardContentContainingIgnoreCaseAndIsDeletedFalse(keyword, pageRequest);
             } else {
-                boards = boardRepository.findByBoardTitleContainingIgnoreCaseOrBoardContentContainingIgnoreCase(
+                boards = boardRepository
+                        .findByBoardTitleContainingIgnoreCaseOrBoardContentContainingIgnoreCaseAndIsDeletedFalse(
                         keyword, keyword, pageRequest);
             }
         } else {
             Category categoryEnum = Category.valueOf(category);
             if ("title".equals(searchType)) {
-                boards = boardRepository.findByCategoryAndBoardTitleContainingIgnoreCase(categoryEnum, keyword, pageRequest);
+                boards = boardRepository
+                        .findByCategoryAndBoardTitleContainingIgnoreCaseAndIsDeletedFalse(categoryEnum, keyword, pageRequest);
             } else if ("content".equals(searchType)) {
-                boards = boardRepository.findByCategoryAndBoardContentContainingIgnoreCase(categoryEnum, keyword, pageRequest);
+                boards = boardRepository
+                        .findByCategoryAndBoardContentContainingIgnoreCaseAndIsDeletedFalse(categoryEnum, keyword, pageRequest);
             } else {
-                boards = boardRepository.findByCategoryAndBoardTitleContainingIgnoreCaseOrBoardContentContainingIgnoreCase(
+                boards = boardRepository
+                        .findByCategoryAndBoardTitleContainingIgnoreCaseOrBoardContentContainingIgnoreCaseAndIsDeletedFalse(
                         categoryEnum, keyword, keyword, pageRequest);
             }
         }
