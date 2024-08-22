@@ -2,6 +2,7 @@ package luckyvicky.petharmony.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import luckyvicky.petharmony.dto.mypage.MyProfileRequestDTO;
 import luckyvicky.petharmony.security.Role;
 import luckyvicky.petharmony.security.UserState;
 import org.hibernate.annotations.CreationTimestamp;
@@ -16,7 +17,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Table(name = "user")
 public class User {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
@@ -50,10 +50,17 @@ public class User {
     private UserState userState;                  // 회원 상태 (ACTIVE, BANNED)
 
     @Column(name = "kakao_id")
-    private String kakaoId;                         // 카카오 회원 ID
+    private String kakaoId;                       // 카카오 회원 ID
 
     // 비밀번호 변경
     public void updatePassword(String password) {
         this.password = password;
+    }
+
+    // [마이페이지] - 내 정보 수정(이름, 이메일, 전화번호)
+    public void updateUserInfo(MyProfileRequestDTO myProfileRequestDTO) {
+        this.userName = myProfileRequestDTO.getUserName();
+        this.email = myProfileRequestDTO.getEmail();
+        this.phone = myProfileRequestDTO.getPhone();
     }
 }
