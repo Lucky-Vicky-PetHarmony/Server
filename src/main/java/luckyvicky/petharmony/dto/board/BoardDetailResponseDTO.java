@@ -34,10 +34,12 @@ public class BoardDetailResponseDTO {
     private Integer views; //조회수
 
     //이미지
+    @Builder.Default
     private List<Image> images = new ArrayList<>(); //빈리스트
 
     private Integer pinCount; //pin
 
     //좋아요 여부
+    @Builder.Default
     private Boolean pinStatus = Boolean.FALSE;
 }
