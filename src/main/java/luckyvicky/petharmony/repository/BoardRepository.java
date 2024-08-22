@@ -7,6 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
+
 public interface BoardRepository extends JpaRepository<Board, Long> {
 
     //카테고리별 list
@@ -31,4 +33,6 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
 
     Page<Board> findByCategoryAndBoardTitleContainingIgnoreCaseOrBoardContentContainingIgnoreCase(Category category, String titleKeyword, String contentKeyword, Pageable pageable);
 
+    // 사용자 ID에 해당하는 게시물들을 조회하는 메소드
+    List<Board> findByUser_UserId(Long userId);
 }
