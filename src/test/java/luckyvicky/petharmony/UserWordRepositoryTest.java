@@ -26,15 +26,15 @@ public class UserWordRepositoryTest {
 
     @Test
     public void testFindWordIdsByUserId() {
-        // 실제 데이터베이스에 있는 user_id = 27의 word_id 리스트를 가져옴
+        // given: 실제 데이터베이스에 있는 user_id = 27의 word_id 리스트를 가져옴
         Long userId = 27L;
         List<Long> wordIds = userWordRepository.findWordIdsByUserId(userId);
 
-        // 검증: 반환된 word_id 리스트가 예상대로 있는지 확인
+        // when: 반환된 word_id 리스트가 예상대로 있는지 확인
         assertThat(wordIds).isNotNull();
         assertThat(wordIds).isNotEmpty();
 
-        // 예상한 word_id들이 포함되어 있는지 확인
+        // then: 예상한 word_id들이 포함되어 있는지 확인
         assertThat(wordIds).containsExactlyInAnyOrder(1L, 3L, 5L, 20L);
     }
 }

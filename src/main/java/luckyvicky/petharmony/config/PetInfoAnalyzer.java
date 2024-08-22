@@ -17,6 +17,6 @@ public class PetInfoAnalyzer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        petInfoWordService.processTop5PetInfo();
+        petInfoWordService.processTopPetInfo();
     }
 }

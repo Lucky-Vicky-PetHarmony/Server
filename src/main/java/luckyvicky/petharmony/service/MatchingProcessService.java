@@ -1,6 +1,9 @@
 package luckyvicky.petharmony.service;
 
 import luckyvicky.petharmony.entity.PetInfo;
+import luckyvicky.petharmony.entity.Word;
+import luckyvicky.petharmony.repository.WordRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -12,6 +15,13 @@ import java.util.stream.Collectors;
 @Service
 public class MatchingProcessService {
 
+    private final WordRepository wordRepository;
+
+    @Autowired
+    public MatchingProcessService(WordRepository wordRepository) {
+        this.wordRepository = wordRepository;
+    }
+
     /**
      * 주어진 PetInfo 객체를 처리하여 원하는 형식의 데이터를 반환합니다.
      *
@@ -21,10 +31,8 @@ public class MatchingProcessService {
     public Map<String, Object> processPetInfo(PetInfo petInfo) {
         Map<String, Object> result = new HashMap<>();
 
-        // words 필드에서 랜덤으로 3개의 단어를 선택하여 반환
-        List<String> wordsList = Arrays.asList(petInfo.getWords().split(","));
-        Collections.shuffle(wordsList); // 단어 리스트를 무작위로 섞음
-        result.put("words", wordsList.stream().limit(3).collect(Collectors.toList())); // 최대 3개의 단어만 선택하여 결과에 추가
+        // words 필드에서 wordId를 추출하여 Word엔티티의 wordSelect 값을 매핑
+        result.put("words", processWords(petInfo.getWords()));
 
         // kind_cd 필드를 처리하여 반환
         result.put("kind_cd", processKindCd(petInfo.getKindCd()));
@@ -42,6 +50,29 @@ public class MatchingProcessService {
     }
 
     /**
+     * words 필드를 처리하여 반환하는 메서드
+     * words필드와 매칭된 word_id의 word_select값을 반환. 최대 3개의 단어만 선택하여 결과에 추가
+     *
+     * @param words pet_info 테이블의 words 필드 값
+     * @return 매칭된 단어들의 리스트*/
+    private List<String> processWords(String words) {
+        if (words == null || words.isEmpty()) {
+            // words 필드가 비었을 때
+            return Collections.emptyList();
+        }
+        // words를 콤마로 구분된 wordId 리스트로 반환
+        List<Long> wordIds = Arrays.stream(words.split(","))
+                .map(Long::parseLong)
+                .collect(Collectors.toList());
+
+        // wordId 리스트로 Word엔티티를 조회하고, wordSelect 값을 추출하여 반환
+        List<Word> wordEntities = wordRepository.findByWordIdIn(wordIds);
+        return wordEntities.stream()
+                .map(Word::getWordSelect)
+                .collect(Collectors.toList());
+    }
+
+    /**
      * kind_cd 필드를 처리하여 반환하는 메서드
      * '기타축종'이라는 단어가 포함된 경우 대괄호([]) 바깥의 값을 반환하고,
      * 포함되지 않은 경우 대괄호 안의 값을 반환합니다.
@@ -50,12 +81,14 @@ public class MatchingProcessService {
      * @return 처리된 kind_cd 문자열
      */
     private String processKindCd(String kindCd) {
-        if (kindCd.contains("기타축종")) {
-            return kindCd.replaceAll("\\[.*?\\]", "").trim(); // 대괄호 안의 내용을 제거하고 반환
+        // "[개] 포메라니안" 형식에서 "포메라니안"만 추출
+        if (kindCd.contains("[") && kindCd.contains("]")) {
+            return kindCd.substring(kindCd.indexOf("]") + 1).trim();
         } else {
-            return kindCd.replaceAll(".*?\\[(.*?)\\]", "$1").trim(); // 대괄호 안의 내용을 추출하여 반환
+            return kindCd;
         }
     }
+
 
     /**
      * age 필드를 처리하여 반환하는 메서드
@@ -71,7 +104,7 @@ public class MatchingProcessService {
 
     /**
      * sex_cd 필드를 처리하여 반환하는 메서드
-     * 'Q'는 "성별 추정 어려움", 'F'는 "여아", 'M'은 "남아"로 반환합니다.
+     * 'M'은 "남아", 'F'는 "여아", 'Q'는 "성별 추정 어려움",로 반환합니다.
      * 그 외의 값은 "알 수 없음"으로 반환합니다.
      *
      * @param sexCd 처리할 sex_cd 필드 값
@@ -79,12 +112,12 @@ public class MatchingProcessService {
      */
     private String processSexCd(String sexCd) {
         switch (sexCd) {
-            case "Q":
-                return "알 수 없음";
-            case "F":
-                return "여아";
             case "M":
                 return "남아";
+            case "F":
+                return "여아";
+            case "Q":
+                return "알 수 없음";
             default:
                 return "알 수 없음";
         }
@@ -92,7 +125,7 @@ public class MatchingProcessService {
 
     /**
      * neuter_yn 필드를 처리하여 반환하는 메서드
-     * 'U'는 "중성화 추정 어려움", 'Y'는 "중성화 완료", 'N'은 "중성화 안됨"으로 반환합니다.
+     * 'N'은 "중성화 안됨", 'Y'는 "중성화 완료", 'U'는 "중성화 추정 어려움"으로 반환합니다.
      * 그 외의 값은 "알 수 없음"으로 반환합니다.
      *
      * @param neuterYn 처리할 neuter_yn 필드 값
@@ -100,11 +133,11 @@ public class MatchingProcessService {
      */
     private String processNeuterYn(String neuterYn) {
         switch (neuterYn) {
-            case "U":
-                return "중성화 추정 어려움";
+            case "N":
+                return "중성화 안됨";
             case "Y":
                 return "중성화 완료";
-            case "N":
+            case "U":
                 return "알 수 없음";
             default:
                 return "알 수 없음";

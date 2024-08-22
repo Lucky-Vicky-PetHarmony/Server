@@ -56,9 +56,9 @@ public class PetInfoWordService {
      * 상위 5개의 PetInfo 레코드를 처리합니다.
      */
     @Transactional
-    public void processTop5PetInfo() {
+    public void processTopPetInfo() {
         // 상위 5개의 PetInfo 데이터를 가져옴
-        List<PetInfo> top5PetInfoList = petInfoRepository.findAll(PageRequest.of(0, 50)).getContent();
+        List<PetInfo> top5PetInfoList = petInfoRepository.findAll(PageRequest.of(0, 100)).getContent();
 
         for (PetInfo petInfo : top5PetInfoList) {
             // desertionNo가 null인 경우 스킵
@@ -70,7 +70,7 @@ public class PetInfoWordService {
             processPetInfo(petInfo);
 
             // 결과 출력
-            //System.out.println("저장된 words 필드 값 (desertionNo: " + petInfo.getDesertionNo() + "): " + petInfo.getWords());
+            // System.out.println("저장된 words 필드 값 (desertionNo: " + petInfo.getDesertionNo() + "): " + petInfo.getWords());
         }
     }
 
@@ -124,6 +124,9 @@ public class PetInfoWordService {
                 petInfo.getWords() // Words 필드를 직접 가져옴
         );
     }
+
+    /**
+     * */
 
     /**
      * OpenAI API를 호출하여 specialMark 필드를 분석하고, 분석 결과에 따라 Words를 반환합니다.
@@ -206,6 +209,6 @@ public class PetInfoWordService {
         }
 
         // 중복된 단어를 제거하고 최대 10개의 단어만 선택하여 반환
-        return wordIds.stream().distinct().limit(10).collect(Collectors.joining(","));
+        return wordIds.stream().distinct().limit(5).collect(Collectors.joining(","));
     }
 }
