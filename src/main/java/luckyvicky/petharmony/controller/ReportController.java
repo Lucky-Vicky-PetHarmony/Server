@@ -50,14 +50,14 @@ public class ReportController {
         return ResponseEntity.ok(reportDetailDTO);
     }
 
-    @PutMapping("/precessing/{reportId}")
+    @PutMapping("/processing/{reportId}")
     public ResponseEntity<String> reportPrecessing(@PathVariable Long reportId,
-                                                            @RequestParam String processing) throws IOException {
+                                                   @RequestParam String processing) throws IOException {
         String processingResult = reportService.reportPrecessing(reportId, processing);
         if(processingResult == null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok("report processing success");
+        return ResponseEntity.ok(processingResult);
     }
 }
 

@@ -196,6 +196,8 @@ public class ReportServiceImpl implements ReportService {
             //TODO: 3일정지
         }else if(Objects.equals(processing, "ACCOUNT_TERMINATION")){
             //TODO: 회원탈퇴
+        }else if(Objects.equals(processing, "UNPROCESSED")){
+            return processing;
         }
 
         //해당 신고를 제외한 신고목록
@@ -215,7 +217,7 @@ public class ReportServiceImpl implements ReportService {
 
         // 변경된 객체들을 저장
         reportRepository.saveAll(updatedReports);
-        return "report precessing success";
+        return processing;
     }
 
     //report -> ReportDetailListDTO
