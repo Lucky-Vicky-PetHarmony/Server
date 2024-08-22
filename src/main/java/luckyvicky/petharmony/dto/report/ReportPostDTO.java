@@ -4,13 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import luckyvicky.petharmony.entity.board.ReportType;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReportDTO {
+public class ReportPostDTO {
     private Long reporterId; //신고자 id
     private Long reportedId; //피신고자 id
     private String reportType; //신고유형

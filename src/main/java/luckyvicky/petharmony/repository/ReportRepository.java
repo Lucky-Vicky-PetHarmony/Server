@@ -11,4 +11,8 @@ import java.util.List;
 public interface ReportRepository extends JpaRepository<Report, Long> {
 
     Page<Report> findByReportProcessingIn(List<ReportProcess> statuses, Pageable pageable);
+
+    List<Report> findByBoard_BoardIdAndReportIdNot(Long boardId, Long reportId);
+
+    List<Report> findByComment_CommIdAndReportIdNot(Long commId, Long reportId);
 }
