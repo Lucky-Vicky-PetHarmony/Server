@@ -16,7 +16,7 @@ import java.util.Objects;
 @RestController
 @RequiredArgsConstructor
 @Log4j2
-@RequestMapping("/api/public/report")
+@RequestMapping("/api")
 public class ReportController {
     private final ReportService reportService;
 
@@ -27,7 +27,7 @@ public class ReportController {
      * @return 신고가 성공적으로 접수되었을 경우 성공 메시지를 반환하고,
      *         실패할 경우 에러 메시지를 반환
      */
-    @PostMapping("/post")
+    @PostMapping("/user/report/post")
     public ResponseEntity<String> report(@RequestBody ReportPostDTO reportPostDTO) {
 
         String reportMsg = reportService.report(reportPostDTO);
@@ -48,7 +48,7 @@ public class ReportController {
      * @param size 페이지 당 레코드 수 (기본값은 8).
      * @return 조건에 맞는 신고 목록을 Page 객체로 반환
      */
-    @GetMapping("/list")
+    @GetMapping("/admin/report/list")
     public Page<ReportListResponseDTO> reportList(@RequestParam(value = "selection", required = false) String selectionString,
                                                   @RequestParam(value = "sortBy", required = false, defaultValue = "date") String sortBy,
                                                   @RequestParam(value = "page", defaultValue = "0") int page,
@@ -64,7 +64,7 @@ public class ReportController {
      * @return 신고 정보를 담고 있는 ReportDetailDTO 객체를 반환하며,
      *         신고가 존재하지 않을 경우 404 Not Found 응답을 반환
      */
-    @GetMapping("/detail/{reportId}")
+    @GetMapping("/admin/report/detail/{reportId}")
     public ResponseEntity<ReportDetailDTO> reportDetail(@PathVariable Long reportId){
         ReportDetailDTO reportDetailDTO = reportService.reportDetail(reportId);
         if(reportDetailDTO == null) {
@@ -82,7 +82,7 @@ public class ReportController {
      *         신고가 존재하지 않을 경우 404 Not Found 응답을 반환
      * @throws IOException 처리 중 오류가 발생할 경우 예외
      */
-    @PutMapping("/processing/{reportId}")
+    @PutMapping("/admin/report/processing/{reportId}")
     public ResponseEntity<String> reportPrecessing(@PathVariable Long reportId,
                                                    @RequestParam String processing) throws IOException {
         String processingResult = reportService.reportPrecessing(reportId, processing);

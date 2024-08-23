@@ -14,7 +14,7 @@ import java.io.IOException;
 @RestController
 @RequiredArgsConstructor
 @Log4j2
-@RequestMapping("/api/public/board")
+@RequestMapping("/api/user/board")
 public class BoardController {
 
     private final BoardService boardService;

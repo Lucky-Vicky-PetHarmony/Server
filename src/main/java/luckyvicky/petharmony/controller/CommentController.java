@@ -14,7 +14,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @Log4j2
-@RequestMapping("/api/public/comment")
+@RequestMapping("/api/user/comment")
 public class CommentController {
 
     private final CommentService commentService;
