@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import luckyvicky.petharmony.entity.board.ReportType;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -14,7 +14,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class ReportDetailListDTO {
     private Long reportId;
-    private LocalDate reportDate;
+    private LocalDateTime reportDate;
     private String reporterName;
     private ReportType reportType;
 }

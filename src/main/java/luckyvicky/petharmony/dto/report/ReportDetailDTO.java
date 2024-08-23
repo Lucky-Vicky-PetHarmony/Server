@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import luckyvicky.petharmony.entity.board.ReportProcess;
 import luckyvicky.petharmony.entity.board.ReportType;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +18,7 @@ import java.util.List;
 public class ReportDetailDTO {
     //기본정보
     private Long reportId;
-    private LocalDate reportDate;
+    private LocalDateTime reportDate;
     private String reporterName;
     private ReportType reportType;
     private ReportProcess reportProcess;

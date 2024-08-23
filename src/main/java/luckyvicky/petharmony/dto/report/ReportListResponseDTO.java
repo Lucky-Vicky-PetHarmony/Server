@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import luckyvicky.petharmony.entity.board.ReportProcess;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -14,7 +15,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class ReportListResponseDTO {
     private Long reportId; //신고 id
-    private LocalDate reportDate; //신고 날짜
+    private LocalDateTime reportDate; //신고 날짜
     private Long postId; //게시글(댓글)id
     private Long reporterId; //신고자 아이디
     private String reporterName; //신고자 이름
