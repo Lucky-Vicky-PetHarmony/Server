@@ -71,6 +71,7 @@ public class UserServiceImpl implements UserService {
                 .phone(signUpDTO.getPhone())
                 .role(Role.USER)
                 .userState(UserState.ACTIVE)
+                .isWithdrawal(false)
                 .build();
 
         return userRepository.save(user);
@@ -83,7 +84,7 @@ public class UserServiceImpl implements UserService {
      * 인증이 성공하면 사용자 정보를 가져와 JWT 토큰을 생성하고,
      * 생성된 토큰과 사용자 정보를 포함한 LoginResponseDTO를 반환합니다.
      *
-     * @param logInDTO 로그인 요청 정보가 담긴 DTO
+     * @param logInDTO 로그인 요청 정보가 담긴 DTOcertification
      * @return 인증에 성공한 사용자의 정보와 JWT 토큰을 담은 LoginResponseDTO 객체
      */
     @Override
@@ -97,6 +98,10 @@ public class UserServiceImpl implements UserService {
         );
         // 인증된 사용자 정보를 CustomUserDetails로 캐스팅하여 가져옴
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        // 회원탈퇴한 사용자인지 확인
+        if (userDetails.getIsWithdrawal()) {
+            throw new IllegalStateException("탈퇴한 회원입니다. 로그인할 수 없습니다.");
+        }
         // 인증 성공 시 JWT 토큰 생성 및 LoginResponseDTO 반환
         String jwtToken = jwtTokenProvider.generateToken(authentication);
         return LogInResponseDTO.builder()
@@ -301,6 +306,7 @@ public class UserServiceImpl implements UserService {
                     .role(Role.USER)
                     .userState(UserState.ACTIVE)
                     .kakaoId(kakaoInfoDTO.getId())
+                    .isWithdrawal(false)
                     .build();
 
             return userRepository.save(user);

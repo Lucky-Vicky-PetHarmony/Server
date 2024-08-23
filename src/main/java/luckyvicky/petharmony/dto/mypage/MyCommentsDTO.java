@@ -24,5 +24,7 @@ public class MyCommentsDTO {
 
     private String boardUpdate;
 
+    private Long commId;
+
     private String content;
 }

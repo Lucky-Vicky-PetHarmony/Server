@@ -1,10 +1,7 @@
 package luckyvicky.petharmony.service;
 
 import luckyvicky.petharmony.dto.board.BoardListResponseDTO;
-import luckyvicky.petharmony.dto.mypage.MyCommentsDTO;
-import luckyvicky.petharmony.dto.mypage.MyProfileRequestDTO;
-import luckyvicky.petharmony.dto.mypage.MyProfileResponseDTO;
-import luckyvicky.petharmony.dto.mypage.PasswordRequestDTO;
+import luckyvicky.petharmony.dto.mypage.*;
 
 import java.util.List;
 
@@ -21,4 +18,6 @@ public interface MyPageService {
     List<BoardListResponseDTO> getMyPosts();
     // 현재 인증된 사용자가 작성한 댓글들을 조회하는 메서드
     List<MyCommentsDTO> getMyComments();
+    // 현재 인증된 사용자가 회원탈퇴를 하는 메서드
+    DeleteAccountResponseDTO deleteMyAccount();
 }
