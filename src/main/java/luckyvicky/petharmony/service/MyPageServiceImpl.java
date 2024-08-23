@@ -170,6 +170,7 @@ public class MyPageServiceImpl implements MyPageService {
                         .pinCount(comment.getBoard().getPinCount())
                         .boardUpdate(comment.getBoard().getBoardUpdate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
                         .content(comment.getCommContent())
+                        .commId(comment.getCommId())
                         .build())
                 .collect(Collectors.toList());
     }
