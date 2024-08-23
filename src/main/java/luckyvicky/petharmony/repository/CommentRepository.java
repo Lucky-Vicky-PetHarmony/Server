@@ -9,4 +9,9 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     List<Comment> findByBoard_BoardIdAndIsDeletedFalse(Long boardId);
 
     void deleteByBoard_BoardId(Long boardId);
+
+    Integer countByBoard_BoardId(Long boardId);
+
+    // 사용자 ID에 해당하는 게시물들을 조회하는 메소드
+    List<Comment> findByUser_UserId(Long userId);
 }

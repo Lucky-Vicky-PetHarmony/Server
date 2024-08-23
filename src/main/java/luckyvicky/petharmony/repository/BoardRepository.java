@@ -6,6 +6,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+
 public interface BoardRepository extends JpaRepository<Board, Long> {
 
     Page<Board> findAllByIsDeletedFalse(Pageable pageable);
@@ -32,4 +34,6 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
 
     Page<Board> findByCategoryAndBoardTitleContainingIgnoreCaseOrBoardContentContainingIgnoreCaseAndIsDeletedFalse(Category category, String titleKeyword, String contentKeyword, Pageable pageable);
 
+    // 사용자 ID에 해당하는 게시물들을 조회하는 메소드
+    List<Board> findByUser_UserId(Long userId);
 }
