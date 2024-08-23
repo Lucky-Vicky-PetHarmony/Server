@@ -4,11 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import luckyvicky.petharmony.dto.comment.CommentResponseDTO;
 import luckyvicky.petharmony.entity.board.Category;
 import luckyvicky.petharmony.entity.board.Image;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,10 +34,12 @@ public class BoardDetailResponseDTO {
     private Integer views; //조회수
 
     //이미지
+    @Builder.Default
     private List<Image> images = new ArrayList<>(); //빈리스트
 
     private Integer pinCount; //pin
 
     //좋아요 여부
+    @Builder.Default
     private Boolean pinStatus = Boolean.FALSE;
 }

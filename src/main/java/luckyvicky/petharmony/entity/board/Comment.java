@@ -1,6 +1,5 @@
 package luckyvicky.petharmony.entity.board;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
 import luckyvicky.petharmony.entity.User;
@@ -11,10 +10,9 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@Builder(toBuilder = true)
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 @Table(name = "comment")
 public class Comment {
 
@@ -38,10 +36,17 @@ public class Comment {
     @JoinColumn(name = "board_id")
     private Board board;                // 게시판 테이블
 
-//    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;                  // 유저 테이블
+
+    @Builder.Default
+    @Column(name = "is_deleted")
+    private Boolean isDeleted = false;
+
+    public void isDeleteActive() {
+        this.isDeleted = true;
+    }
 
     public void updateContent(String newContent) {
         this.commContent = newContent;

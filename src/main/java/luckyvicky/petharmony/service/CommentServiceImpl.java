@@ -14,12 +14,9 @@ import luckyvicky.petharmony.repository.CommentRepository;
 import luckyvicky.petharmony.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -125,7 +122,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public List<CommentResponseDTO> listComment(Long boardId) {
 
-        List<Comment> comments = commentRepository.findByBoard_BoardId(boardId);
+        List<Comment> comments = commentRepository.findByBoard_BoardIdAndIsDeletedFalse(boardId);
 
         // Comment 객체들을 CommentResponseDTO로 변환
         return comments.stream()
