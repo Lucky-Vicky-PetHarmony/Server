@@ -26,6 +26,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -315,5 +317,18 @@ public class UserServiceImpl implements UserService {
             phone = "0" + phone;
         }
         return phone;
+    }
+
+
+    /**
+     * 벤 풀어주는 기능
+     */
+    @Override
+    public void releaseBans() {
+        List<User> users = userRepository.findBySuspensionUntil(LocalDate.now());
+        log.info(users);
+        for(User user : users){
+            user.releaseBans();
+        }
     }
 }

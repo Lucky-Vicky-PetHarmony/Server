@@ -74,6 +74,11 @@ public class User {
                 LocalDate.now().plusDays(days);
         this.userState = UserState.BANNED;
     }
+
+    // 정지처리해제
+    public void releaseBans() {
+        this.userState = UserState.ACTIVE;
+    }
   
     // [마이페이지] - 내 정보 수정(이름, 이메일, 전화번호)
     public void updateUserInfo(MyProfileRequestDTO myProfileRequestDTO) {
