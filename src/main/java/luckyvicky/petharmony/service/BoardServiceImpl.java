@@ -257,7 +257,9 @@ public class BoardServiceImpl implements BoardService {
         return BoardDetailResponseDTO.builder()
                 .boardId(board.getBoardId())
                 .userId(board.getUser().getUserId())
-                .userName(user.getUserName())
+                .userName(user.getIsWithdrawal()?
+                            "(알수없음)":
+                            user.getUserName())
                 .title(board.getBoardTitle())
                 .content(board.getBoardContent())
                 .category(board.getCategory())

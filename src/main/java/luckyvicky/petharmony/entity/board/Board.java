@@ -54,7 +54,9 @@ public class Board {
     @Formula("(select count(*) from comment c where c.board_id = board_id)")
     private int commentCount;
 
-    @Formula("(select count(*) from board_pin bc where bc.board_id = board_id)")
+    @Formula("(select count(*) " +
+            "from board_pin bp join user u on bp.user_id = u.user_id " +
+            "where bp.board_id = board_id and u.is_withdrawal = false)")
     private int pinCount;
 
     @Builder.Default

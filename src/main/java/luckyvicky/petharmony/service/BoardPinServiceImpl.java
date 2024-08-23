@@ -57,7 +57,7 @@ public class BoardPinServiceImpl implements BoardPinService {
 
         boardPinRepository.flush();
         // Board 엔티티를 다시 불러와서 업데이트된 핀 카운트를 가져옴
-        int updatedPinCount = boardPinRepository.countByBoard_BoardId(boardId);
+        int updatedPinCount = boardPinRepository.countByBoard_BoardIdAndUser_IsWithdrawalFalse(boardId);
 
         return BoardPinResponseDTO.builder()
                 .boardId(board.getBoardId())

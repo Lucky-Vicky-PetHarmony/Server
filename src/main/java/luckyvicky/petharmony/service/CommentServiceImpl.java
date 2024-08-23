@@ -105,11 +105,15 @@ public class CommentServiceImpl implements CommentService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         return CommentResponseDTO.builder()
                 .commId(comment.getCommId())
-                .content(comment.getCommContent())
+                .content (comment.getIsDeleted()?
+                        "관리자에 의해 삭제된 댓글입니다.":
+                        comment.getCommContent())
                 .commUpdate(comment.getCommUpdate().format(formatter))
                 .commCreate(comment.getCommCreate().format(formatter))
                 .userId(comment.getUser().getUserId())
-                .userName(comment.getUser().getUserName())
+                .userName (comment.getUser() .getIsWithdrawal()?
+                        "(알수없음)":
+                        comment.getUser().getUserName())
                 .build();
     }
 
@@ -122,7 +126,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public List<CommentResponseDTO> listComment(Long boardId) {
 
-        List<Comment> comments = commentRepository.findByBoard_BoardIdAndIsDeletedFalse(boardId);
+        List<Comment> comments = commentRepository.findByBoard_BoardId(boardId);
 
         // Comment 객체들을 CommentResponseDTO로 변환
         return comments.stream()
