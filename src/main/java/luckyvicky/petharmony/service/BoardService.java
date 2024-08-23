@@ -1,7 +1,6 @@
 package luckyvicky.petharmony.service;
 
 import luckyvicky.petharmony.dto.board.*;
-import luckyvicky.petharmony.entity.board.Category;
 import org.springframework.data.domain.Page;
 
 import java.io.IOException;

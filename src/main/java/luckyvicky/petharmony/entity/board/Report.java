@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 @Builder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 @Table(name = "report")
 public class Report {
 
@@ -25,7 +24,7 @@ public class Report {
 
     @CreationTimestamp
     @Column(name = "report_date", nullable = false)
-    private LocalDate reportDate;         // 신고날짜
+    private LocalDateTime reportDate;         // 신고날짜
 
     @Column(name = "report_type", nullable = false, updatable = false)
     @Enumerated(EnumType.STRING) // Enum을 문자열로 저장

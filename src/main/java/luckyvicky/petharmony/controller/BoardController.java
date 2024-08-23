@@ -3,8 +3,6 @@ package luckyvicky.petharmony.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import luckyvicky.petharmony.dto.board.*;
-import luckyvicky.petharmony.dto.comment.CommentResponseDTO;
-import luckyvicky.petharmony.entity.board.Board;
 import luckyvicky.petharmony.service.BoardPinService;
 import luckyvicky.petharmony.service.BoardService;
 import org.springframework.data.domain.Page;
@@ -12,8 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Objects;
 
 @RestController
 @RequiredArgsConstructor

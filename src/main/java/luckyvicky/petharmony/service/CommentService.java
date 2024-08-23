@@ -3,7 +3,6 @@ package luckyvicky.petharmony.service;
 import luckyvicky.petharmony.dto.comment.CommentPostDTO;
 import luckyvicky.petharmony.dto.comment.CommentResponseDTO;
 import luckyvicky.petharmony.dto.comment.CommentUpdateDTO;
-import luckyvicky.petharmony.entity.board.Comment;
 
 import java.util.List;
 

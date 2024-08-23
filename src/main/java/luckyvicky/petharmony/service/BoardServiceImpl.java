@@ -4,7 +4,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import luckyvicky.petharmony.dto.board.*;
-import luckyvicky.petharmony.dto.comment.CommentResponseDTO;
 import luckyvicky.petharmony.entity.User;
 import luckyvicky.petharmony.entity.board.*;
 import luckyvicky.petharmony.repository.*;
@@ -13,7 +12,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
@@ -52,6 +50,7 @@ public class BoardServiceImpl implements BoardService {
                 .boardContent(boardPostDTO.getContent())
                 .category(boardPostDTO.getCategory())
                 .user(user)
+
                 .build();
         boardRepository.save(board);
 
@@ -152,9 +151,9 @@ public class BoardServiceImpl implements BoardService {
 
         // 검색 및 카테고리 필터링 적용
         if (Objects.equals(category, "ALL")) {
-            boardPage = boardRepository.findAll(pageable);
+            boardPage = boardRepository.findAllByIsDeletedFalse(pageable);
         } else {
-            boardPage = boardRepository.findByCategory(Category.valueOf(category), pageable);
+            boardPage = boardRepository.findByCategoryAndIsDeletedFalse(Category.valueOf(category), pageable);
         }
 
         return boardPage.map(this::buildBoardListResponseDTO);
@@ -180,21 +179,25 @@ public class BoardServiceImpl implements BoardService {
         // 검색 및 카테고리 필터링 적용
         if (Objects.equals(category, "ALL")) {
             if ("title".equals(searchType)) {
-                boards = boardRepository.findByBoardTitleContainingIgnoreCase(keyword, pageRequest);
+                boards = boardRepository.findByBoardTitleContainingIgnoreCaseAndIsDeletedFalse(keyword, pageRequest);
             } else if ("content".equals(searchType)) {
-                boards = boardRepository.findByBoardContentContainingIgnoreCase(keyword, pageRequest);
+                boards = boardRepository.findByBoardContentContainingIgnoreCaseAndIsDeletedFalse(keyword, pageRequest);
             } else {
-                boards = boardRepository.findByBoardTitleContainingIgnoreCaseOrBoardContentContainingIgnoreCase(
+                boards = boardRepository
+                        .findByBoardTitleContainingIgnoreCaseOrBoardContentContainingIgnoreCaseAndIsDeletedFalse(
                         keyword, keyword, pageRequest);
             }
         } else {
             Category categoryEnum = Category.valueOf(category);
             if ("title".equals(searchType)) {
-                boards = boardRepository.findByCategoryAndBoardTitleContainingIgnoreCase(categoryEnum, keyword, pageRequest);
+                boards = boardRepository
+                        .findByCategoryAndBoardTitleContainingIgnoreCaseAndIsDeletedFalse(categoryEnum, keyword, pageRequest);
             } else if ("content".equals(searchType)) {
-                boards = boardRepository.findByCategoryAndBoardContentContainingIgnoreCase(categoryEnum, keyword, pageRequest);
+                boards = boardRepository
+                        .findByCategoryAndBoardContentContainingIgnoreCaseAndIsDeletedFalse(categoryEnum, keyword, pageRequest);
             } else {
-                boards = boardRepository.findByCategoryAndBoardTitleContainingIgnoreCaseOrBoardContentContainingIgnoreCase(
+                boards = boardRepository
+                        .findByCategoryAndBoardTitleContainingIgnoreCaseOrBoardContentContainingIgnoreCaseAndIsDeletedFalse(
                         categoryEnum, keyword, keyword, pageRequest);
             }
         }
