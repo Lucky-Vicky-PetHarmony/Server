@@ -36,6 +36,10 @@ public class CustomUserDetails implements UserDetails {
         return user.getUserName();
     }
 
+    public Boolean getIsWithdrawal() {
+        return user.getIsWithdrawal();
+    }
+
     @Override
     public boolean isAccountNonExpired() {
         return true;
