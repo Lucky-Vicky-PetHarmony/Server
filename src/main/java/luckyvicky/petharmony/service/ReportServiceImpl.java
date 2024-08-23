@@ -194,9 +194,14 @@ public class ReportServiceImpl implements ReportService {
                 comment.isDeleteActive();
             }
         }else if(Objects.equals(processing, "THREE_DAY_SUSPENSION")){
-            //TODO: 3일정지
+            User user = report.getReported();
+            user.updateSuspensionUntil(3);
+        }else if(Objects.equals(processing, "SEVEN_DAY_SUSPENSION")){
+            User user = report.getReported();
+            user.updateSuspensionUntil(7);
         }else if(Objects.equals(processing, "ACCOUNT_TERMINATION")){
-            //TODO: 회원탈퇴
+            User user = report.getReported();
+            user.activeIsWithdrawal();
         }else if(Objects.equals(processing, "UNPROCESSED")){
             return processing;
         }

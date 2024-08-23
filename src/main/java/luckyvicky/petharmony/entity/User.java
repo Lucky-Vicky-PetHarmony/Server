@@ -56,8 +56,8 @@ public class User {
     @Column(name = "is_withdrawal")
     private Boolean isWithdrawal;                 // 탈퇴 여부
 
-    @Column(name = "suspension_util")
-    private LocalDate suspensionUtil;                 // 정지 여부(정지 마지막 날짜)
+    @Column(name = "suspension_until")
+    private LocalDate suspensionUntil;                 // 정지 여부(정지 마지막 날짜)
 
     // 비밀번호 변경
     public void updatePassword(String password) {
@@ -65,11 +65,13 @@ public class User {
     }
   
     // 탈퇴처리
-    public void updateIsWithdrawal(Boolean isWithdrawal) { this.isWithdrawal = isWithdrawal; }
+    public void activeIsWithdrawal() { this.isWithdrawal = true; }
 
-    // 정지처리(정지시킬 기간을 받아서 처리), 정지와 동시에 BANNED처리
-    public void updateSuspensionUtil(int days) {
-        this.suspensionUtil = LocalDate.now().plusDays(days);
+    // 정지처리(정지시킬 기간을 받아서 처리), 정지와 동시에 BANNED
+    public void updateSuspensionUntil(int days) {
+        this.suspensionUntil = this.suspensionUntil!=null?
+                this.suspensionUntil.plusDays(days):
+                LocalDate.now().plusDays(days);
         this.userState = UserState.BANNED;
     }
   
