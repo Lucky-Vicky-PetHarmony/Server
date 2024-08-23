@@ -36,7 +36,7 @@ public class Board {
     @Column(name = "board_create", nullable = false, updatable = false)
     private LocalDateTime boardCreate;   // 게시물 생성 날짜
 
-    @UpdateTimestamp
+    @CreationTimestamp
     @Column(name = "board_update", nullable = false)
     private LocalDateTime boardUpdate;   // 게시물 업데이트 날짜
 
@@ -73,5 +73,6 @@ public class Board {
         this.boardContent = newContent;
         this.boardTitle = newTitle;
         this.category = category;
+        this.boardUpdate = LocalDateTime.now();
     }
 }
