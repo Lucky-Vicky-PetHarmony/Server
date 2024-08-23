@@ -3,6 +3,7 @@ package luckyvicky.petharmony.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import luckyvicky.petharmony.dto.board.BoardListResponseDTO;
+import luckyvicky.petharmony.dto.mypage.MyCommentsDTO;
 import luckyvicky.petharmony.dto.mypage.MyProfileRequestDTO;
 import luckyvicky.petharmony.dto.mypage.MyProfileResponseDTO;
 import luckyvicky.petharmony.dto.mypage.PasswordRequestDTO;
@@ -60,6 +61,30 @@ public class MyPageController {
             return ResponseEntity.ok(pinPosts);
         } catch (Exception e) {
             log.error("PIN 게시물 조회 중 오류 발생", e);
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+    // 사용자가 작성한 게시물 조회 엔드포인트
+    @GetMapping("/api/user/myPosts")
+    public ResponseEntity<List<BoardListResponseDTO>> getMyPosts() {
+        try {
+            List<BoardListResponseDTO> myPosts = myPageService.getMyPosts();
+            return ResponseEntity.ok(myPosts);
+        } catch (Exception e) {
+            log.error("작성한 게시물 조회 중 오류 발생", e);
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+    // 사용자가 작성한 댓글 조회 엔드포인트
+    @GetMapping("/api/user/myComments")
+    public ResponseEntity<List<MyCommentsDTO>> getMyComments() {
+        try {
+            List<MyCommentsDTO> myComments = myPageService.getMyComments();
+            return ResponseEntity.ok(myComments);
+        } catch (Exception e) {
+            log.error("작성한 댓글 조회 중 오류 발생", e);
             return ResponseEntity.badRequest().body(null);
         }
     }

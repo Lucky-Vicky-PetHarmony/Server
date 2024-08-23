@@ -4,15 +4,15 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import luckyvicky.petharmony.dto.board.BoardListResponseDTO;
+import luckyvicky.petharmony.dto.mypage.MyCommentsDTO;
 import luckyvicky.petharmony.dto.mypage.MyProfileRequestDTO;
 import luckyvicky.petharmony.dto.mypage.MyProfileResponseDTO;
 import luckyvicky.petharmony.dto.mypage.PasswordRequestDTO;
 import luckyvicky.petharmony.entity.User;
 import luckyvicky.petharmony.entity.board.Board;
 import luckyvicky.petharmony.entity.board.BoardPin;
-import luckyvicky.petharmony.repository.BoardPinRepository;
-import luckyvicky.petharmony.repository.ImageRepository;
-import luckyvicky.petharmony.repository.UserRepository;
+import luckyvicky.petharmony.entity.board.Comment;
+import luckyvicky.petharmony.repository.*;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -31,6 +31,8 @@ public class MyPageServiceImpl implements MyPageService {
     private final PasswordEncoder passwordEncoder;
     private final BoardPinRepository boardPinRepository;
     private final ImageRepository imageRepository;
+    private final BoardRepository boardRepository;
+    private final CommentRepository commentRepository;
 
     // 현재 인증된 사용자의 프로필 정보를 조회하는 메서드
     @Override
@@ -123,5 +125,52 @@ public class MyPageServiceImpl implements MyPageService {
                 .image(hasImage)
                 .pinCount(board.getPinCount())
                 .build();
+    }
+
+    // 현재 인증된 사용자가 작성한 게시물들을 조회하는 메서드
+    @Override
+    public List<BoardListResponseDTO> getMyPosts() {
+        // 현재 로그인된 사용자의 정보를 가져온다(이메일)
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        // 사용자가 작성한 게시물 목록을 가져옴
+        List<Board> my = boardRepository.findByUser_UserId(user.getUserId());
+        // Pin된 게시물 리스트가 비어있는 경우를 처리할 수 있음
+        if (my.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return my.stream()
+                .map(this::buildBoardListResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    // 현재 인증된 사용자가 작성한 댓글들을 조회하는 메소드
+    @Override
+    public List<MyCommentsDTO> getMyComments() {
+        // 현재 로그인된 사용자의 정보를 가져온다(이메일)
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        // 사용자가 작성한 댓글 목록을 가져옴
+        List<Comment> my = commentRepository.findByUser_UserId(user.getUserId());
+        // 댓글 게시물 리스트가 비어있는 경우를 처리할 수 있음
+        if (my.isEmpty()) {
+            return Collections.emptyList();
+        }
+        // Comment 엔티티를 MyCommentsDTO로 변환하여 반환
+        return my.stream()
+                .map(comment -> MyCommentsDTO.builder()
+                        .boardId(comment.getBoard().getBoardId())
+                        .category(comment.getBoard().getCategory())
+                        .boardTitle(comment.getBoard().getBoardTitle())
+                        .image(imageRepository.existsByBoard_BoardId(comment.getBoard().getBoardId()))
+                        .viewCount(comment.getBoard().getView())
+                        .commentCount(comment.getBoard().getCommentCount())
+                        .pinCount(comment.getBoard().getPinCount())
+                        .boardUpdate(comment.getBoard().getBoardUpdate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                        .content(comment.getCommContent())
+                        .build())
+                .collect(Collectors.toList());
     }
 }
