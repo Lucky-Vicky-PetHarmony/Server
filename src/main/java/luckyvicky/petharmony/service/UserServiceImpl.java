@@ -85,7 +85,7 @@ public class UserServiceImpl implements UserService {
      * @return 인증에 성공한 사용자의 정보와 JWT 토큰을 담은 LoginResponseDTO 객체
      */
     @Override
-    public LoginResponseDTO login(LogInDTO logInDTO) {
+    public LogInResponseDTO login(LogInDTO logInDTO) {
         // 사용자 인증
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -97,7 +97,7 @@ public class UserServiceImpl implements UserService {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         // 인증 성공 시 JWT 토큰 생성 및 LoginResponseDTO 반환
         String jwtToken = jwtTokenProvider.generateToken(authentication);
-        return LoginResponseDTO.builder()
+        return LogInResponseDTO.builder()
                 .jwtToken(jwtToken)
                 .email(userDetails.getUsername())
                 .userName(userDetails.getUserName())

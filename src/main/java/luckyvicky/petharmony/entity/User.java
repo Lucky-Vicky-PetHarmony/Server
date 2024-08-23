@@ -2,6 +2,7 @@ package luckyvicky.petharmony.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import luckyvicky.petharmony.dto.mypage.MyProfileRequestDTO;
 import luckyvicky.petharmony.security.Role;
 import luckyvicky.petharmony.security.UserState;
 import org.hibernate.annotations.CreationTimestamp;
@@ -11,12 +12,12 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "user")
 public class User {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
@@ -50,7 +51,7 @@ public class User {
     private UserState userState;                  // 회원 상태 (ACTIVE, BANNED)
 
     @Column(name = "kakao_id")
-    private String kakaoId;                         // 카카오 회원 ID
+    private String kakaoId;                       // 카카오 회원 ID
 
     @Column(name = "is_withdrawal")
     private Boolean isWithdrawal;                 // 탈퇴 여부
@@ -62,7 +63,7 @@ public class User {
     public void updatePassword(String password) {
         this.password = password;
     }
-
+  
     // 탈퇴처리
     public void updateIsWithdrawal(Boolean isWithdrawal) { this.isWithdrawal = isWithdrawal; }
 
@@ -70,5 +71,12 @@ public class User {
     public void updateSuspensionUtil(int days) {
         this.suspensionUtil = LocalDate.now().plusDays(days);
         this.userState = UserState.BANNED;
+    }
+  
+    // [마이페이지] - 내 정보 수정(이름, 이메일, 전화번호)
+    public void updateUserInfo(MyProfileRequestDTO myProfileRequestDTO) {
+        this.userName = myProfileRequestDTO.getUserName();
+        this.email = myProfileRequestDTO.getEmail();
+        this.phone = myProfileRequestDTO.getPhone();
     }
 }
