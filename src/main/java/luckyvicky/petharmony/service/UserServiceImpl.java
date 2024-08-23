@@ -69,6 +69,7 @@ public class UserServiceImpl implements UserService {
                 .phone(signUpDTO.getPhone())
                 .role(Role.USER)
                 .userState(UserState.ACTIVE)
+                .isWithdrawal(false)
                 .build();
 
         return userRepository.save(user);
@@ -302,6 +303,7 @@ public class UserServiceImpl implements UserService {
                     .role(Role.USER)
                     .userState(UserState.ACTIVE)
                     .kakaoId(kakaoInfoDTO.getId())
+                    .isWithdrawal(false)
                     .build();
 
             return userRepository.save(user);
