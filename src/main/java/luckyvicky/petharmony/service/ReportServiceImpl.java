@@ -36,12 +36,12 @@ public class ReportServiceImpl implements ReportService {
     private final UserRepository userRepository;
     private final BoardRepository boardRepository;
     private final CommentRepository commentRepository;
-    private final ImageService imageService;
 
     /**
      * 신고하기
      *
      * @param reportPostDTO 신고내용에 관한 정보들이 담겨있는 DTO
+     * @return 신고 성공 여부를 반환하는 문자열 ("report success" 또는 "report failed")
      */
     @Override
     public String report(ReportPostDTO reportPostDTO) {
@@ -83,6 +83,7 @@ public class ReportServiceImpl implements ReportService {
      * @param sortBy 정렬
      * @param page 요청 페이지
      * @param size 페이지 사이즈
+     * @return 선택된 필터와 정렬 기준에 따라 페이징된 신고 목록을 반환
      */
     @Override
     public Page<ReportListResponseDTO> reportList(String selectionString, String sortBy, int page, int size) {
@@ -105,7 +106,6 @@ public class ReportServiceImpl implements ReportService {
             reportPage = reportRepository.findAll(pageable);
         } else {
             List<ReportProcess> statuses = new ArrayList<>();
-            boolean includeCompleted = false;
 
             for (String status : selection) {
                 if ("UNPROCESSED".equals(status)) {
@@ -129,8 +129,8 @@ public class ReportServiceImpl implements ReportService {
     /**
      * 신고상세
      *
-     * @param reportId 신고번호
-     * @return 신고번호에 대한 정보들
+     * @param reportId reportId 조회할 신고 ID
+     * @return 신고 상세 정보 DTO
      */
     @Override
     public ReportDetailDTO reportDetail(Long reportId) {
@@ -173,7 +173,8 @@ public class ReportServiceImpl implements ReportService {
      * 신고처리
      *
      * @param reportId 처리할 reportId
-     * @return 처리여부
+     * @param processing 처리할 상태 (예: 삭제, 3일 정지, 회원 탈퇴 등)
+     * @return 처리 결과 메시지 (처리 상태)
      */
     @Override
     public String reportPrecessing(Long reportId, String processing) throws IOException {
