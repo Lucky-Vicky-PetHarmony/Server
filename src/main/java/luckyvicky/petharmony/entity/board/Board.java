@@ -36,7 +36,7 @@ public class Board {
     @Column(name = "board_create", nullable = false, updatable = false)
     private LocalDateTime boardCreate;   // 게시물 생성 날짜
 
-    @UpdateTimestamp
+    @CreationTimestamp
     @Column(name = "board_update", nullable = false)
     private LocalDateTime boardUpdate;   // 게시물 업데이트 날짜
 
@@ -54,7 +54,9 @@ public class Board {
     @Formula("(select count(*) from comment c where c.board_id = board_id)")
     private int commentCount;
 
-    @Formula("(select count(*) from board_pin bc where bc.board_id = board_id)")
+    @Formula("(select count(*) " +
+            "from board_pin bp join user u on bp.user_id = u.user_id " +
+            "where bp.board_id = board_id and u.is_withdrawal = false)")
     private int pinCount;
 
     @Builder.Default
@@ -73,5 +75,6 @@ public class Board {
         this.boardContent = newContent;
         this.boardTitle = newTitle;
         this.category = category;
+        this.boardUpdate = LocalDateTime.now();
     }
 }

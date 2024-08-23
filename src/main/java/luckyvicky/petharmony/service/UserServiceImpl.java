@@ -99,6 +99,7 @@ public class UserServiceImpl implements UserService {
         String jwtToken = jwtTokenProvider.generateToken(authentication);
         return LogInResponseDTO.builder()
                 .jwtToken(jwtToken)
+                .userId(userDetails.getUser().getUserId())
                 .email(userDetails.getUsername())
                 .userName(userDetails.getUserName())
                 .role(authentication.getAuthorities().toString())
