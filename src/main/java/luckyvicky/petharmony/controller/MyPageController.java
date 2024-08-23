@@ -3,10 +3,7 @@ package luckyvicky.petharmony.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import luckyvicky.petharmony.dto.board.BoardListResponseDTO;
-import luckyvicky.petharmony.dto.mypage.MyCommentsDTO;
-import luckyvicky.petharmony.dto.mypage.MyProfileRequestDTO;
-import luckyvicky.petharmony.dto.mypage.MyProfileResponseDTO;
-import luckyvicky.petharmony.dto.mypage.PasswordRequestDTO;
+import luckyvicky.petharmony.dto.mypage.*;
 import luckyvicky.petharmony.service.MyPageService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -85,6 +82,18 @@ public class MyPageController {
             return ResponseEntity.ok(myComments);
         } catch (Exception e) {
             log.error("작성한 댓글 조회 중 오류 발생", e);
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+    // 사용자가 회원 탈퇴하는 엔드포인트
+    @PutMapping("/api/user/deleteAccount")
+    public ResponseEntity<DeleteAccountResponseDTO> deleteAccount() {
+        try {
+            DeleteAccountResponseDTO deleteAccountResponseDTO = myPageService.deleteMyAccount();
+            return ResponseEntity.ok(deleteAccountResponseDTO);
+        } catch (Exception e) {
+            log.error("회원 탈퇴 처리 중 오류 발생");
             return ResponseEntity.badRequest().body(null);
         }
     }

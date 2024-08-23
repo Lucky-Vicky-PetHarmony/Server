@@ -4,10 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import luckyvicky.petharmony.dto.board.BoardListResponseDTO;
-import luckyvicky.petharmony.dto.mypage.MyCommentsDTO;
-import luckyvicky.petharmony.dto.mypage.MyProfileRequestDTO;
-import luckyvicky.petharmony.dto.mypage.MyProfileResponseDTO;
-import luckyvicky.petharmony.dto.mypage.PasswordRequestDTO;
+import luckyvicky.petharmony.dto.mypage.*;
 import luckyvicky.petharmony.entity.User;
 import luckyvicky.petharmony.entity.board.Board;
 import luckyvicky.petharmony.entity.board.BoardPin;
@@ -173,5 +170,24 @@ public class MyPageServiceImpl implements MyPageService {
                         .commId(comment.getCommId())
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    // 현재 인증된 사용자가 회원탈퇴를 하는 메서드
+    @Override
+    @Transactional
+    public DeleteAccountResponseDTO deleteMyAccount() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        // 회원 탈퇴
+        user.activeIsWithdrawal();
+        // 저장
+        userRepository.save(user);
+        // DeleteAccountResponseDTO 반환
+        return DeleteAccountResponseDTO.builder()
+                .userName(user.getUserName())
+                .email(user.getEmail())
+                .role(user.getRole().toString())
+                .build();
     }
 }
