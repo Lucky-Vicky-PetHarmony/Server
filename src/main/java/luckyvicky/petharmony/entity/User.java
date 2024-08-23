@@ -6,6 +6,7 @@ import luckyvicky.petharmony.security.Role;
 import luckyvicky.petharmony.security.UserState;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -51,8 +52,23 @@ public class User {
     @Column(name = "kakao_id")
     private String kakaoId;                         // 카카오 회원 ID
 
+    @Column(name = "is_withdrawal")
+    private Boolean isWithdrawal;                 // 탈퇴 여부
+
+    @Column(name = "suspension_util")
+    private LocalDate suspensionUtil;                 // 정지 여부(정지 마지막 날짜)
+
     // 비밀번호 변경
     public void updatePassword(String password) {
         this.password = password;
+    }
+
+    // 탈퇴처리
+    public void updateIsWithdrawal(Boolean isWithdrawal) { this.isWithdrawal = isWithdrawal; }
+
+    // 정지처리(정지시킬 기간을 받아서 처리), 정지와 동시에 BANNED처리
+    public void updateSuspensionUtil(int days) {
+        this.suspensionUtil = LocalDate.now().plusDays(days);
+        this.userState = UserState.BANNED;
     }
 }
