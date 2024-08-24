@@ -57,9 +57,17 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public User signUp(SignUpDTO signUpDTO) {
-        // 이메일 중복 체크
-        if (userRepository.findByEmail(signUpDTO.getEmail()).isPresent()) {
-            throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
+        // 탈퇴한 사용자 이메일인지 확인
+        Optional<User> withdrawanUser = userRepository.findByIsWithdrawalTrueAndEmail(signUpDTO.getEmail());
+        if (withdrawanUser.isPresent()) {
+            throw new IllegalArgumentException("🐶해당 이메일은 탈퇴한 계정입니다." +
+                    "\npetharmony77@gmail.com로 문의주세요.");
+        }
+        // 이미 사용 중인 이메일인지 확인
+        Optional<User> existingUser = userRepository.findByEmail(signUpDTO.getEmail());
+        if (existingUser.isPresent()) {
+            throw new IllegalArgumentException("🐶이미 사용 중인 이메일입니다." +
+                    "\n다른 이메일로 회원가입을 진행해주세요.");
         }
         // 비밀번호 암호화
         String encodedPassword = passwordEncoder.encode(signUpDTO.getPassword());

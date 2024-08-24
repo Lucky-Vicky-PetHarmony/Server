@@ -33,8 +33,11 @@ public class UserController {
         try {
             userService.signUp(signUpDTO);
             return ResponseEntity.ok("PetHarmony에 오신걸 환영합니다.");
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
+            // 예외 메시지를 클라이언트에 그대로 반환
             return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("회원가입 처리 중 오류가 발생했습니다.");
         }
     }
 
