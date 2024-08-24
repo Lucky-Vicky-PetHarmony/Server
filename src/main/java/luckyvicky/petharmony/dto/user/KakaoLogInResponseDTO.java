@@ -9,6 +9,8 @@ import lombok.*;
 public class KakaoLogInResponseDTO {
     private String jwtToken;
 
+    private Long userId;
+
     private String email;
 
     private String userName;

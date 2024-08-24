@@ -135,6 +135,7 @@ public class UserController {
         // 반환할 KakaoLogInResponseDTO 객체 생성
         KakaoLogInResponseDTO response = new KakaoLogInResponseDTO(
                 jwtToken,
+                user.getUserId(),
                 user.getEmail(),
                 user.getUserName(),
                 user.getRole().toString()

@@ -326,7 +326,6 @@ public class UserServiceImpl implements UserService {
         // 카카오 ID 기반으로 DB에 사용자 있는지 확인
         Optional<User> existingUser = userRepository.findByKakaoId(kakaoInfoDTO.getId());
         if (existingUser.isPresent()) {
-            log.info("Kakao ID {}로 이미 등록된 사용자입니다. 로그인 처리를 진행합니다.", kakaoInfoDTO.getId());
             return existingUser.get();
         } else {
             User user = User.builder()
