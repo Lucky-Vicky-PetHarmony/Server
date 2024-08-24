@@ -14,7 +14,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByPhoneAndKakaoIdIsNull(String phone);
     // 카카오 ID로 사용자 조회
     Optional<User> findByKakaoId(String kakaoId);
-
+    // 탈퇴한 사용자 중 이메일로 사용자 조회
+    Optional<User> findByIsWithdrawalTrueAndEmail(String email);
+    // 카카오 ID가 있는지 이메일로 사용자 조회
+    Optional<User> findByEmailAndKakaoIdIsNotNull(String email);
     //오늘 날짜랑 suspensionUntil이랑 같은 유저 조회
     List<User> findBySuspensionUntil(LocalDate today);
 }

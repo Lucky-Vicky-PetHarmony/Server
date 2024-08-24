@@ -18,7 +18,6 @@ public interface UserService {
     KakaoInfoDTO getUserInfoFromKakao(String accessToken);
     // 카카오 로그인 처리 메서드
     User kakaoLogin(KakaoInfoDTO kakaoInfoDTO);
-
-    //벤 풀어주는 메소드
+    // 활동 정지 해제 메서드
     void releaseBans();
 }
