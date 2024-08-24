@@ -9,12 +9,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PetInfoFormatServiceTest {
 
@@ -24,12 +22,11 @@ public class PetInfoFormatServiceTest {
 
     @BeforeEach
     public void setUp() {
-        // Given: Mock WordRepository and ShelterInfoRepository is set up with expected data
-        // WordRepository와 ShelterInfoRepository를 Mocking하여 예상 데이터를 설정합니다.
+        // Mock WordRepository and ShelterInfoRepository is set up with expected data
         wordRepository = Mockito.mock(WordRepository.class);
         shelterInfoRepository = Mockito.mock(ShelterInfoRepository.class);
 
-        // 테스트 데이터 기반의 Word ID 매핑 설정
+        // Word ID 매핑 설정
         List<Word> words = Arrays.asList(
                 new Word(1L, "건강한"),
                 new Word(3L, "온순한"),
@@ -39,7 +36,7 @@ public class PetInfoFormatServiceTest {
         Mockito.when(wordRepository.findByWordIdIn(Arrays.asList(1L, 3L, 7L, 17L)))
                 .thenReturn(words);
 
-        // 테스트 데이터 기반의 ShelterInfo 매핑 설정
+        // ShelterInfo 매핑 설정
         ShelterInfo shelterInfo = new ShelterInfo();
         shelterInfo.setCareNm("한국동물구조관리협회");
         shelterInfo.setOrgNm("서울특별시");
@@ -47,14 +44,13 @@ public class PetInfoFormatServiceTest {
         Mockito.when(shelterInfoRepository.findByCareNm("한국동물구조관리협회"))
                 .thenReturn(Optional.of(shelterInfo));
 
-        // Mock된 WordRepository와 ShelterInfoRepository로 MatchingProcessService를 초기화합니다.
+        // Mock된 WordRepository와 ShelterInfoRepository로 PetInfoFormatService를 초기화합니다.
         petInfoFormatService = new PetInfoFormatService(wordRepository, shelterInfoRepository);
     }
 
     @Test
     public void testProcessPetInfo() {
         // Given: A PetInfo object is created with specified attributes
-        // 지정된 속성들로 PetInfo 객체를 생성합니다.
         PetInfo petInfo = new PetInfo();
         petInfo.setDesertionNo("411300202400334");
         petInfo.setHappenPlace("종로 386 진형빌딩 인근");
@@ -73,12 +69,10 @@ public class PetInfoFormatServiceTest {
         petInfo.setOfficetel("02-2148-1894");
         petInfo.setWords("1,3,7,17");
 
-        // When: MatchingProcessService's processPetInfo method is called
-        // MatchingProcessService의 processPetInfo 메서드를 호출합니다.
+        // When: PetInfoFormatService's processPetInfo method is called
         Map<String, Object> result = petInfoFormatService.processPetInfo(petInfo);
 
         // Then: The result should match the expected processed values
-        // 결과가 예상된 처리된 값과 일치해야 합니다.
         System.out.println("결과: " + result);
 
         // 각 필드의 올바른 처리 확인을 위한 Assertions
@@ -88,5 +82,51 @@ public class PetInfoFormatServiceTest {
         assertEquals("남아", result.get("sex_cd"));
         assertEquals("중성화 완료", result.get("neuter_yn"));
         assertEquals("서울특별시", result.get("care_nm"));
+        assertEquals("http://www.animal.go.kr/files/shelter/2024/07/20240731150770.jpg", result.get("popfile")); // popfile 필드 검증
     }
+
+/*    @Test
+    public void testProcessWords_WithLessThanOrEqualToThreeWords() {
+        // Given: Less than or equal to 3 words
+        Mockito.when(wordRepository.findByWordIdIn(Arrays.asList(1L, 3L)))
+                .thenReturn(Arrays.asList(new Word(1L, "건강한"), new Word(3L, "온순한")));
+
+        // When
+        List<String> result = petInfoFormatService.processWords("1,3");
+
+        // Then: The words list should contain exactly "건강한", "온순한"
+        assertEquals(2, result.size());
+        assertTrue(result.containsAll(Arrays.asList("건강한", "온순한")));
+    }
+
+    @Test
+    public void testProcessWords_WithMoreThanThreeWords() {
+        // Given: More than 3 words
+        Mockito.when(wordRepository.findByWordIdIn(Arrays.asList(1L, 3L, 7L, 17L)))
+                .thenReturn(Arrays.asList(
+                        new Word(1L, "건강한"),
+                        new Word(3L, "온순한"),
+                        new Word(7L, "겁많은"),
+                        new Word(17L, "특별한")
+                ));
+
+        // When
+        List<String> result = petInfoFormatService.processWords("1,3,7,17");
+
+        // Then: The words list should contain exactly 3 words randomly selected from the 4 available
+        assertEquals(3, result.size());
+        assertTrue(Arrays.asList("건강한", "온순한", "겁많은", "특별한").containsAll(result));
+    }
+
+    @Test
+    public void testProcessWords_WithEmptyOrNullWords() {
+        // Given: No words
+        // When
+        List<String> resultEmpty = petInfoFormatService.processWords("");
+        List<String> resultNull = petInfoFormatService.processWords(null);
+
+        // Then: The words list should be empty
+        assertTrue(resultEmpty.isEmpty());
+        assertTrue(resultNull.isEmpty());
+    }*/
 }

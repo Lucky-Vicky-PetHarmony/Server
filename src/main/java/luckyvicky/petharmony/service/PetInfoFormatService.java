@@ -52,6 +52,10 @@ public class PetInfoFormatService {
 
         // care_nm필드를 처리하여 반환
         result.put("care_nm", processLocation(petInfo.getCareNm()));
+
+        // popfile필드를 결과에 추가하여 유기동물의 이미지 경로를 반환
+        result.put("popfile", petInfo.getPopfile());
+
         return result; // 최종 처리된 데이터를 Map으로 반환
     }
 
@@ -73,9 +77,18 @@ public class PetInfoFormatService {
 
         // wordId 리스트로 Word엔티티를 조회하고, wordSelect 값을 추출하여 반환
         List<Word> wordEntities = wordRepository.findByWordIdIn(wordIds);
-        return wordEntities.stream()
+        List<String> wordSelects = wordEntities.stream()
                 .map(Word::getWordSelect)
                 .collect(Collectors.toList());
+
+        // 단어의 개수가 3개 이하일 경우 그대로 반환
+        if (wordSelects.size() <= 3) {
+            return wordSelects;
+        }
+
+        // 단어가 4개 이상인 경우 3개의 랜덤한 단어를 선택하여 반환
+        Collections.shuffle(wordSelects);
+        return wordSelects.subList(0, 3);
     }
 
     /**
