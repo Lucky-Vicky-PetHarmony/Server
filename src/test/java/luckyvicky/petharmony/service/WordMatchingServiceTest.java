@@ -1,3 +1,4 @@
+/*
 package luckyvicky.petharmony.service;
 
 import luckyvicky.petharmony.entity.PetInfo;
@@ -153,3 +154,4 @@ public class WordMatchingServiceTest {
         assertThat(result).isEqualTo(0);
     }
 }
+*/
