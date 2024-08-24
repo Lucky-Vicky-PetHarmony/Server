@@ -36,4 +36,8 @@ public interface PetInfoRepository extends JpaRepository<PetInfo, String> {
     // words 필드를 LIKE 검색하여 wordId가 포함된 모든 PetInfo를 가져옵니다.
     @Query("SELECT p FROM PetInfo p WHERE p.words LIKE CONCAT('%,', :wordId, ',%') OR p.words LIKE CONCAT(:wordId, ',%') OR p.words LIKE CONCAT('%,', :wordId) OR p.words = :wordId")
     List<PetInfo> findByWordId(@Param("wordId") String wordId);
+
+    // shelter_info와 pet_info의 care_nm(위치 정보에 활용)
+    @Query("SELECT p FROM PetInfo p WHERE p.careNm = :careNm")
+    List<PetInfo> findAllByCareNm(@Param("careNm") String careNm);
 }

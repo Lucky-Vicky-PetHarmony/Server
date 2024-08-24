@@ -44,9 +44,6 @@ public class PetInfoRepositoryTest {
                 .neuterYn("Y")  // 중성화 여부
                 .specialMark("Friendly")  // 특이사항
                 .careNm("Care Center 1")  // 보호소 이름
-                .chargeNm("John Doe")  // 담당자 이름
-                .officetel("1234567890")  // 담당자 연락처
-                .noticeComment("No comments")  // 공고 코멘트
                 .words("word1")  // 연관된 단어
                 .build();
 
@@ -67,9 +64,6 @@ public class PetInfoRepositoryTest {
                 .neuterYn("N")
                 .specialMark("Playful")
                 .careNm("Care Center 2")
-                .chargeNm("Jane Smith")
-                .officetel("0987654321")
-                .noticeComment("Adopted")
                 .words("word2")
                 .build();
 

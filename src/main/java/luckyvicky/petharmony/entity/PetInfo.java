@@ -2,6 +2,7 @@ package luckyvicky.petharmony.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.util.Date;
 
 @Entity
@@ -65,19 +66,10 @@ public class PetInfo {
     @Column(name = "care_nm", length = 50)
     private String careNm;
 
-    @Column(name = "charge_nm", length = 20)
-    private String chargeNm;
-
-    @Column(name = "officetel", length = 14)
-    private String officetel;
-
-    @Column(name = "notice_comment", length = 200)
-    private String noticeComment;
-
-    @Column(name = "words")
+    @Column(name = "words", length = 255)
     private String words;
 
-    // WordId 업데이트를 위한 메서드
+    // Method to update the words field
     public void updateWordId(String words) {
         this.words = words;
     }

@@ -65,8 +65,6 @@ public class PetInfoFormatServiceTest {
         petInfo.setNeuterYn("Y");
         petInfo.setSpecialMark("온순. 소심. 치석. 양쪽눈 혼탁. 코검정. 꼬리단미안됨. 털상태양호. 오른쪽슬개골.");
         petInfo.setCareNm("한국동물구조관리협회");
-        petInfo.setChargeNm("김민지");
-        petInfo.setOfficetel("02-2148-1894");
         petInfo.setWords("1,3,7,17");
 
         // When: PetInfoFormatService's processPetInfo method is called
