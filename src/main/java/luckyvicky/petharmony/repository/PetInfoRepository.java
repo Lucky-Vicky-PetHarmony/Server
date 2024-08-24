@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.security.core.parameters.P;
 
 import java.util.List;
 
@@ -31,4 +32,12 @@ public interface PetInfoRepository extends JpaRepository<PetInfo, String> {
     @Query("SELECT new luckyvicky.petharmony.dto.WordClassificationDTO(p.desertionNo, p.specialMark, p.age, p.sexCd, '') " +
             "FROM PetInfo p WHERE p.age = :age AND p.sexCd = :sexCd")
     Page<WordClassificationDTO> findWordClassificationsByCriteria(@Param("age") String age, @Param("sexCd") String sexCd, Pageable pageable);
+
+    // words 필드를 LIKE 검색하여 wordId가 포함된 모든 PetInfo를 가져옵니다.
+    @Query("SELECT p FROM PetInfo p WHERE p.words LIKE CONCAT('%,', :wordId, ',%') OR p.words LIKE CONCAT(:wordId, ',%') OR p.words LIKE CONCAT('%,', :wordId) OR p.words = :wordId")
+    List<PetInfo> findByWordId(@Param("wordId") String wordId);
+
+    // shelter_info와 pet_info의 care_nm(위치 정보에 활용)
+    @Query("SELECT p FROM PetInfo p WHERE p.careNm = :careNm")
+    List<PetInfo> findAllByCareNm(@Param("careNm") String careNm);
 }

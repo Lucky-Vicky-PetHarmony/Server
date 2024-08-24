@@ -35,7 +35,7 @@ public class MatchingController {
     @GetMapping("/api/user/top12/{userId}")
     public List<Map<String, Object>> getTop12PetsByUserWord(@PathVariable Long userId) {
         // 사용자의 wordId 리스트와 매칭된 PetInfo 리스트를 가져옴
-        List<PetInfo> matchedPetInfos = wordMatchingService.getTop12PetInfosByUserWord(userId);
+        List<PetInfo> matchedPetInfos = wordMatchingService.getMatchingPetInfosByUserWord(userId);
 
         // 각 PetInfo 객체를 처리하여 프론트엔드에 전달할 형식으로 변환
         return matchedPetInfos.stream()

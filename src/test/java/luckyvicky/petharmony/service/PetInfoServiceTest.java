@@ -60,7 +60,7 @@ public class PetInfoServiceTest {
         when(petInfoRepository.findAll()).thenReturn(mockPetInfos);
 
         // 실제 테스트 수행: 서비스 메서드 호출
-        List<PetInfo> top12PetInfos = wordMatchingService.getTop12PetInfosByUserWord(userId);
+        List<PetInfo> top12PetInfos = wordMatchingService.getMatchingPetInfosByUserWord(userId);
 
         // 검증: 반환된 리스트가 null이 아니고, 12개 이하의 PetInfo를 포함하는지 확인
         assertThat(top12PetInfos).isNotNull();

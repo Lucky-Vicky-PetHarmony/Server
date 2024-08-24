@@ -58,6 +58,10 @@ dependencies {
 
 	// 추가된 Spring Security Test
 	testImplementation "org.springframework.security:spring-security-test:$springSecurityVersion"
+
+	// Spring Batch Core 의존성
+	implementation 'org.springframework.boot:spring-boot-starter-batch'
+	testImplementation 'org.springframework.batch:spring-batch-test'
 }
 
 tasks.named('test') {

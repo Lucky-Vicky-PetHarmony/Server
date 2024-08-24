@@ -1,16 +1,18 @@
 package luckyvicky.petharmony.service;
 
+import luckyvicky.petharmony.dto.WordClassificationDTO;
 import luckyvicky.petharmony.entity.PetInfo;
 import luckyvicky.petharmony.repository.PetInfoRepository;
-import luckyvicky.petharmony.service.PetInfoWordService;
 import luckyvicky.petharmony.service.openapi.OpenAiService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class PetInfoWordServiceTest {
@@ -24,35 +26,86 @@ class PetInfoWordServiceTest {
     @InjectMocks
     private PetInfoWordService petInfoWordService;
 
+    // Mock 초기화
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
     }
 
+    /**
+     * processPetInfo 메서드가 desertionNo가 null인 경우를 처리하는지 테스트
+     */
     @Test
-    void testProcessPetInfoWithAgeAndSex() {
-        // Given: PetInfo 객체 생성 및 초기화
+    void testProcessPetInfo_withNullDesertionNo() {
+        // given: desertionNo가 null인 PetInfo 객체를 생성
         PetInfo petInfo = new PetInfo();
-        petInfo.setDesertionNo("311300202400322");
-        petInfo.setSpecialMark("특별한 특징이 있습니다.");
-        petInfo.setAge("2024(년생)");
-        petInfo.setSexCd("M");
+        petInfo.setDesertionNo(null);
 
-        // Mock 설정: OpenAiService의 analyzeSpecialMark 메서드가 특정 결과를 반환하도록 설정
-        when(openAiService.analyzeSpecialMark("특별한 특징이 있습니다.")).thenReturn("특별한");
-
-        // When: processPetInfo 메서드 호출
+        // when: processPetInfo 메서드를 호출
         petInfoWordService.processPetInfo(petInfo);
 
-        // Then: words 필드가 예상한 대로 저장되었는지 확인
-        // 2024년생이므로 "활발한", 성별이 "M"이므로 "예쁜", OpenAi 분석 결과로 "특별한"이 추가되어야 함
-        String expectedWords = "5,11,17";
-        assertEquals(expectedWords, petInfo.getWords());
+        // then
+        verify(petInfoRepository, never()).save(any(PetInfo.class));
+        verify(openAiService, never()).analyzeSpecialMark(anyString());
+    }
 
-        // 저장 메서드 호출 확인
-        verify(petInfoRepository, times(1)).save(petInfo);
+    /**
+     * processPetInfo 메서드가 이미 words 필드에 데이터가 있는 경우 OpenAI 호출을 건너뛰는지 테스트
+     */
+    @Test
+    void testProcessPetInfo_withExistingWords() {
+        // given: words 필드가 이미 채워진 PetInfo 객체를 생성
+        PetInfo petInfo = new PetInfo();
+        petInfo.setDesertionNo("12345");
+        petInfo.setWords("이미 존재하는 단어");
 
-        // 결과 출력
-        System.out.println("저장된 words 필드 값: " + petInfo.getWords());
+        // when: processPetInfo 메서드를 호출
+        petInfoWordService.processPetInfo(petInfo);
+
+        // then
+        verify(petInfoRepository, never()).save(any(PetInfo.class));
+        verify(openAiService, never()).analyzeSpecialMark(anyString());
+    }
+
+    /**
+     * processPetInfo 메서드가 OpenAI API를 호출하고 words 필드를 업데이트하는지 테스트
+     */
+    @Test
+    void testProcessPetInfo_updatesWords() {
+        // given: 분석이 필요한 PetInfo 객체를 생성
+        PetInfo petInfo = new PetInfo();
+        petInfo.setDesertionNo("12345");
+        petInfo.setSpecialMark("특별한 특성");
+
+        // Mock OpenAI 분석 결과
+        when(openAiService.analyzeSpecialMark("특별한 특성")).thenReturn("건강한, 회복중인");
+
+        // when: processPetInfo 메서드를 호출하여 OpenAI API를 통해 분석을 수행
+        petInfoWordService.processPetInfo(petInfo);
+
+        // then
+        // PetInfo가 저장될 때 사용된 객체를 캡처
+        ArgumentCaptor<PetInfo> petInfoCaptor = ArgumentCaptor.forClass(PetInfo.class);
+        verify(petInfoRepository).save(petInfoCaptor.capture());
+
+        assertEquals("1,2", petInfoCaptor.getValue().getWords()); // "건강한"과 "회복중인"이 매칭된 "1,2"로 설정되었는지 확인
+    }
+
+    /**
+     * processPetInfo 메서드가 specialMark 필드가 비어있을 때의 동작을 테스트합니다.
+     */
+    @Test
+    void testProcessPetInfo_withEmptySpecialMark() {
+        // given: specialMark 필드가 null인 PetInfo 객체를 생성
+        PetInfo petInfo = new PetInfo();
+        petInfo.setDesertionNo("12345");
+        petInfo.setSpecialMark(null);
+
+        // when: processPetInfo 메서드를 호출
+        petInfoWordService.processPetInfo(petInfo);
+
+        // then
+        verify(openAiService, never()).analyzeSpecialMark(anyString());
+        verify(petInfoRepository).save(petInfo); // 빈 words 상태로 저장은 진행되는지 확인
     }
 }

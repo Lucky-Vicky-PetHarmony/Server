@@ -22,8 +22,6 @@ public class PetInfoWordService {
     private final PetInfoRepository petInfoRepository;
     private final OpenAiService openAiService;
 
-    private static final int PAGE_SIZE = 100; // 페이징 처리 시 사용
-
     /**
      * PetInfoWordService의 생성자
      *
@@ -33,45 +31,6 @@ public class PetInfoWordService {
     public PetInfoWordService(PetInfoRepository petInfoRepository, OpenAiService openAiService) {
         this.petInfoRepository = petInfoRepository;
         this.openAiService = openAiService;
-    }
-
-    // 기존 코드는 주석처리하여 비활성화
-    /*
-    @Transactional
-    public void processAllPetInfo() {
-        int page = 0;
-        Page<PetInfo> resultPage;
-
-        // 페이징을 사용하여 모든 PetInfo 레코드를 처리
-        do {
-            resultPage = petInfoRepository.findAll(PageRequest.of(page, PAGE_SIZE));
-            List<PetInfo> petInfoList = resultPage.getContent();
-            petInfoList.forEach(this::processPetInfo);
-            page++;
-        } while (resultPage.hasNext());
-    }
-    */
-
-    /**
-     * 상위 5개의 PetInfo 레코드를 처리합니다.
-     */
-    @Transactional
-    public void processTopPetInfo() {
-        // 상위 5개의 PetInfo 데이터를 가져옴
-        List<PetInfo> top5PetInfoList = petInfoRepository.findAll(PageRequest.of(0, 100)).getContent();
-
-        for (PetInfo petInfo : top5PetInfoList) {
-            // desertionNo가 null인 경우 스킵
-            if (petInfo.getDesertionNo() == null) {
-                continue;
-            }
-
-            // PetInfo 엔티티를 분석하고 업데이트
-            processPetInfo(petInfo);
-
-            // 결과 출력
-            // System.out.println("저장된 words 필드 값 (desertionNo: " + petInfo.getDesertionNo() + "): " + petInfo.getWords());
-        }
     }
 
     /**
