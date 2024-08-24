@@ -21,6 +21,7 @@ import org.springframework.http.*;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -63,6 +64,12 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("🐶해당 이메일은 탈퇴한 계정입니다." +
                     "\npetharmony77@gmail.com로 문의주세요.");
         }
+        // 카카오 회원인지 확인
+        Optional<User> kakaoUser = userRepository.findByEmailAndKakaoIdIsNotNull(signUpDTO.getEmail());
+        if (kakaoUser.isPresent()) {
+            throw new IllegalArgumentException("🐶카카오 로그인으로 회원가입한 사용자입니다." +
+                    "\n[카카오로 시작하기]로 로그인을 진행해주세요.");
+        }
         // 이미 사용 중인 이메일인지 확인
         Optional<User> existingUser = userRepository.findByEmail(signUpDTO.getEmail());
         if (existingUser.isPresent()) {
@@ -97,28 +104,44 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public LogInResponseDTO login(LogInDTO logInDTO) {
-        // 사용자 인증
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        logInDTO.getEmail(),
-                        logInDTO.getPassword()
-                )
-        );
-        // 인증된 사용자 정보를 CustomUserDetails로 캐스팅하여 가져옴
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        // 회원탈퇴한 사용자인지 확인
-        if (userDetails.getIsWithdrawal()) {
-            throw new IllegalStateException("탈퇴한 회원입니다. 로그인할 수 없습니다.");
+        try {
+            Optional<User> kakaoUser = userRepository.findByEmailAndKakaoIdIsNotNull(logInDTO.getEmail());
+            if (kakaoUser.isPresent()) {
+                throw new IllegalStateException("🐶카카오로 회원가입한 사용자입니다." +
+                        "\n카카오 로그인으로 진행해주세요.");
+            }
+            // 사용자 인증
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            logInDTO.getEmail(),
+                            logInDTO.getPassword()
+                    )
+            );
+            // 인증된 사용자 정보를 CustomUserDetails로 캐스팅하여 가져옴
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            // 회원탈퇴한 사용자인지 확인 후 에러 처리
+            if (userDetails.getIsWithdrawal()) {
+                throw new IllegalStateException("🐶탈퇴한 계정입니다." +
+                        "\npetharmony77@gmail.com로 문의주세요.");
+            }
+            // 회원 상태가 BANNED인지 확인
+            if (userDetails.getUserState() == UserState.BANNED) {
+                throw new IllegalStateException("🐶활동이 정지된 계정입니다."+
+                        "\npetharmony77@gmail.com으로 문의주세요.");
+            }
+            // 인증 성공 시 JWT 토큰 생성 및 LoginResponseDTO 반환
+            String jwtToken = jwtTokenProvider.generateToken(authentication);
+            return LogInResponseDTO.builder()
+                    .jwtToken(jwtToken)
+                    .userId(userDetails.getUser().getUserId())
+                    .email(userDetails.getUsername())
+                    .userName(userDetails.getUserName())
+                    .role(authentication.getAuthorities().toString())
+                    .build();
+        } catch (AuthenticationException e) {
+            throw new IllegalArgumentException("🐶존재하지 않는 계정입니다." +
+                    "\n아이디 찾기나 비밀번호 찾기를 이용해주세요.");
         }
-        // 인증 성공 시 JWT 토큰 생성 및 LoginResponseDTO 반환
-        String jwtToken = jwtTokenProvider.generateToken(authentication);
-        return LogInResponseDTO.builder()
-                .jwtToken(jwtToken)
-                .userId(userDetails.getUser().getUserId())
-                .email(userDetails.getUsername())
-                .userName(userDetails.getUserName())
-                .role(authentication.getAuthorities().toString())
-                .build();
     }
 
     /**

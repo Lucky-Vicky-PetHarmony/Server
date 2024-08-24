@@ -48,12 +48,18 @@ public class UserController {
      * @return 성공 시 사용자 정보와 JWT 토큰을 담은 LoginResponseDTO, 실패 시 HTTP 400 상태와 null 응답
      */
     @PostMapping("/api/public/login")
-    public ResponseEntity<LogInResponseDTO> login(@RequestBody LogInDTO logInDTO) {
+    public ResponseEntity<?> login(@RequestBody LogInDTO logInDTO) {
         try {
             LogInResponseDTO logInResponseDTO = userService.login(logInDTO);
             return ResponseEntity.ok(logInResponseDTO);
+        } catch (IllegalArgumentException e) {
+            // 예외 메시지를 클라이언트에 그대로 반환 (존재하지 않는 계정, 비밀번호 오류 등)
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (IllegalStateException e) {
+            // 탈퇴한 계정, 정지상태인 계정, 카카오 회원인 계정
+            return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("로그인 처리 중 오류가 발생했습니다.");
         }
     }
 
