@@ -52,6 +52,10 @@ public class PetInfoFormatService {
 
         // care_nm필드를 처리하여 반환
         result.put("care_nm", processLocation(petInfo.getCareNm()));
+
+        // popfile필드를 결과에 추가하여 유기동물의 이미지 경로를 반환
+        result.put("popfile", petInfo.getPopfile());
+
         return result; // 최종 처리된 데이터를 Map으로 반환
     }
 

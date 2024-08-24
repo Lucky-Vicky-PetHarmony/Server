@@ -25,7 +25,6 @@ public class PetInfoFormatServiceTest {
     @BeforeEach
     public void setUp() {
         // Given: Mock WordRepository and ShelterInfoRepository is set up with expected data
-        // WordRepository와 ShelterInfoRepository를 Mocking하여 예상 데이터를 설정합니다.
         wordRepository = Mockito.mock(WordRepository.class);
         shelterInfoRepository = Mockito.mock(ShelterInfoRepository.class);
 
@@ -47,14 +46,13 @@ public class PetInfoFormatServiceTest {
         Mockito.when(shelterInfoRepository.findByCareNm("한국동물구조관리협회"))
                 .thenReturn(Optional.of(shelterInfo));
 
-        // Mock된 WordRepository와 ShelterInfoRepository로 MatchingProcessService를 초기화합니다.
+        // Mock된 WordRepository와 ShelterInfoRepository로 PetInfoFormatService를 초기화합니다.
         petInfoFormatService = new PetInfoFormatService(wordRepository, shelterInfoRepository);
     }
 
     @Test
     public void testProcessPetInfo() {
         // Given: A PetInfo object is created with specified attributes
-        // 지정된 속성들로 PetInfo 객체를 생성합니다.
         PetInfo petInfo = new PetInfo();
         petInfo.setDesertionNo("411300202400334");
         petInfo.setHappenPlace("종로 386 진형빌딩 인근");
@@ -73,12 +71,10 @@ public class PetInfoFormatServiceTest {
         petInfo.setOfficetel("02-2148-1894");
         petInfo.setWords("1,3,7,17");
 
-        // When: MatchingProcessService's processPetInfo method is called
-        // MatchingProcessService의 processPetInfo 메서드를 호출합니다.
+        // When: PetInfoFormatService's processPetInfo method is called
         Map<String, Object> result = petInfoFormatService.processPetInfo(petInfo);
 
         // Then: The result should match the expected processed values
-        // 결과가 예상된 처리된 값과 일치해야 합니다.
         System.out.println("결과: " + result);
 
         // 각 필드의 올바른 처리 확인을 위한 Assertions
@@ -88,5 +84,6 @@ public class PetInfoFormatServiceTest {
         assertEquals("남아", result.get("sex_cd"));
         assertEquals("중성화 완료", result.get("neuter_yn"));
         assertEquals("서울특별시", result.get("care_nm"));
+        assertEquals("http://www.animal.go.kr/files/shelter/2024/07/20240731150770.jpg", result.get("popfile")); // popfile 필드 검증
     }
 }
