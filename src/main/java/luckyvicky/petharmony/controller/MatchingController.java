@@ -1,8 +1,7 @@
 package luckyvicky.petharmony.controller;
 
 import luckyvicky.petharmony.entity.PetInfo;
-import luckyvicky.petharmony.entity.Word;
-import luckyvicky.petharmony.service.MatchingProcessService;
+import luckyvicky.petharmony.service.PetInfoFormatService;
 import luckyvicky.petharmony.service.WordMatchingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,12 +18,12 @@ import java.util.stream.Collectors;
 public class MatchingController {
 
     private final WordMatchingService wordMatchingService;
-    private final MatchingProcessService matchingProcessService;
+    private final PetInfoFormatService petInfoFormatService;
 
     @Autowired
-    public MatchingController(WordMatchingService wordMatchingService, MatchingProcessService matchingProcessService) {
+    public MatchingController(WordMatchingService wordMatchingService, PetInfoFormatService petInfoFormatService) {
         this.wordMatchingService = wordMatchingService;
-        this.matchingProcessService = matchingProcessService;
+        this.petInfoFormatService = petInfoFormatService;
     }
 
     /**
@@ -40,7 +39,7 @@ public class MatchingController {
 
         // 각 PetInfo 객체를 처리하여 프론트엔드에 전달할 형식으로 변환
         return matchedPetInfos.stream()
-                .map(matchingProcessService::processPetInfo)
+                .map(petInfoFormatService::processPetInfo)
                 .collect(Collectors.toList());
     }
 }

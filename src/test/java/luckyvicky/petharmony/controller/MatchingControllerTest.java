@@ -1,8 +1,7 @@
 package luckyvicky.petharmony.controller;
 
-import luckyvicky.petharmony.controller.MatchingController;
 import luckyvicky.petharmony.entity.PetInfo;
-import luckyvicky.petharmony.service.MatchingProcessService;
+import luckyvicky.petharmony.service.PetInfoFormatService;
 import luckyvicky.petharmony.service.WordMatchingService;
 import luckyvicky.petharmony.security.JwtTokenProvider;
 import org.junit.jupiter.api.Test;
@@ -29,7 +28,7 @@ public class MatchingControllerTest {
     private MockMvc mockMvc;  // MockMvc 객체를 통해 컨트롤러 테스트
 
     @MockBean
-    private MatchingProcessService matchingProcessService;  // MatchingProcessService를 MockBean으로 주입
+    private PetInfoFormatService petInfoFormatService;  // MatchingProcessService를 MockBean으로 주입
 
     @MockBean
     private WordMatchingService wordMatchingService;  // WordMatchingService를 MockBean으로 주입
@@ -70,7 +69,7 @@ public class MatchingControllerTest {
         processedResult.put("sex_cd", "남아");
         processedResult.put("neuter_yn", "중성화 완료");
         processedResult.put("care_nm", "서울동물보호센터");
-        when(matchingProcessService.processPetInfo(Mockito.any(PetInfo.class))).thenReturn(processedResult);
+        when(petInfoFormatService.processPetInfo(Mockito.any(PetInfo.class))).thenReturn(processedResult);
 
         // When: 매핑된 엔드포인트를 MockMvc를 통해 호출
         mockMvc.perform(MockMvcRequestBuilders.get("/api/api/user/top12/{userId}", 1L))

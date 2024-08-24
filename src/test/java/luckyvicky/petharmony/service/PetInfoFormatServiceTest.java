@@ -5,7 +5,6 @@ import luckyvicky.petharmony.entity.ShelterInfo;
 import luckyvicky.petharmony.entity.Word;
 import luckyvicky.petharmony.repository.ShelterInfoRepository;
 import luckyvicky.petharmony.repository.WordRepository;
-import luckyvicky.petharmony.service.MatchingProcessService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -17,9 +16,9 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class MatchingProcessServiceTest {
+public class PetInfoFormatServiceTest {
 
-    private MatchingProcessService matchingProcessService;
+    private PetInfoFormatService petInfoFormatService;
     private WordRepository wordRepository;
     private ShelterInfoRepository shelterInfoRepository;
 
@@ -49,7 +48,7 @@ public class MatchingProcessServiceTest {
                 .thenReturn(Optional.of(shelterInfo));
 
         // Mock된 WordRepository와 ShelterInfoRepository로 MatchingProcessService를 초기화합니다.
-        matchingProcessService = new MatchingProcessService(wordRepository, shelterInfoRepository);
+        petInfoFormatService = new PetInfoFormatService(wordRepository, shelterInfoRepository);
     }
 
     @Test
@@ -76,7 +75,7 @@ public class MatchingProcessServiceTest {
 
         // When: MatchingProcessService's processPetInfo method is called
         // MatchingProcessService의 processPetInfo 메서드를 호출합니다.
-        Map<String, Object> result = matchingProcessService.processPetInfo(petInfo);
+        Map<String, Object> result = petInfoFormatService.processPetInfo(petInfo);
 
         // Then: The result should match the expected processed values
         // 결과가 예상된 처리된 값과 일치해야 합니다.

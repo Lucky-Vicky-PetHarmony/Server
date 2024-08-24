@@ -15,13 +15,13 @@ import java.util.stream.Collectors;
  * MatchingProcessService는 매칭된 PetInfo 객체를 처리하여 원하는 형식으로 반환하는 서비스입니다.
  */
 @Service
-public class MatchingProcessService {
+public class PetInfoFormatService {
 
     private final WordRepository wordRepository;
     private final ShelterInfoRepository shelterInfoRepository;
 
     @Autowired
-    public MatchingProcessService(WordRepository wordRepository, ShelterInfoRepository shelterInfoRepository) {
+    public PetInfoFormatService(WordRepository wordRepository, ShelterInfoRepository shelterInfoRepository) {
         this.wordRepository = wordRepository;
         this.shelterInfoRepository = shelterInfoRepository;
     }
