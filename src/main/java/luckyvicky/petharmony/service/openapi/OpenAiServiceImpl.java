@@ -47,9 +47,12 @@ public class OpenAiServiceImpl implements OpenAiService {
             this.dotenv = Dotenv.configure()
                     .directory(dotenvFilePath)
                     .filename(".env")
+                    .ignoreIfMalformed()
+                    .ignoreIfMissing()
                     .load();
         } else {
             this.dotenv = Dotenv.configure()
+                    .ignoreIfMalformed()
                     .ignoreIfMissing()
                     .load();
         }
@@ -57,7 +60,7 @@ public class OpenAiServiceImpl implements OpenAiService {
 
     // 환경 변수에서 API 키를 불러옵니다.
     private String getOpenAiApiKey() {
-        return dotenv.get("OPENAI_API_KEY");
+        return dotenv.get("OPENAI_API_KEY", "default-api-key");
     }
 
     /**
