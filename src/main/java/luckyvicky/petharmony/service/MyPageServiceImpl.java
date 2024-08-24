@@ -106,8 +106,6 @@ public class MyPageServiceImpl implements MyPageService {
                 .collect(Collectors.toList());
     }
     private BoardListResponseDTO buildBoardListResponseDTO(Board board) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-
         boolean hasImage = imageRepository.existsByBoard_BoardId(board.getBoardId());
 
         return BoardListResponseDTO.builder()
@@ -116,8 +114,8 @@ public class MyPageServiceImpl implements MyPageService {
                 .boardTitle(board.getBoardTitle())
                 .category(board.getCategory())
                 .viewCount(board.getView())
-                .boardCreate(board.getBoardCreate().format(formatter))
-                .boardUpdate(board.getBoardUpdate().format(formatter))
+                .boardCreate(board.getBoardCreate().toString())
+                .boardUpdate(board.getBoardUpdate().toString())
                 .commentCount(board.getCommentCount())
                 .image(hasImage)
                 .pinCount(board.getPinCount())
