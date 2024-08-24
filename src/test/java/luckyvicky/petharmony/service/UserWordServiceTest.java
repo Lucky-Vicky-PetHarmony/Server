@@ -1,4 +1,4 @@
-package luckyvicky.petharmony;
+package luckyvicky.petharmony.service;
 
 import luckyvicky.petharmony.dto.UserWordDTO;
 import luckyvicky.petharmony.service.UserWordService;

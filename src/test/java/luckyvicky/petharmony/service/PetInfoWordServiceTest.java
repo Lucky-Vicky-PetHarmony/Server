@@ -1,4 +1,4 @@
-package luckyvicky.petharmony;
+package luckyvicky.petharmony.service;
 
 import luckyvicky.petharmony.entity.PetInfo;
 import luckyvicky.petharmony.repository.PetInfoRepository;

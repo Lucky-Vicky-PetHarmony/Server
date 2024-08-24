@@ -1,4 +1,4 @@
-package luckyvicky.petharmony;
+package luckyvicky.petharmony.repository;
 
 import luckyvicky.petharmony.repository.UserWordRepository;
 import org.junit.jupiter.api.BeforeEach;

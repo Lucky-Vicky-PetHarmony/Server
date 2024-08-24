@@ -1,4 +1,4 @@
-package luckyvicky.petharmony;
+package luckyvicky.petharmony.service;
 
 import luckyvicky.petharmony.service.openapi.OpenAiServiceImpl;
 import org.junit.jupiter.api.Test;
