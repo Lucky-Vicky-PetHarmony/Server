@@ -25,7 +25,7 @@ public class UserController {
     /**
      * 회원가입 API 엔드포인트
      *
-     * @param signUpDTO 회원가입 정보가 담긴 DTO
+     * @param signUpDTO 회원가입 정보를 담은 DTO
      * @return 성공 시 "PetHarmony에 오신걸 환영합니다." 메시지, 실패 시 오류 메시지
      */
     @PostMapping("/api/public/signUp")
@@ -44,8 +44,8 @@ public class UserController {
     /**
      * 로그인 API 엔드포인트
      *
-     * @param logInDTO 사용자 로그인 정보가 담긴 DTO
-     * @return 성공 시 사용자 정보와 JWT 토큰을 담은 LoginResponseDTO, 실패 시 HTTP 400 상태와 null 응답
+     * @param logInDTO 사용자 로그인 정보를 담은 DTO
+     * @return 성공 시 사용자 정보와 JWT 토큰을 포함한 LoginResponseDTO, 실패 시 오류 메시지 반환
      */
     @PostMapping("/api/public/login")
     public ResponseEntity<?> login(@RequestBody LogInDTO logInDTO) {
@@ -66,8 +66,8 @@ public class UserController {
     /**
      * 아이디 찾기 시 인증번호 전송 API 엔드포인트
      *
-     * @param findIdDTO 사용자 전화번호 정보가 담긴 DTO
-     * @return 성공 시 인증번호 전송에 대한 결과 메시지, 실패 시 HTTP 500 상태와 오류 메시지
+     * @param findIdDTO 사용자의 전화번호 정보를 담은 DTO
+     * @return 성공 시 인증번호 전송 결과 메시지, 실패 시 오류 메시지
      */
     @PostMapping("/api/public/send-certification")
     public ResponseEntity<String> sendingNumberToFindId(@RequestBody FindIdDTO findIdDTO) {
@@ -83,8 +83,8 @@ public class UserController {
     /**
      * 인증번호 확인 API 엔드포인트
      *
-     * @param findIdDTO 사용자 전화번호와 인증번호 정보가 담긴 DTO
-     * @return 성공 시 사용자 아이디(이메일)와 가입 날짜를 담은 FindIdResponseDTO, 실패 시 HTTP 400 상태와 null 응답
+     * @param findIdDTO 사용자의 전화번호와 인증번호 정보를 담은 DTO
+     * @return 성공 시 사용자 아이디(이메일)와 가입 날짜를 포함한 FindIdResponseDTO, 실패 시 오류 메시지
      */
     @PostMapping("/api/public/check-certification")
     public ResponseEntity<FindIdResponseDTO> checkingNumberToFindId(@RequestBody FindIdDTO findIdDTO) {
@@ -99,8 +99,8 @@ public class UserController {
     /**
      * 비밀번호 찾기 시 이메일 전송 API 엔드포인트
      *
-     * @param findPasswordDTO 사용자 이메일 정보가 담긴 DTO
-     * @return 성공 시 임시 비밀번호 전송에 대한 결과 메시지, 실패 시 HTTP 400 상태와 null 응답
+     * @param findPasswordDTO 사용자의 이메일 정보를 담은 DTO
+     * @return 성공 시 임시 비밀번호 전송 결과 메시지, 실패 시 오류 메시지
      */
     @PostMapping("/api/public/send-email")
     public ResponseEntity<String> sendingEmailToFindPassword(@RequestBody FindPasswordDTO findPasswordDTO) {
@@ -115,8 +115,8 @@ public class UserController {
     /**
      * 카카오 로그인 API 엔드포인트
      *
-     * @param payload 클라이언트로부터 전달받은 카카오 액세스 토큰이 담긴 맵
-     * @return JWT 토큰과 사용자 정보를 담은 KakaoLogInResponseDTO, 성공 시 HTTP 200 상태와 함께 반환
+     * @param payload 클라이언트로부터 전달받은 카카오 액세스 토큰을 포함한 맵
+     * @return 성공 시 JWT 토큰과 사용자 정보를 포함한 KakaoLogInResponseDTO, 실패 시 HTTP 500 상태 반환
      */
     @PostMapping("api/public/kakao")
     public ResponseEntity<KakaoLogInResponseDTO> kakaoLogin(@RequestBody Map<String, String> payload) {

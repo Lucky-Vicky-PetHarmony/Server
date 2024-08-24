@@ -46,14 +46,14 @@ public class UserServiceImpl implements UserService {
 
     /**
      * 자체 회원가입 메서드
-     * <p>
+     *
      * 사용자가 제공한 정보로 새로운 사용자 계정을 생성합니다.
-     * 이메일 중복 여부를 확인한 후, 비밀번호를 암호화하여 저장합니다.
-     * 생성된 사용자의 Role은 기본적으로 USER로 설정되며, UserState는 ACTIVE로 설정됩니다.
+     * - 탈퇴한 사용자 이메일, 카카오 회원인지, 기존 이메일 존재 여부를 확인합니다.
+     * - 비밀번호를 암호화하여 저장하고, 기본적으로 사용자 상태를 ACTIVE로 설정합니다.
      *
      * @param signUpDTO 사용자 회원가입 정보가 담긴 DTO
      * @return 생성된 사용자 엔티티 객체
-     * @throws IllegalArgumentException 중복된 이메일이 존재할 경우 발생
+     * @throws IllegalArgumentException 탈퇴한 계정, 카카오 회원, 중복된 이메일일 경우 예외 발생
      */
     @Override
     @Transactional
@@ -94,13 +94,15 @@ public class UserServiceImpl implements UserService {
 
     /**
      * 자체 로그인 메서드
-     * <p>
-     * 사용자가 제공한 이메일과 비밀번호로 인증을 시도합니다.
-     * 인증이 성공하면 사용자 정보를 가져와 JWT 토큰을 생성하고,
-     * 생성된 토큰과 사용자 정보를 포함한 LoginResponseDTO를 반환합니다.
      *
-     * @param logInDTO 로그인 요청 정보가 담긴 DTOcertification
+     * 사용자가 제공한 이메일과 비밀번호로 인증을 시도합니다.
+     * - 카카오 회원인지, 탈퇴한 계정인지, 활동 정지된 계정인지 확인합니다.
+     * - 인증에 성공하면 JWT 토큰을 생성하여 반환합니다.
+     *
+     * @param logInDTO 로그인 요청 정보가 담긴 DTO
      * @return 인증에 성공한 사용자의 정보와 JWT 토큰을 담은 LoginResponseDTO 객체
+     * @throws IllegalArgumentException 존재하지 않는 계정이거나 비밀번호가 틀렸을 경우 예외 발생
+     * @throws IllegalStateException 탈퇴한 계정이거나, 정지된 계정, 또는 카카오 회원일 경우 예외 발생
      */
     @Override
     public LogInResponseDTO login(LogInDTO logInDTO) {
@@ -146,7 +148,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * 아이디 찾기를 위한 인증번호 전송 메서드
-     * <p>
+     *
      * 사용자가 입력한 전화번호로 사용자를 조회하고, 해당 사용자가 존재하면
      * 4자리 랜덤 인증번호를 생성하여 SMS로 전송합니다.
      * SMS 전송이 성공하면 인증번호를 Certification 엔티티로 저장하고,
@@ -184,7 +186,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * 아이디 찾기 시 인증번호 확인 메서드
-     * <p>
+     *
      * 사용자가 입력한 전화번호로 최근에 생성된 인증번호(Certification)를 조회하고,
      * 입력한 인증번호와 일치하는지 확인합니다. 인증번호가 일치하면, 해당 전화번호로
      * 등록된 사용자를 조회하여 사용자의 이메일과 가입 날짜를 반환합니다.
@@ -215,7 +217,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * 비밀번호 찾기 시 임시 비밀번호 이메일 전송 메서드
-     * <p>
+     *
      * 사용자가 입력한 이메일로 사용자를 조회한 후, 해당 사용자가 카카오톡으로 로그인한
      * 사용자라면, 그에 맞는 메시지를 반환합니다. 그렇지 않은 경우, 8자리의 랜덤 임시
      * 비밀번호를 생성하여 암호화한 후, 사용자 계정의 비밀번호를 업데이트하고,
@@ -261,7 +263,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * 카카오 액세스 토큰을 사용하여 사용자 정보를 가져오는 메서드
-     * <p>
+     *
      * 주어진 액세스 토큰을 이용해 카카오 API를 호출하여 사용자 정보를 가져옵니다.
      * HTTP 요청을 위해 RestTemplate과 HttpHeaders를 설정하고, 카카오 API로부터
      * 사용자 정보를 받아온 후, 이를 KakaoInfoDTO 객체로 변환하여 반환합니다.
@@ -310,7 +312,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * 카카오 로그인 처리 메서드
-     * <p>
+     *
      * 카카오에서 가져온 사용자 정보를 기반으로 로그인 처리를 수행합니다.
      * 먼저, 카카오 ID로 DB에 해당 사용자가 이미 존재하는지 확인합니다.
      * 사용자가 존재하면 해당 사용자를 반환하여 로그인 처리를 진행하고,
@@ -355,9 +357,11 @@ public class UserServiceImpl implements UserService {
         return phone;
     }
 
-
     /**
-     * 벤 풀어주는 기능
+     * 활동 정지 해제 메서드
+     *
+     * 정지된 사용자 계정을 현재 날짜 기준으로 해제합니다.
+     * 정지 해제 조건을 만족하는 사용자를 조회하여, 해당 사용자들의 정지 상태를 해제합니다.
      */
     @Override
     public void releaseBans() {
