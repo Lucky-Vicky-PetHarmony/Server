@@ -1,7 +1,9 @@
 package luckyvicky.petharmony.service;
 
 import luckyvicky.petharmony.entity.PetInfo;
+import luckyvicky.petharmony.entity.ShelterInfo;
 import luckyvicky.petharmony.entity.Word;
+import luckyvicky.petharmony.repository.ShelterInfoRepository;
 import luckyvicky.petharmony.repository.WordRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,10 +18,12 @@ import java.util.stream.Collectors;
 public class MatchingProcessService {
 
     private final WordRepository wordRepository;
+    private final ShelterInfoRepository shelterInfoRepository;
 
     @Autowired
-    public MatchingProcessService(WordRepository wordRepository) {
+    public MatchingProcessService(WordRepository wordRepository, ShelterInfoRepository shelterInfoRepository) {
         this.wordRepository = wordRepository;
+        this.shelterInfoRepository = shelterInfoRepository;
     }
 
     /**
@@ -46,6 +50,8 @@ public class MatchingProcessService {
         // neuter_yn 필드를 처리하여 반환
         result.put("neuter_yn", processNeuterYn(petInfo.getNeuterYn()));
 
+        // care_nm필드를 처리하여 반환
+        result.put("care_nm", processLocation(petInfo.getCareNm()));
         return result; // 최종 처리된 데이터를 Map으로 반환
     }
 
@@ -142,5 +148,17 @@ public class MatchingProcessService {
             default:
                 return "알 수 없음";
         }
+    }
+
+    /**
+     * 위치 정보 반환하는 메서드
+     * pet_info 테이블의 care_nm과 shelter_info테이블의 care_nm이 같은 shelter_info의 org_nm빈환
+     *
+     * @param careNm pet_info테이블의 care_nm 필드값
+     * @return 매칭된 shelter_info의 org_nm 값 또는 정보 없음 문자열 반환*/
+    private String processLocation(String careNm) {
+        return shelterInfoRepository.findByCareNm(careNm)
+                .map(ShelterInfo::getOrgNm)
+                .orElse("정보 없음");
     }
 }

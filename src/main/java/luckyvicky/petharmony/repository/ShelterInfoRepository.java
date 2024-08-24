@@ -4,7 +4,10 @@ import luckyvicky.petharmony.entity.ShelterInfo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface ShelterInfoRepository extends JpaRepository<ShelterInfo, Integer> {
-    // 커스텀 쿼리 메소드는 여기에 정의
+    // careNm으로 ShelterInfo 엔티티 검색하는 메서드
+    Optional<ShelterInfo> findByCareNm(String careNm);
 }

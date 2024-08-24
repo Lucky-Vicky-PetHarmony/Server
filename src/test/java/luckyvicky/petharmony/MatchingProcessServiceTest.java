@@ -1,7 +1,9 @@
 package luckyvicky.petharmony;
 
 import luckyvicky.petharmony.entity.PetInfo;
+import luckyvicky.petharmony.entity.ShelterInfo;
 import luckyvicky.petharmony.entity.Word;
+import luckyvicky.petharmony.repository.ShelterInfoRepository;
 import luckyvicky.petharmony.repository.WordRepository;
 import luckyvicky.petharmony.service.MatchingProcessService;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,18 +13,22 @@ import org.mockito.Mockito;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MatchingProcessServiceTest {
 
     private MatchingProcessService matchingProcessService;
+    private WordRepository wordRepository;
+    private ShelterInfoRepository shelterInfoRepository;
 
     @BeforeEach
     public void setUp() {
-        // Given: Mock WordRepository is set up with expected word mappings
-        // WordRepository를 Mocking하여 예상되는 단어 매핑을 설정합니다.
-        WordRepository wordRepository = Mockito.mock(WordRepository.class);
+        // Given: Mock WordRepository and ShelterInfoRepository is set up with expected data
+        // WordRepository와 ShelterInfoRepository를 Mocking하여 예상 데이터를 설정합니다.
+        wordRepository = Mockito.mock(WordRepository.class);
+        shelterInfoRepository = Mockito.mock(ShelterInfoRepository.class);
 
         // 테스트 데이터 기반의 Word ID 매핑 설정
         List<Word> words = Arrays.asList(
@@ -34,8 +40,16 @@ public class MatchingProcessServiceTest {
         Mockito.when(wordRepository.findByWordIdIn(Arrays.asList(1L, 3L, 7L, 17L)))
                 .thenReturn(words);
 
-        // Mock된 WordRepository로 MatchingProcessService를 초기화합니다.
-        matchingProcessService = new MatchingProcessService(wordRepository);
+        // 테스트 데이터 기반의 ShelterInfo 매핑 설정
+        ShelterInfo shelterInfo = new ShelterInfo();
+        shelterInfo.setCareNm("한국동물구조관리협회");
+        shelterInfo.setOrgNm("서울특별시");
+
+        Mockito.when(shelterInfoRepository.findByCareNm("한국동물구조관리협회"))
+                .thenReturn(Optional.of(shelterInfo));
+
+        // Mock된 WordRepository와 ShelterInfoRepository로 MatchingProcessService를 초기화합니다.
+        matchingProcessService = new MatchingProcessService(wordRepository, shelterInfoRepository);
     }
 
     @Test
@@ -74,6 +88,6 @@ public class MatchingProcessServiceTest {
         assertEquals("2017년생", result.get("age"));
         assertEquals("남아", result.get("sex_cd"));
         assertEquals("중성화 완료", result.get("neuter_yn"));
+        assertEquals("서울특별시", result.get("care_nm"));
     }
 }
-

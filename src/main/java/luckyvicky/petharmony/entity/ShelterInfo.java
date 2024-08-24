@@ -8,6 +8,7 @@ import java.util.Date;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -19,78 +20,87 @@ public class ShelterInfo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(length = 255)
-    private String care_nm;
+    @Column(name = "care_nm", length = 255)
+    private String careNm;
 
-    @Column(length = 255)
-    private String org_nm;
+    @Column(name = "org_nm", length = 255)
+    private String orgNm;
 
-    @Column(length = 255)
-    private String division_nm;
+    @Column(name = "division_nm", length = 255)
+    private String divisionNm;
 
-    @Column(length = 255)
-    private String save_trgt_animal;
+    @Column(name = "save_trgt_animal", length = 255)
+    private String saveTrgtAnimal;
 
-    @Column(length = 255)
-    private String care_addr;
+    @Column(name = "care_addr", length = 255)
+    private String careAddr;
 
-    @Column(length = 255)
-    private String jibun_addr;
+    @Column(name = "jibun_addr", length = 255)
+    private String jibunAddr;
 
-    @Column(precision = 10, scale = 7)
+    @Column(name = "lat", precision = 10, scale = 7)
     private BigDecimal lat;
 
-    @Column(precision = 10, scale = 7)
+    @Column(name = "lng", precision = 10, scale = 7)
     private BigDecimal lng;
 
+    @Column(name = "dsignation_date")
     @Temporal(TemporalType.DATE)
-    private Date dsignation_date;
+    private Date dsignationDate;
 
-    @Column(length = 5)
-    private String week_opr_stime;
+    @Column(name = "week_opr_stime", length = 5)
+    private String weekOprStime;
 
-    @Column(length = 5)
-    private String week_opr_etime;
+    @Column(name = "week_opr_etime", length = 5)
+    private String weekOprEtime;
 
-    @Column(length = 5)
-    private String week_cell_stime;
+    @Column(name = "week_cell_stime", length = 5)
+    private String weekCellStime;
 
-    @Column(length = 5)
-    private String week_cell_etime;
+    @Column(name = "week_cell_etime", length = 5)
+    private String weekCellEtime;
 
-    @Column(length = 5)
-    private String weekend_opr_stime;
+    @Column(name = "weekend_opr_stime", length = 5)
+    private String weekendOprStime;
 
-    @Column(length = 5)
-    private String weekend_opr_etime;
+    @Column(name = "weekend_opr_etime", length = 5)
+    private String weekendOprEtime;
 
-    @Column(length = 5)
-    private String weekend_cell_stime;
+    @Column(name = "weekend_cell_stime", length = 5)
+    private String weekendCellStime;
 
-    @Column(length = 5)
-    private String weekend_cell_etime;
+    @Column(name = "weekend_cell_etime", length = 5)
+    private String weekendCellEtime;
 
-    @Column(length = 255)
-    private String close_day;
+    @Column(name = "close_day", length = 255)
+    private String closeDay;
 
-    private int vet_person_cnt;
+    @Column(name = "vet_person_cnt")
+    private int vetPersonCnt;
 
-    private int specs_person_cnt;
+    @Column(name = "specs_person_cnt")
+    private int specsPersonCnt;
 
-    private int medical_cnt;
+    @Column(name = "medical_cnt")
+    private int medicalCnt;
 
-    private int breed_cnt;
+    @Column(name = "breed_cnt")
+    private int breedCnt;
 
-    private int quarantine_cnt;
+    @Column(name = "quarantine_cnt")
+    private int quarantineCnt;
 
-    private int feed_cnt;
+    @Column(name = "feed_cnt")
+    private int feedCnt;
 
-    private int trans_car_cnt;
+    @Column(name = "trans_car_cnt")
+    private int transCarCnt;
 
-    @Column(length = 20)
-    private String care_tel;
+    @Column(name = "care_tel", length = 20)
+    private String careTel;
 
+    @Column(name = "data_std_dt")
     @Temporal(TemporalType.DATE)
-    private Date data_std_dt;
+    private Date dataStdDt;
 
 }
