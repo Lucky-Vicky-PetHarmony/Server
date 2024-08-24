@@ -77,9 +77,18 @@ public class PetInfoFormatService {
 
         // wordId 리스트로 Word엔티티를 조회하고, wordSelect 값을 추출하여 반환
         List<Word> wordEntities = wordRepository.findByWordIdIn(wordIds);
-        return wordEntities.stream()
+        List<String> wordSelects = wordEntities.stream()
                 .map(Word::getWordSelect)
                 .collect(Collectors.toList());
+
+        // 단어의 개수가 3개 이하일 경우 그대로 반환
+        if (wordSelects.size() <= 3) {
+            return wordSelects;
+        }
+
+        // 단어가 4개 이상인 경우 3개의 랜덤한 단어를 선택하여 반환
+        Collections.shuffle(wordSelects);
+        return wordSelects.subList(0, 3);
     }
 
     /**
