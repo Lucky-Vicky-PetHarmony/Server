@@ -22,39 +22,30 @@ public class WordMatchingService {
     }
 
     /**
-     * 특정 사용자가 선택한 word_id와 매칭되는 상위 12개의 PetInfo를 반환하는 메서드
+     * 특정 사용자가 선택한 word_id와 매칭되는 PetInfo를 반환하는 메서드
      *
      * @param userId 현재 로그인된 사용자의 ID
-     * @return 상위 12개의 PetInfo 리스트
+     * @return PetInfo 리스트
      */
-    public List<PetInfo> getTop12PetInfosByUserWord(Long userId) {
+    public List<PetInfo> getMatchingPetInfosByUserWord(Long userId) {
         // userId에 해당하는 모든 word_id 리스트를 가져옴
-        String wordIdListAsString = getWordIdListAsString(userId);
+        List<Long> wordIds = userWordRepository.findWordIdsByUserId(userId);
 
-        if (wordIdListAsString.isEmpty()) {
+        if (wordIds == null || wordIds.isEmpty()) {
             System.out.println("Word ID 리스트가 비어 있습니다.");
             return List.of(); // wordIds가 비어있으면 빈 리스트 반환
         }
 
-        // 모든 PetInfo를 로드한 후 메모리에서 필터링
-        List<PetInfo> allPetInfos = petInfoRepository.findAll();
+        Set<PetInfo> matchedPetInfos = new HashSet<>();
 
-        // 각 PetInfo의 words와 wordIds를 비교하여 매칭되는 정도에 따라 정렬
-        List<PetInfo> matchedPetInfos = allPetInfos.stream()
-                .filter(petInfo -> petInfo.getWords() != null && hasMatchingWords(petInfo.getWords(), wordIdListAsString))
-                .sorted((p1, p2) -> Integer.compare(
-                        countMatchingWords(p2.getWords(), wordIdListAsString),
-                        countMatchingWords(p1.getWords(), wordIdListAsString)
-                ))
-                .limit(12)
-                .collect(Collectors.toList());
-
-        // 디버깅: 매칭된 PetInfo 정보 출력
-        for (PetInfo petInfo : matchedPetInfos) {
-            System.out.println("매칭된 PetInfo: DesertionNo=" + petInfo.getDesertionNo() + ", Words=" + petInfo.getWords());
+        // 각 wordId를 사용하여 데이터베이스에서 매칭되는 PetInfo를 가져옴
+        for (Long wordId : wordIds) {
+            List<PetInfo> petInfos = petInfoRepository.findByWordId(wordId.toString());
+            matchedPetInfos.addAll(petInfos); // 중복 방지를 위해 Set에 추가
         }
 
-        return matchedPetInfos;
+        // 매칭된 모든 PetInfo를 리스트로 변환 후 반환
+        return new ArrayList<>(matchedPetInfos);
     }
 
     /**
@@ -62,6 +53,9 @@ public class WordMatchingService {
      */
     public String getWordIdListAsString(Long userId) {
         List<Long> wordIds = userWordRepository.findWordIdsByUserId(userId);
+        if (wordIds == null || wordIds.isEmpty()) {
+            return "";
+        }
         return wordIds.stream()
                 .map(String::valueOf)
                 .collect(Collectors.joining(","));
@@ -75,6 +69,10 @@ public class WordMatchingService {
      * @return 매칭 여부
      */
     private boolean hasMatchingWords(String words, String wordIdListAsString) {
+        if (words == null || words.isEmpty() || wordIdListAsString.isEmpty()) {
+            return false;
+        }
+
         Set<String> wordSet = Arrays.stream(words.split(","))
                 .collect(Collectors.toSet());
         Set<String> userWordSet = Arrays.stream(wordIdListAsString.split(","))
@@ -93,6 +91,10 @@ public class WordMatchingService {
      * @return 매칭되는 단어의 수
      */
     private int countMatchingWords(String words, String wordIdListAsString) {
+        if (words == null || words.isEmpty() || wordIdListAsString.isEmpty()) {
+            return 0;
+        }
+
         Set<String> wordSet = Arrays.stream(words.split(","))
                 .collect(Collectors.toSet());
         Set<String> userWordSet = Arrays.stream(wordIdListAsString.split(","))

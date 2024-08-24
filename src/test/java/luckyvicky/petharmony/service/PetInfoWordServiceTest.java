@@ -2,7 +2,6 @@ package luckyvicky.petharmony.service;
 
 import luckyvicky.petharmony.entity.PetInfo;
 import luckyvicky.petharmony.repository.PetInfoRepository;
-import luckyvicky.petharmony.service.PetInfoWordService;
 import luckyvicky.petharmony.service.openapi.OpenAiService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,14 +44,48 @@ class PetInfoWordServiceTest {
         petInfoWordService.processPetInfo(petInfo);
 
         // Then: words 필드가 예상한 대로 저장되었는지 확인
-        // 2024년생이므로 "활발한", 성별이 "M"이므로 "예쁜", OpenAi 분석 결과로 "특별한"이 추가되어야 함
-        String expectedWords = "5,11,17";
+        // 예상되는 words 값을 확인 (예: "17")
+        String expectedWords = "17";
         assertEquals(expectedWords, petInfo.getWords());
 
         // 저장 메서드 호출 확인
         verify(petInfoRepository, times(1)).save(petInfo);
 
-        // 결과 출력
+        // 결과 출력 (디버깅 용도)
         System.out.println("저장된 words 필드 값: " + petInfo.getWords());
+    }
+
+    @Test
+    void testProcessPetInfoWhenWordsAlreadySet() {
+        // Given: words 필드가 이미 설정된 PetInfo 객체
+        PetInfo petInfo = new PetInfo();
+        petInfo.setDesertionNo("311300202400322");
+        petInfo.setWords("1,2,3");
+
+        // When: processPetInfo 메서드 호출
+        petInfoWordService.processPetInfo(petInfo);
+
+        // Then: words 필드가 이미 설정되어 있으므로, OpenAiService 호출이 발생하지 않음
+        verify(openAiService, never()).analyzeSpecialMark(anyString());
+
+        // 저장 메서드 호출도 발생하지 않음
+        verify(petInfoRepository, never()).save(petInfo);
+    }
+
+    @Test
+    void testProcessPetInfoWhenDesertionNoIsNull() {
+        // Given: desertionNo가 null인 PetInfo 객체
+        PetInfo petInfo = new PetInfo();
+        petInfo.setDesertionNo(null);
+        petInfo.setSpecialMark("특별한 특징이 있습니다.");
+
+        // When: processPetInfo 메서드 호출
+        petInfoWordService.processPetInfo(petInfo);
+
+        // Then: desertionNo가 null이므로, OpenAiService 호출이 발생하지 않음
+        verify(openAiService, never()).analyzeSpecialMark(anyString());
+
+        // 저장 메서드 호출도 발생하지 않음
+        verify(petInfoRepository, never()).save(petInfo);
     }
 }

@@ -59,7 +59,7 @@ public class MatchingControllerTest {
         );
 
         // WordMatchingService의 getTop12PetInfosByUserWord 메서드 호출 시, mockPetInfos 리스트 반환하도록 설정
-        when(wordMatchingService.getTop12PetInfosByUserWord(anyLong())).thenReturn(mockPetInfos);
+        when(wordMatchingService.getMatchingPetInfosByUserWord(anyLong())).thenReturn(mockPetInfos);
 
         // MatchingProcessService의 processPetInfo 메서드 호출 시, 결과 맵 반환하도록 설정
         Map<String, Object> processedResult = new HashMap<>();
