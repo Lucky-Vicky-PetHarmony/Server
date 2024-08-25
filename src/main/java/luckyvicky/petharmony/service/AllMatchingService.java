@@ -62,10 +62,16 @@ public class AllMatchingService {
                     List<PetInfo> combinedList = combinedSet.stream()
                             .collect(Collectors.toList());
 
-                    // 만약 교집합에 포함된 PetInfo가 12개 미만이라면 나머지 PetInfo를 추가하여 12개로 만듦
+                    // 교집합이 12개 미만일 경우 매칭률이 높은 순으로 추가
                     if (combinedList.size() < 12) {
+                        // 매칭률을 기준으로 정렬된 단어 매칭 결과에서 추가
                         petInfosFromWordMatching.stream()
                                 .filter(petInfo -> !combinedSet.contains(petInfo))
+                                .sorted((p1, p2) -> {
+                                    int matchCount1 = wordMatchingService.countMatchingWords(p1.getWords(), wordMatchingService.getWordIdListAsString(userId));
+                                    int matchCount2 = wordMatchingService.countMatchingWords(p2.getWords(), wordMatchingService.getWordIdListAsString(userId));
+                                    return Integer.compare(matchCount2, matchCount1);
+                                })
                                 .limit(12 - combinedList.size())
                                 .forEach(combinedList::add);
                     }
