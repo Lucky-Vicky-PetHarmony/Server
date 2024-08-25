@@ -14,7 +14,7 @@ import java.io.IOException;
 @RestController
 @RequiredArgsConstructor
 @Log4j2
-@RequestMapping("/api/user/board")
+@RequestMapping("/api")
 public class BoardController {
 
     private final BoardService boardService;
@@ -27,7 +27,7 @@ public class BoardController {
      * @return 생성된 게시글의 ID를 반환하며, 성공 시 HTTP 200 OK 응답을, 실패 시 HTTP 400 Bad Request 응답을 반환
      * @throws IOException 파일 업로드 중 발생할 수 있는 예외를 처리
      */
-    @PostMapping("/post")
+    @PostMapping("/user/board/post")
     public ResponseEntity<BoardDetailResponseDTO> boardPost(@ModelAttribute BoardPostDTO boardPostDTO) throws IOException {
 
         BoardDetailResponseDTO boardDetailResponseDTO = boardService.boardPost(boardPostDTO);
@@ -45,7 +45,7 @@ public class BoardController {
      * @return 수정된 게시글의 ID를 반환하며, 성공 시 HTTP 200 OK 응답을, 실패 시 HTTP 400 Bad Request 응답을 반환
      * @throws IOException 파일 업로드 중 발생할 수 있는 예외를 처리
      */
-    @PutMapping("/update")
+    @PutMapping("/user/board/update")
     public ResponseEntity<BoardDetailResponseDTO> boardUpdate(@ModelAttribute BoardUpdateDTO boardUpdateDTO) throws IOException {
 
         BoardDetailResponseDTO boardDetailResponseDTO = boardService.boardUpdate(boardUpdateDTO);
@@ -64,7 +64,7 @@ public class BoardController {
      * @return 삭제성공시 200반환
      * @throws IOException 파일 삭제 중 발생할 수 있는 예외를 처리
      */
-    @DeleteMapping("/delete")
+    @DeleteMapping("/user/board/delete")
     public ResponseEntity<String> boardDelete(@RequestParam Long userId, @RequestParam Long boardId) throws IOException {
         boardService.boardDelete(userId, boardId);
 
@@ -78,7 +78,7 @@ public class BoardController {
      * @return
      * @throws
      */
-    @GetMapping("/view")
+    @GetMapping("/public/board/view")
     public ResponseEntity<BoardDetailResponseDTO> boardDetailView(@RequestParam Long userId,
                                                                   @RequestParam Long boardId) throws IOException {
         BoardDetailResponseDTO boardDetailResponseDTO = boardService.boardDetail(userId, boardId);
@@ -92,7 +92,7 @@ public class BoardController {
      * @return
      * @throws
      */
-    @GetMapping("/list")
+    @GetMapping("/public/board/list")
     public Page<BoardListResponseDTO> boardList(@RequestParam String category,
                                                 @RequestParam String sortBy,
                                                 @RequestParam int page,
@@ -108,7 +108,7 @@ public class BoardController {
      * @return
      * @throws
      */
-    @GetMapping("/search")
+    @GetMapping("/public/board/search")
     public Page<BoardListResponseDTO> boardSearch(@RequestParam String category,
                                                   @RequestParam String sortBy,
                                                   @RequestParam String keyword,
@@ -126,7 +126,7 @@ public class BoardController {
      * @return 상태에 따른 처리 결과 메시지 (예: "좋아요가 등록되었습니다.", "좋아요가 취소되었습니다.")
      * @throws IOException 입출력 예외 발생 시 던지는 예외
      */
-    @PostMapping("/pinned")
+    @PostMapping("/user/board/pinned")
     public ResponseEntity<BoardPinResponseDTO> boardPinned(@RequestBody BoardPinDTO boardPinDTO) throws IOException {
 
         BoardPinResponseDTO boardPinResponseDTO = boardPinService.boardPinned(boardPinDTO.getPinAction(),
