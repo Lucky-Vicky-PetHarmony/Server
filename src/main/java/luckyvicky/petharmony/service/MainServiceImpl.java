@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,8 +44,13 @@ public class MainServiceImpl implements MainService {
                         .age(formatAge(petInfo.getAge())+"년생")
                         .build())
                 .collect(Collectors.toList());
-        log.info(slideResponseDTOList);
-        return slideResponseDTOList;
+        // 리스트를 랜덤으로 섞음
+        Collections.shuffle(slideResponseDTOList);
+        // 30개 이하인 경우에도 안전하게 슬라이스 처리
+        int limit = Math.min(slideResponseDTOList.size(), 30);
+        // 섞인 리스트에서 최대 30개의 슬라이드만 반환
+        List<SlideResponseDTO> limitedSlideResponseDTOList = slideResponseDTOList.subList(0, limit);
+        return limitedSlideResponseDTOList;
     }
 
     private String formatNoticeNo(String noticeNo) {
