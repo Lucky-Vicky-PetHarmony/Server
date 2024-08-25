@@ -32,7 +32,7 @@ public class MatchingController {
      * @param userId 사용자의 ID
      * @return 매칭된 반려동물 정보 목록 (JSON 형식)
      */
-    @GetMapping("/api/user/top12/{userId}")
+    @GetMapping("/user/top12/{userId}")
     public List<Map<String, Object>> getTop12PetsByUserWord(@PathVariable Long userId) {
         // 사용자의 wordId 리스트와 매칭된 PetInfo 리스트를 가져옴
         List<PetInfo> matchedPetInfos = wordMatchingService.getMatchingPetInfosByUserWord(userId);

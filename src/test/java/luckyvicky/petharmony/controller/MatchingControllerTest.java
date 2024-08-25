@@ -72,7 +72,7 @@ public class MatchingControllerTest {
         when(petInfoFormatService.processPetInfo(Mockito.any(PetInfo.class))).thenReturn(processedResult);
 
         // When: 매핑된 엔드포인트를 MockMvc를 통해 호출
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/api/user/top12/{userId}", 1L))
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/user/top12/{userId}", 1L))
                 .andExpect(MockMvcResultMatchers.status().isOk())  // HTTP 상태 코드가 200 OK인지 확인
                 .andExpect(jsonPath("$[0].words").isArray())  // 반환된 JSON 배열에서 'words' 필드가 배열인지 확인
                 .andExpect(jsonPath("$[0].words[0]").value("건강한"))  // 'words' 배열의 첫 번째 요소가 "건강한"인지 확인
