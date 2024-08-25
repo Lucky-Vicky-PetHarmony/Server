@@ -18,10 +18,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyList;
 
 @SpringBootTest
-public class DetailAdoptionTest {
+public class DetailAdoptionServiceTest {
 
     @Autowired
-    private DetailAdoption detailAdoption;
+    private DetailAdoptionService detailAdoptionService;
 
     @MockBean
     private WordRepository wordRepository;
@@ -61,7 +61,7 @@ public class DetailAdoptionTest {
         Mockito.when(petInfoFormatService.processPetInfo(petInfo)).thenReturn(mockBaseResult);
 
         // When
-        Map<String, Object> result = detailAdoption.processPetInfo(petInfo);
+        Map<String, Object> result = detailAdoptionService.processPetInfo(petInfo);
 
         // Then
         assertThat(result).isNotNull();
@@ -84,8 +84,8 @@ public class DetailAdoptionTest {
         String species2 = "기타축종";
 
         // When
-        String result1 = detailAdoption.processSpecies(species1);
-        String result2 = detailAdoption.processSpecies(species2);
+        String result1 = detailAdoptionService.processSpecies(species1);
+        String result2 = detailAdoptionService.processSpecies(species2);
 
         // Then
         assertThat(result1).isEqualTo(" 페르시안");

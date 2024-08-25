@@ -11,24 +11,24 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * DetailAdoption 클래스는 PetInfoFormatService를 확장하여 추가적인 기능을 제공하는 서비스
+ * DetailAdoptionService 클래스는 PetInfoFormatService를 확장하여 추가적인 기능을 제공하는 서비스
  * 기본적인 PetInfo 포맷팅 기능에 더해, 모든 단어를 반환하고 추가적인 필드를 처리하는 기능을 포함
  */
 @Service
-public class DetailAdoption implements PetInfoFormatter {
+public class DetailAdoptionService implements PetInfoFormatter {
 
     private final PetInfoFormatService petInfoFormatService; // 기본 PetInfo 포맷팅을 담당하는 서비스
     private final WordRepository wordRepository; // Word 엔티티와 관련된 데이터베이스 작업을 처리하는 레포지토리
 
     /**
-     * DetailAdoption 생성자.
+     * DetailAdoptionService 생성자.
      * PetInfoFormatService와 WordRepository를 의존성 주입을 통해 초기화
      *
      * @param petInfoFormatService 기본 포맷팅 서비스를 제공하는 PetInfoFormatService
      * @param wordRepository Word 엔티티 관련 데이터베이스 작업을 처리하는 레포지토리
      */
     @Autowired
-    public DetailAdoption(PetInfoFormatService petInfoFormatService, WordRepository wordRepository) {
+    public DetailAdoptionService(PetInfoFormatService petInfoFormatService, WordRepository wordRepository) {
         this.petInfoFormatService = petInfoFormatService;
         this.wordRepository = wordRepository;
     }
