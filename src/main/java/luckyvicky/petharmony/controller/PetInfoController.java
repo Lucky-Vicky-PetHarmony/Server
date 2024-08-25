@@ -30,7 +30,7 @@ public class PetInfoController {
      *
      * @return 유기동물 정보 목록 (JSON 형식)
      */
-    @GetMapping("user/allPetsInfo")
+    @GetMapping("/public/allPetsInfo")
     public List<Map<String, Object>> getAllPetsInfo() {
         // 모든 PetInfo 데이터를 가져옴
         List<PetInfo> allPetInfos = petInfoRepository.findAll();

@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  * MatchingProcessService는 매칭된 PetInfo 객체를 처리하여 원하는 형식으로 반환하는 서비스입니다.
  */
 @Service
-public class PetInfoFormatService {
+public class PetInfoFormatService implements PetInfoFormatter {
 
     private final WordRepository wordRepository;
     private final ShelterInfoRepository shelterInfoRepository;
@@ -65,7 +65,7 @@ public class PetInfoFormatService {
      *
      * @param words pet_info 테이블의 words 필드 값
      * @return 매칭된 단어들의 리스트*/
-    private List<String> processWords(String words) {
+    protected List<String> processWords(String words) {
         if (words == null || words.isEmpty()) {
             // words 필드가 비었을 때
             return Collections.emptyList();
