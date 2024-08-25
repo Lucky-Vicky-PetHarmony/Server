@@ -2,81 +2,134 @@ package luckyvicky.petharmony.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import luckyvicky.petharmony.entity.ShelterInfo;
+import luckyvicky.petharmony.entity.User;
+import luckyvicky.petharmony.repository.ShelterInfoRepository;
+import luckyvicky.petharmony.repository.UserRepository;
+import org.apache.http.HttpHeaders;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.math.BigDecimal;
 import java.net.URI;
+import java.util.Optional;
 
-/**
- * LocationService 클래스는 주소 정보를 통해 위도와 경도를 얻는 기능을 제공
- * WebClient를 사용하여 OpenStreetMap의 Nominatim API를 통해 주소를 위도와 경도로 변환
- */
 @Service
 public class LocationService {
 
-    private final WebClient webClient; // HTTP 요청을 비동기적으로 처리하기 위한 WebClient 객체
+    private final WebClient webClient;
+    private final UserRepository userRepository;
+    private final ShelterInfoRepository shelterInfoRepository;
 
-    /**
-     * LocationService 생성자. WebClient.Builder 객체를 주입받아 초기화
-     *
-     * @param webClientBuilder WebClient.Builder 객체
-     */
-    public LocationService(WebClient.Builder webClientBuilder) {
-        this.webClient = webClientBuilder.baseUrl("https://nominatim.openstreetmap.org").build();
+    @Autowired
+    public LocationService(WebClient.Builder webClientBuilder, UserRepository userRepository, ShelterInfoRepository shelterInfoRepository) {
+        this.webClient = webClientBuilder.baseUrl("https://nominatim.openstreetmap.org")
+                .defaultHeader(HttpHeaders.USER_AGENT, "YourAppName")
+                .build();
+        this.userRepository = userRepository;
+        this.shelterInfoRepository = shelterInfoRepository;
     }
 
-    /**
-     * 주어진 주소를 기반으로 Nominatim API를 호출하여 위도와 경도를 얻는다.
-     *
-     * @param address 위도와 경도를 얻고자 하는 주소
-     * @return 위도와 경도를 포함한 double 배열 (index 0: 위도, index 1: 경도)
-     */
     public double[] getLatLonFromAddress(String address) {
+        if (address == null || address.trim().isEmpty()) {
+            throw new AddressNotFoundException("주소 정보가 없습니다.");
+        }
+
         try {
-            // Nominatim API의 검색 엔드포인트 URI를 생성
-            URI uri = UriComponentsBuilder.fromPath("/search")
-                    .queryParam("q", address) // 검색 쿼리에 주소를 추가
-                    .queryParam("format", "json") // 응답 포맷을 JSON으로 설정
+            URI uri = UriComponentsBuilder.fromUriString("https://nominatim.openstreetmap.org/search")
+                    .queryParam("q", address)
+                    .queryParam("format", "json")
+                    .encode()
                     .build().toUri();
 
-            // WebClient를 사용하여 API 요청을 보내고, 응답을 문자열로 수신
             String response = this.webClient.get()
                     .uri(uri)
                     .retrieve()
                     .bodyToMono(String.class)
-                    .block(); // 비동기 요청을 동기 방식으로 대기
+                    .block();
 
-            // JSON 파서를 사용하여 응답 문자열을 JSON 객체로 변환
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode root = objectMapper.readTree(response);
 
-            // JSON 응답이 배열이고, 하나 이상의 결과가 있는지 확인
             if (root.isArray() && root.size() > 0) {
-                // 첫 번째 결과에서 위도와 경도 값을 추출
                 JsonNode locationNode = root.get(0);
                 double lat = locationNode.path("lat").asDouble();
                 double lon = locationNode.path("lon").asDouble();
-                return new double[]{lat, lon}; // 위도와 경도를 double 배열로 반환
+
+                if (lat < -90 || lat > 90 || lon < -180 || lon > 180) {
+                    lat = 35.00;
+                    lon = 125.00;
+                }
+                return new double[]{lat, lon};
             } else {
-                // 검색 결과가 없는 경우 예외를 발생
                 throw new LocationNotFoundException("주소를 찾을 수 없습니다: " + address);
             }
         } catch (WebClientResponseException e) {
-            // HTTP 요청 오류 시 예외 처리
             throw new RuntimeException("HTTP 요청 오류: " + e.getMessage(), e);
         } catch (Exception e) {
-            // 일반적인 예외 처리
             throw new RuntimeException("위도 경도를 얻는데 실패하였습니다.", e);
         }
     }
 
+    public double[] getLatLonFromShelterInfo(ShelterInfo shelterInfo) {
+        double lat = shelterInfo.getLat() != null ? shelterInfo.getLat().doubleValue() : 35.00;
+        double lon = shelterInfo.getLng() != null ? shelterInfo.getLng().doubleValue() : 125.00;
+
+        if (lat < -90 || lat > 90 || lon < -180 || lon > 180) {
+            lat = 35.00;
+            lon = 125.00;
+        }
+
+        return new double[]{lat, lon};
+    }
+
+    public double[] getLatLonFromUserId(Long userId) {
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isEmpty()) {
+            throw new UserNotFoundException("사용자 ID에 해당하는 사용자가 없습니다: " + userId);
+        }
+
+        User user = userOptional.get();
+        String address = user.getAddress();
+
+        if (address == null || address.trim().isEmpty()) {
+            throw new AddressNotFoundException("사용자 ID " + userId + "의 주소 정보가 없습니다.");
+        }
+
+        return getLatLonFromAddress(address);
+    }
+
     /**
-     * 사용자 정의 예외 클래스: 주소를 찾을 수 없는 경우에 사용
+     * 두 지점 간의 거리를 계산하는 메서드 (단위: km)
      */
+    public double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+        final int EARTH_RADIUS_KM = 6371;
+        double latDistance = Math.toRadians(lat2 - lat1);
+        double lonDistance = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return EARTH_RADIUS_KM * c;
+    }
+
     private static class LocationNotFoundException extends RuntimeException {
         public LocationNotFoundException(String message) {
+            super(message);
+        }
+    }
+
+    private static class UserNotFoundException extends RuntimeException {
+        public UserNotFoundException(String message) {
+            super(message);
+        }
+    }
+
+    private static class AddressNotFoundException extends RuntimeException {
+        public AddressNotFoundException(String message) {
             super(message);
         }
     }
