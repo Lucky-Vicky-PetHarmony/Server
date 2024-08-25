@@ -24,6 +24,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // CSRF 비활성화
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/api/public/**").permitAll()  // 공용 엔드포인트
+                        .requestMatchers("/api/user/top12/**").permitAll()  // 특정 엔드포인트 접근 허용
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")  // 관리자 엔드포인트
                         .requestMatchers("/api/user/**").hasRole("USER")  // 사용자 엔드포인트
                         .anyRequest().authenticated()  // 그 외 모든 요청은 인증 필요

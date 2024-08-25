@@ -1,50 +1,49 @@
 package luckyvicky.petharmony.controller;
 
 import luckyvicky.petharmony.entity.PetInfo;
-import luckyvicky.petharmony.service.PetInfoFormatService;
-import luckyvicky.petharmony.service.WordMatchingService;
+import luckyvicky.petharmony.repository.PetInfoRepository;
 import luckyvicky.petharmony.security.JwtTokenProvider;
+import luckyvicky.petharmony.service.PetInfoFormatService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.*;
 
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(MatchingController.class)  // MatchingController 클래스만 로드하여 테스트
-public class MatchingControllerTest {
+@WebMvcTest(PetInfoController.class) // PetInfoController만 로드하여 테스트
+@AutoConfigureMockMvc(addFilters = false) // 모든 시큐리티 필터 비활성화
+public class PetInfoControllerTest {
 
     @Autowired
-    private MockMvc mockMvc;  // MockMvc 객체를 통해 컨트롤러 테스트
+    private MockMvc mockMvc;
 
     @MockBean
-    private PetInfoFormatService petInfoFormatService;  // MatchingProcessService를 MockBean으로 주입
+    private PetInfoFormatService petInfoFormatService;
 
     @MockBean
-    private WordMatchingService wordMatchingService;  // WordMatchingService를 MockBean으로 주입
+    private PetInfoRepository petInfoRepository;
 
     @MockBean
-    private JwtTokenProvider jwtTokenProvider;  // JwtTokenProvider를 MockBean으로 주입하여 테스트에서 사용
+    private UserDetailsService userDetailsService; // UserDetailsService를 모킹하여 의존성 해결
 
     @MockBean
-    private UserDetailsService userDetailsService; // UserDetailsService를 MockBean으로 주입하여 테스트에서 사용
+    private JwtTokenProvider jwtTokenProvider; // JwtTokenProvider를 모킹하여 의존성 해결
 
     /**
-     * 사용자 ID로 매칭된 상위 12개의 반려동물 정보를 반환하는 엔드포인트를 테스트하는 메서드
+     * 모든 유기동물 정보를 반환하는 엔드포인트를 테스트하는 메서드
      */
     @Test
-    @WithMockUser(username = "user", roles = {"USER"})  // Mock된 사용자로 테스트 수행
-    void testGetTop12PetsByUserWord() throws Exception {
+    void testGetAllPetsInfo() throws Exception {
         // Given: 테스트에 사용할 PetInfo 리스트를 설정
         List<PetInfo> mockPetInfos = Arrays.asList(
                 PetInfo.builder()
@@ -58,10 +57,10 @@ public class MatchingControllerTest {
                         .build()
         );
 
-        // WordMatchingService의 getTop12PetInfosByUserWord 메서드 호출 시, mockPetInfos 리스트 반환하도록 설정
-        when(wordMatchingService.getMatchingPetInfosByUserWord(anyLong())).thenReturn(mockPetInfos);
+        // PetInfoRepository의 findAll 메서드 호출 시, mockPetInfos 리스트 반환하도록 설정
+        when(petInfoRepository.findAll()).thenReturn(mockPetInfos);
 
-        // MatchingProcessService의 processPetInfo 메서드 호출 시, 결과 맵 반환하도록 설정
+        // PetInfoFormatService의 processPetInfo 메서드 호출 시, 결과 맵 반환하도록 설정
         Map<String, Object> processedResult = new HashMap<>();
         processedResult.put("words", Arrays.asList("건강한", "회복중인", "온순한"));
         processedResult.put("kind_cd", "포메라니안");
@@ -72,8 +71,8 @@ public class MatchingControllerTest {
         when(petInfoFormatService.processPetInfo(Mockito.any(PetInfo.class))).thenReturn(processedResult);
 
         // When: 매핑된 엔드포인트를 MockMvc를 통해 호출
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/user/top12/{userId}", 1L))
-                .andExpect(MockMvcResultMatchers.status().isOk())  // HTTP 상태 코드가 200 OK인지 확인
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/public/allPetsInfo"))
+                .andExpect(status().isOk())  // HTTP 상태 코드가 200 OK인지 확인
                 .andExpect(jsonPath("$[0].words").isArray())  // 반환된 JSON 배열에서 'words' 필드가 배열인지 확인
                 .andExpect(jsonPath("$[0].words[0]").value("건강한"))  // 'words' 배열의 첫 번째 요소가 "건강한"인지 확인
                 .andExpect(jsonPath("$[0].kind_cd").value("포메라니안"))  // 'kind_cd' 필드의 값이 "포메라니안"인지 확인
