@@ -12,6 +12,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.security.core.parameters.P;
 
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -41,6 +42,9 @@ public interface PetInfoRepository extends JpaRepository<PetInfo, String> {
     @Query("SELECT p FROM PetInfo p WHERE p.careNm = :careNm")
     List<PetInfo> findAllByCareNm(@Param("careNm") String careNm);
 
+    // notice_edt가 현재 날짜를 지난 PetInfo 조회
+    List<PetInfo> findByNoticeEdtBefore(LocalDate currentDate);
+
     /**
      * desertionNo에 해당하는 PetInfo와 연결된 ShelterInfo를 조인하여 가져옵니다.
      *
@@ -49,5 +53,4 @@ public interface PetInfoRepository extends JpaRepository<PetInfo, String> {
      */
     @Query("SELECT p FROM PetInfo p JOIN FETCH ShelterInfo s ON p.careNm = s.careNm WHERE p.desertionNo = :desertionNo")
     PetInfo findPetInfoWithShelterByDesertionNo(@Param("desertionNo") String desertionNo);
-
 }
