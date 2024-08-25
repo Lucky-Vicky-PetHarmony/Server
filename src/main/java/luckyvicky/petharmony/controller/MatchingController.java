@@ -1,13 +1,12 @@
 package luckyvicky.petharmony.controller;
 
 import luckyvicky.petharmony.entity.PetInfo;
+import luckyvicky.petharmony.service.AllMatchingService;
 import luckyvicky.petharmony.service.PetInfoFormatService;
-import luckyvicky.petharmony.service.WordMatchingService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Map;
@@ -17,29 +16,32 @@ import java.util.stream.Collectors;
 @RequestMapping("/api")
 public class MatchingController {
 
-    private final WordMatchingService wordMatchingService;
+    private final AllMatchingService allMatchingService;
     private final PetInfoFormatService petInfoFormatService;
 
     @Autowired
-    public MatchingController(WordMatchingService wordMatchingService, PetInfoFormatService petInfoFormatService) {
-        this.wordMatchingService = wordMatchingService;
+    public MatchingController(AllMatchingService allMatchingService, PetInfoFormatService petInfoFormatService) {
+        this.allMatchingService = allMatchingService;
         this.petInfoFormatService = petInfoFormatService;
     }
 
     /**
-     * 사용자의 단어와 매칭된 상위 12개의 반려동물 정보를 반환하는 엔드포인트
+     * 사용자 ID로 매칭된 PetInfo 데이터를 가져와 포맷된 형태로 반환하는 메서드
      *
-     * @param userId 사용자의 ID
-     * @return 매칭된 반려동물 정보 목록 (JSON 형식)
+     * @param userId 사용자 ID
+     * @return 포맷된 PetInfo 데이터 리스트
      */
-    @GetMapping("/user/top12/{userId}")
-    public List<Map<String, Object>> getTop12PetsByUserWord(@PathVariable Long userId) {
-        // 사용자의 wordId 리스트와 매칭된 PetInfo 리스트를 가져옴
-        List<PetInfo> matchedPetInfos = wordMatchingService.getMatchingPetInfosByUserWord(userId);
-
-        // 각 PetInfo 객체를 처리하여 프론트엔드에 전달할 형식으로 변환
-        return matchedPetInfos.stream()
-                .map(petInfoFormatService::processPetInfo)
-                .collect(Collectors.toList());
+    @GetMapping("/user/matching/{userId}")
+    public ResponseEntity<List<Map<String, Object>>> getMatchingPetInfos(@PathVariable Long userId) {
+        return allMatchingService.getTop12PetInfos(userId)
+                .map(petInfos -> petInfos.stream()
+                        .map(petInfoFormatService::processPetInfo)
+                        .collect(Collectors.toList()))
+                .map(ResponseEntity::ok)
+                .onErrorResume(e -> {
+                    // 오류 처리: 예외 메시지와 함께 빈 리스트 반환
+                    return Mono.just(ResponseEntity.badRequest().body(List.of(Map.of("error", e.getMessage()))));
+                })
+                .block(); // 비동기 결과를 동기적으로 반환
     }
 }
