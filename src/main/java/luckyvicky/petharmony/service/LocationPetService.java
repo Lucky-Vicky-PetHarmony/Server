@@ -9,16 +9,17 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
-public class PetService {
+public class LocationPetService {
 
     private final LocationService locationService; // 위치 정보를 가져오는 LocationService
     private final ShelterInfoRepository shelterInfoRepository; // 보호소 정보와 관련된 데이터베이스 작업을 처리하는 Repository
     private final PetInfoRepository petInfoRepository; // 반려동물 정보와 관련된 데이터베이스 작업을 처리하는 Repository
 
-    public PetService(LocationService locationService, ShelterInfoRepository shelterInfoRepository, PetInfoRepository petInfoRepository) {
+    public LocationPetService(LocationService locationService, ShelterInfoRepository shelterInfoRepository, PetInfoRepository petInfoRepository) {
         this.locationService = locationService;
         this.shelterInfoRepository = shelterInfoRepository;
         this.petInfoRepository = petInfoRepository;
@@ -32,7 +33,7 @@ public class PetService {
      */
     public List<PetInfo> getPetsNearUser(String address) {
         if (address == null || address.trim().isEmpty()) {
-            throw new IllegalArgumentException("주소가 유효하지 않습니다.");
+            return Collections.emptyList();
         }
 
         // 사용자의 주소로부터 위도와 경도를 계산해서 가져옴
