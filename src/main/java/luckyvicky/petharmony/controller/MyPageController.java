@@ -42,7 +42,6 @@ public class MyPageController {
     @PutMapping("/api/user/password")
     public ResponseEntity<?> updatePassword(@RequestBody PasswordRequestDTO passwordRequestDTO) {
         try {
-            log.info(passwordRequestDTO);
             myPageService.updatePassword(passwordRequestDTO);
             return ResponseEntity.ok(null);
         } catch (Exception e) {
