@@ -20,8 +20,8 @@ public interface UserService {
     User kakaoLogin(KakaoInfoDTO kakaoInfoDTO);
     // 활동 정지 해제 메서드
     void releaseBans();
-
+    // 유저주소
+    String userAddrExist(Long userId);
     // 사용자 주소를 업데이트하는 메서드
     void updateUserAddress(UserAddressDTO userAddressDTO);
-
 }

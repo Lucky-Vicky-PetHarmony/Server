@@ -39,6 +39,9 @@ public class ShelterInfoService {
         // 전화번호 추가
         result.put("care_tel", shelterInfo.getCareTel());
 
+        // 지역 추가
+        result.put("org_nm", shelterInfo.getOrgNm());
+
         return result; // 최종 처리된 데이터를 Map으로 반환
     }
 

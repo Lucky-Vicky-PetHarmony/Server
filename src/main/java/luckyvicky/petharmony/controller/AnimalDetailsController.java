@@ -23,9 +23,10 @@ public class AnimalDetailsController {
     /**
      * 유기동물 정보와 보호소 정보를 결합하여 반환하는 API 엔드포인트
      */
-    @GetMapping("/public/{desertionNo}")
-    public Map<String, Object> getCombinedAnimalInfo(@PathVariable String desertionNo) {
-        return combinedInfoService.getCombinedInfo(desertionNo);
+    @GetMapping("/public/{desertionNo}/{userId}")
+    public Map<String, Object> getCombinedAnimalInfo(@PathVariable String desertionNo
+                                                    , @PathVariable Long userId) {
+        return combinedInfoService.getCombinedInfo(desertionNo, userId);
     }
 
 }
