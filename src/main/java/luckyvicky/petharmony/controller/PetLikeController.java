@@ -1,7 +1,7 @@
 package luckyvicky.petharmony.controller;
 
-import luckyvicky.petharmony.dto.PetLikeRequestDTO;
-import luckyvicky.petharmony.dto.PetLikeResponseDTO;
+import luckyvicky.petharmony.dto.petlike.PetLikeRequestDTO;
+import luckyvicky.petharmony.dto.petlike.PetLikeResponseDTO;
 import luckyvicky.petharmony.service.PetLikeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

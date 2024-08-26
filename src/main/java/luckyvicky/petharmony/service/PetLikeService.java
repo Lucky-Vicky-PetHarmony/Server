@@ -1,7 +1,7 @@
 package luckyvicky.petharmony.service;
 
-import luckyvicky.petharmony.dto.PetLikeRequestDTO;
-import luckyvicky.petharmony.dto.PetLikeResponseDTO;
+import luckyvicky.petharmony.dto.petlike.PetLikeRequestDTO;
+import luckyvicky.petharmony.dto.petlike.PetLikeResponseDTO;
 
 import java.util.List;
 
