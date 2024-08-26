@@ -1,7 +1,9 @@
 package luckyvicky.petharmony.controller;
 
 import luckyvicky.petharmony.dto.UserWordDTO;
+import luckyvicky.petharmony.dto.WordDTO;
 import luckyvicky.petharmony.service.UserWordService;
+import luckyvicky.petharmony.service.WordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,6 +15,9 @@ public class UserWordController {
     // UserWordService 주입
     @Autowired
     private UserWordService userWordService;
+
+    @Autowired
+    private WordService wordService;
 
     /**
      * 사용자가 선택한 선호 단어들을 저장하는 API 엔드포인트
@@ -34,5 +39,16 @@ public class UserWordController {
     public List<UserWordDTO> getUserWords(@PathVariable Long userId) {
         // UserWordService를 호출하여 사용자가 선택한 단어 목록을 조회하고 반환합니다.
         return userWordService.getUserWords(userId);
+    }
+
+    /**
+     * 사용자가 선택할 수 있는 모든 단어 조회
+     *
+     * @return 단어 반환
+     */
+    @GetMapping("/user/allwords")
+    public List<WordDTO> getWords() {
+        // UserWordService를 호출하여 사용자가 선택한 단어 목록을 조회하고 반환합니다.
+        return wordService.getAllWord();
     }
 }
