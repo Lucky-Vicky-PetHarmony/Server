@@ -1,8 +1,10 @@
 package luckyvicky.petharmony.service;
 
 import luckyvicky.petharmony.entity.PetInfo;
+import luckyvicky.petharmony.entity.PetLike;
 import luckyvicky.petharmony.entity.ShelterInfo;
 import luckyvicky.petharmony.repository.PetInfoRepository;
+import luckyvicky.petharmony.repository.PetLikeRepository;
 import luckyvicky.petharmony.repository.ShelterInfoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,16 +20,18 @@ public class CombinedInfoService {
     private final ShelterInfoRepository shelterInfoRepository;
     private final DetailAdoptionService detailAdoptionService;
     private final ShelterInfoService shelterInfoService;
+    private final PetLikeRepository petLikeRepository;
 
     @Autowired
     public CombinedInfoService(PetInfoRepository petInfoRepository,
                                ShelterInfoRepository shelterInfoRepository,
                                DetailAdoptionService detailAdoption,
-                               ShelterInfoService shelterInfoService) {
+                               ShelterInfoService shelterInfoService, PetLikeRepository petLikeRepository) {
         this.petInfoRepository = petInfoRepository;
         this.shelterInfoRepository = shelterInfoRepository;
         this.detailAdoptionService = detailAdoption;
         this.shelterInfoService = shelterInfoService;
+        this.petLikeRepository = petLikeRepository;
     }
 
     /**
@@ -36,13 +40,18 @@ public class CombinedInfoService {
      * @param desertionNo 유기동물 번호
      * @return 유기동물 정보와 보호소 정보가 결합된 맵 객체
      */
-    public Map<String, Object> getCombinedInfo(String desertionNo) {
+    public Map<String, Object> getCombinedInfo(String desertionNo, Long userId) {
         Map<String, Object> combinedInfo = new HashMap<>();
 
         PetInfo petInfo = petInfoRepository.findPetInfoWithShelterByDesertionNo(desertionNo);
+
         if (petInfo != null) {
             Map<String, Object> petInfoDetails = detailAdoptionService.processPetInfo(petInfo);
             combinedInfo.putAll(petInfoDetails);
+
+            // 좋아요 여부 추가
+            Optional<PetLike> PetLike = petLikeRepository.findByUser_UserIdAndDesertionNo(userId, desertionNo);
+            combinedInfo.put("pet_like", PetLike.isPresent());
 
             Optional<ShelterInfo> shelterInfoOptional = shelterInfoRepository.findByCareNm(petInfo.getCareNm());
             if (shelterInfoOptional.isPresent()) {
