@@ -34,6 +34,8 @@ public class PetInfoFormatService implements PetInfoFormatter {
      */
     public Map<String, Object> processPetInfo(PetInfo petInfo) {
         Map<String, Object> result = new HashMap<>();
+        // 입양동물 번호
+        result.put("desertion_no", petInfo.getDesertionNo());
 
         // words 필드에서 wordId를 추출하여 Word엔티티의 wordSelect 값을 매핑
         result.put("words", processWords(petInfo.getWords()));
