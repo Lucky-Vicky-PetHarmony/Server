@@ -34,13 +34,6 @@ public class SecurityConfig {
         return http.build();
     }
 
-    /*
-       현재 Spring Security와 통합된 OAuth2 로그인 기능을 사용하지 않고
-       UserServeImpl 클래스에서 RestTemplate을 사용하여
-       직접 Kako API에 요청하여 JWT 토큰을 발급하는 방식으로 구현했다.
-       추후 리팩토링 필요 (기록 차원에 주석 남김)
-    */
-
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

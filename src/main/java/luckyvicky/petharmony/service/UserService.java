@@ -22,4 +22,6 @@ public interface UserService {
     void releaseBans();
     // 유저주소
     String userAddrExist(Long userId);
+    // 사용자 주소를 업데이트하는 메서드
+    void updateUserAddress(UserAddressDTO userAddressDTO);
 }
