@@ -7,6 +7,8 @@ import luckyvicky.petharmony.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class PetLikeService {
 
@@ -22,10 +24,17 @@ public class PetLikeService {
     public PetLike savePetLike(Long userId, String desertionNo) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다: " + userId));
-        PetLike petLike = PetLike.builder()
-                .user(user)
-                .desertionNo(desertionNo)
-                .build();
-        return petLikeRepository.save(petLike);
+        Optional<PetLike> existPetLike = petLikeRepository.findByUser_UserIdAndDesertionNo(userId, desertionNo);
+
+        if (existPetLike.isPresent()) {
+            petLikeRepository.delete(existPetLike.get());
+            return null;
+        }else {
+            PetLike petLike = PetLike.builder()
+                    .user(user)
+                    .desertionNo(desertionNo)
+                    .build();
+            return petLikeRepository.save(petLike);
+        }
     }
 }
