@@ -2,16 +2,15 @@ package luckyvicky.petharmony.controller;
 
 import luckyvicky.petharmony.dto.PetLikeRequestDTO;
 import luckyvicky.petharmony.dto.PetLikeResponseDTO;
-import luckyvicky.petharmony.entity.PetLike;
 import luckyvicky.petharmony.service.PetLikeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/user")
 public class PetLikeController {
 
     private final PetLikeService petLikeService;
@@ -22,37 +21,34 @@ public class PetLikeController {
     }
 
     /**
-     * 사용자가 반려동물을 좋아요 표시하는 요청을 처리합니다.
+     * 반려동물 좋아요 처리 또는 좋아요 취소 요청을 처리
      *
-     * @param requestDTO 사용자의 ID와 반려동물의 desertionNo를 포함하는 요청 데이터
-     * @return PetLikeResponseDTO 좋아요가 성공적으로 저장된 후 반환되는 데이터
+     * @param requestDTO 사용자의 ID, 반려동물의 desertionNo, 좋아요 여부를 포함하는 요청 데이터
+     * @return 좋아요 또는 좋아요 취소 결과를 담은 PetLikeResponseDTO 객체
      */
-    @PostMapping("/user/pet-likes")
-    public PetLikeResponseDTO likePet(@RequestBody PetLikeRequestDTO requestDTO) {
-        // PetLikeService의 savePetLike 메서드에 DTO를 그대로 전달합니다.
-        PetLike petLike = petLikeService.savePetLike(requestDTO);
-        return new PetLikeResponseDTO(
-                petLike.getLikeId(),
-                petLike.getDesertionNo(),
-                petLike.getUser().getUserId()
-        );
+    @PostMapping("/pet-likes")
+    public ResponseEntity<PetLikeResponseDTO> likeOrUnlikePet(@RequestBody PetLikeRequestDTO requestDTO) {
+        PetLikeResponseDTO responseDTO;
+
+        // 좋아요 또는 좋아요 취소 요청을 처리
+        if (requestDTO.isLiked()) {
+            responseDTO = petLikeService.savePetLike(requestDTO);
+        } else {
+            responseDTO = petLikeService.removePetLike(requestDTO);
+        }
+
+        return ResponseEntity.ok(responseDTO);
     }
 
     /**
-     * 특정 사용자가 좋아요를 표시한 모든 반려동물의 목록을 반환합니다.
+     * 특정 사용자가 좋아요한 반려동물 목록을 반환
      *
      * @param userId 사용자의 ID
-     * @return List<PetLikeResponseDTO> 사용자가 좋아요를 표시한 반려동물의 목록
+     * @return 사용자가 좋아요한 반려동물 목록을 담은 PetLikeResponseDTO 리스트
      */
-    @GetMapping("/user/{userId}/pet-likes")
-    public List<PetLikeResponseDTO> getPetLikesByUser(@PathVariable Long userId) {
-        List<PetLike> petLikes = petLikeService.getPetLikesByUser(userId);
-        return petLikes.stream()
-                .map(petLike -> new PetLikeResponseDTO(
-                        petLike.getLikeId(),
-                        petLike.getDesertionNo(),
-                        petLike.getUser().getUserId()
-                ))
-                .collect(Collectors.toList());
+    @GetMapping("/{userId}/pet-likes")
+    public ResponseEntity<List<PetLikeResponseDTO>> getPetLikesByUser(@PathVariable Long userId) {
+        List<PetLikeResponseDTO> petLikes = petLikeService.getPetLikesByUser(userId);
+        return ResponseEntity.ok(petLikes);
     }
 }
