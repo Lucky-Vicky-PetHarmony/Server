@@ -1,7 +1,7 @@
 package luckyvicky.petharmony.service;
 
-import luckyvicky.petharmony.dto.PetLikeRequestDTO;
-import luckyvicky.petharmony.dto.PetLikeResponseDTO;
+import luckyvicky.petharmony.dto.petlike.PetLikeRequestDTO;
+import luckyvicky.petharmony.dto.petlike.PetLikeResponseDTO;
 import luckyvicky.petharmony.entity.PetLike;
 import luckyvicky.petharmony.entity.User;
 import luckyvicky.petharmony.repository.PetLikeRepository;
@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service

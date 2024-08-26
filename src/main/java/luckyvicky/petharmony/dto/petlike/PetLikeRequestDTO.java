@@ -1,4 +1,4 @@
-package luckyvicky.petharmony.dto;
+package luckyvicky.petharmony.dto.petlike;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
