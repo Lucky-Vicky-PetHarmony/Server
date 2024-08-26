@@ -20,4 +20,6 @@ public interface UserService {
     User kakaoLogin(KakaoInfoDTO kakaoInfoDTO);
     // 활동 정지 해제 메서드
     void releaseBans();
+    // 유저주소
+    String userAddrExist(Long userId);
 }

@@ -9,9 +9,7 @@ import luckyvicky.petharmony.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -141,5 +139,10 @@ public class UserController {
                 user.getRole().toString()
         );
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("api/user/existaddr/{userId}")
+    public ResponseEntity<String> existAddr(@PathVariable Long userId) {
+        return ResponseEntity.ok(userService.userAddrExist(userId));
     }
 }

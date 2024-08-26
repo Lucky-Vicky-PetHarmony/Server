@@ -371,4 +371,18 @@ public class UserServiceImpl implements UserService {
             user.releaseBans();
         }
     }
+
+    /**
+     * @param userId 주소를 확인할 유저 id
+     * @return 주소가 있으면 주소, 없으면 Empty Address
+     */
+    @Override
+    public String userAddrExist(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("유효하지않은 user"));
+        if(user.getAddress()!=null){
+            return user.getAddress();
+        }else {
+            return "Empty Address";
+        }
+    }
 }
