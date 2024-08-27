@@ -96,4 +96,18 @@ public class MyPageController {
             return ResponseEntity.badRequest().body(null);
         }
     }
+
+    // 사용자가 관심있는 입양 동물 조회 엔드포인트였던 것 (수정예정)
+    /*
+    @GetMapping("/api/user/interestedPets")
+    public ResponseEntity<List<MyInterestedPetDTO>> getInterestedPets() {
+        try {
+            List<MyInterestedPetDTO> myInterestedPetDTO = myPageService.getMyInterestedPet();
+            return ResponseEntity.ok(myInterestedPetDTO);
+        } catch (Exception e) {
+            log.error("관심있는 입양 동물 조회 중 오류 발생", e);
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+     */
 }

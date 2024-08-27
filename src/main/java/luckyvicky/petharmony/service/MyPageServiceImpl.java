@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import luckyvicky.petharmony.dto.board.BoardListResponseDTO;
 import luckyvicky.petharmony.dto.mypage.*;
+import luckyvicky.petharmony.entity.PetInfo;
+import luckyvicky.petharmony.entity.PetLike;
 import luckyvicky.petharmony.entity.User;
 import luckyvicky.petharmony.entity.board.Board;
 import luckyvicky.petharmony.entity.board.BoardPin;
@@ -16,7 +18,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,6 +34,9 @@ public class MyPageServiceImpl implements MyPageService {
     private final ImageRepository imageRepository;
     private final BoardRepository boardRepository;
     private final CommentRepository commentRepository;
+    private final PetLikeRepository petLikeRepository;
+    private final PetInfoRepository petInfoRepository;
+    private final PetInfoWordService petInfoFormatService;
 
     // 현재 인증된 사용자의 프로필 정보를 조회하는 메서드
     @Override
@@ -187,4 +194,51 @@ public class MyPageServiceImpl implements MyPageService {
                 .role(user.getRole().toString())
                 .build();
     }
+
+    // 현재 인증된 사용자가 관심있는 입양동물 조회하는 메서드였던 것 (수정 예정)
+    /*
+    @Override
+    public List<MyInterestedPetDTO> getMyInterestedPet() {
+        // 현재 인증된 사용자의 이메일을 가져옴
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        // 이메일로 사용자 조회
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        // 사용자 ID로 PetLike 엔티티 리스트 조회
+        List<PetLike> petLikes = petLikeRepository.findByUser_UserId(user.getUserId());
+        // 관심 있는 입양 동물이 없으면 예외 처리
+        if (petLikes.isEmpty()) {
+            throw new IllegalArgumentException("관심있는 입양동물이 없습니다.");
+        }
+
+        List<MyInterestedPetDTO> myInterestedPetDTOList = petLikes.stream()
+                .map(petLike -> {
+                    PetInfo petInfo = petInfoRepository.findByDesertionNo(petLike.getDesertionNo());
+                    if (petInfo == null) {
+                        throw new IllegalArgumentException("해당하는 입양동물 정보를 찾을 수 없습니다.");
+                    }
+
+                    // PetInfo 객체를 처리하여 Map으로 변환
+                    Map<String, Object> processedInfo = petInfoFormatService.processPetInfo(petInfo);
+                    if (processedInfo == null) {
+                        processedInfo = new HashMap<>();
+                    }
+
+                    return MyInterestedPetDTO.builder()
+                            .desertionNo(petInfo.getDesertionNo())
+                            .popFile(petInfo.getPopfile())
+                            .words((List<String>) processedInfo.get("words"))
+                            .kindCd((String) processedInfo.getOrDefault("kind_cd", petInfo.getKindCd()))
+                            .sexCd((String) processedInfo.getOrDefault("sex_cd", petInfo.getSexCd()))
+                            .age((String) processedInfo.getOrDefault("age", petInfo.getAge()))
+                            .weight(petInfo.getWeight())
+                            .orgNm((String) processedInfo.getOrDefault("care_nm", "Unknown"))
+                            .neuterYn((String) processedInfo.getOrDefault("neuter_yn", "Unknown"))
+                            .build();
+                })
+                .collect(Collectors.toList());
+
+        return myInterestedPetDTOList;
+    }
+     */
 }
