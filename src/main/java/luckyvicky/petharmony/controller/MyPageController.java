@@ -16,7 +16,11 @@ import java.util.List;
 public class MyPageController {
     private final MyPageService myPageService;
 
-    // 사용자 프로필 조회 API 엔드포인트
+    /**
+     * 사용자 프로필 조회 API 엔드포인트
+     *
+     * @return ResponseEntity<MyProfileResponseDTO> - 사용자 프로필 정보를 담은 DTO
+     */
     @GetMapping("/api/user/myProfile")
     public ResponseEntity<MyProfileResponseDTO> getMyProfile() {
         try {
@@ -27,7 +31,12 @@ public class MyPageController {
         }
     }
 
-    // 사용자 프로필 수정 API 엔드포인트
+    /**
+     * 사용자 프로필 수정 API 엔드포인트
+     *
+     * @param myProfileRequestDTO 수정할 프로필 정보를 담은 요청 DTO
+     * @return ResponseEntity<MyProfileResponseDTO> - 수정된 사용자 프로필 정보를 담은 DTO
+     */
     @PutMapping("/api/user/myProfile")
     public ResponseEntity<MyProfileResponseDTO> updateMyProfile(@RequestBody MyProfileRequestDTO myProfileRequestDTO) {
         try {
@@ -38,7 +47,12 @@ public class MyPageController {
         }
     }
 
-    // 사용자 비밀번호 수정 API 엔드포인트
+    /**
+     * 사용자 비밀번호 수정 API 엔드포인트
+     *
+     * @param passwordRequestDTO 수정할 비밀번호 정보를 담은 요청 DTO
+     * @return ResponseEntity<?> - 성공 여부를 나타내는 응답
+     */
     @PutMapping("/api/user/password")
     public ResponseEntity<?> updatePassword(@RequestBody PasswordRequestDTO passwordRequestDTO) {
         try {
@@ -49,7 +63,27 @@ public class MyPageController {
         }
     }
 
-    // 사용자가 PIN한 게시물 조회 엔드포인트
+    /**
+     * 사용자가 관심있는 입양 동물 조회 API 엔드포인트
+     *
+     * @return ResponseEntity<List<MyInterestedPetDTO>> - 관심있는 입양 동물 목록을 담은 DTO 리스트
+     */
+    @GetMapping("/api/user/interestedPets")
+    public ResponseEntity<List<MyInterestedPetDTO>> getInterestedPets() {
+        try {
+            List<MyInterestedPetDTO> myInterestedPetDTO = myPageService.getMyInterestedPet();
+            return ResponseEntity.ok(myInterestedPetDTO);
+        } catch (Exception e) {
+            log.error("관심있는 입양 동물 조회 중 오류 발생", e);
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+    /**
+     * 사용자가 PIN한 게시물 조회 API 엔드포인트
+     *
+     * @return ResponseEntity<List<BoardListResponseDTO>> - PIN한 게시물 목록을 담은 DTO 리스트
+     */
     @GetMapping("/api/user/pinPosts")
     public ResponseEntity<List<BoardListResponseDTO>> getPinPosts() {
         try {
@@ -61,19 +95,11 @@ public class MyPageController {
         }
     }
 
-    // 사용자가 작성한 게시물 조회 엔드포인트
-    @GetMapping("/api/user/myPosts")
-    public ResponseEntity<List<BoardListResponseDTO>> getMyPosts() {
-        try {
-            List<BoardListResponseDTO> myPosts = myPageService.getMyPosts();
-            return ResponseEntity.ok(myPosts);
-        } catch (Exception e) {
-            log.error("작성한 게시물 조회 중 오류 발생", e);
-            return ResponseEntity.badRequest().body(null);
-        }
-    }
-
-    // 사용자가 작성한 댓글 조회 엔드포인트
+    /**
+     * 사용자가 작성한 댓글 조회 API 엔드포인트
+     *
+     * @return ResponseEntity<List<MyCommentsDTO>> - 작성한 댓글 목록을 담은 DTO 리스트
+     */
     @GetMapping("/api/user/myComments")
     public ResponseEntity<List<MyCommentsDTO>> getMyComments() {
         try {
@@ -85,7 +111,27 @@ public class MyPageController {
         }
     }
 
-    // 사용자가 회원 탈퇴하는 엔드포인트
+    /**
+     * 사용자가 작성한 게시물 조회 API 엔드포인트
+     *
+     * @return ResponseEntity<List<BoardListResponseDTO>> - 작성한 게시물 목록을 담은 DTO 리스트
+     */
+    @GetMapping("/api/user/myPosts")
+    public ResponseEntity<List<BoardListResponseDTO>> getMyPosts() {
+        try {
+            List<BoardListResponseDTO> myPosts = myPageService.getMyPosts();
+            return ResponseEntity.ok(myPosts);
+        } catch (Exception e) {
+            log.error("작성한 게시물 조회 중 오류 발생", e);
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+    /**
+     * 사용자가 회원 탈퇴하는 API 엔드포인트
+     *
+     * @return ResponseEntity<DeleteAccountResponseDTO> - 회원 탈퇴 결과를 담은 DTO
+     */
     @PutMapping("/api/user/deleteAccount")
     public ResponseEntity<DeleteAccountResponseDTO> deleteAccount() {
         try {
@@ -96,18 +142,4 @@ public class MyPageController {
             return ResponseEntity.badRequest().body(null);
         }
     }
-
-    // 사용자가 관심있는 입양 동물 조회 엔드포인트였던 것 (수정예정)
-    /*
-    @GetMapping("/api/user/interestedPets")
-    public ResponseEntity<List<MyInterestedPetDTO>> getInterestedPets() {
-        try {
-            List<MyInterestedPetDTO> myInterestedPetDTO = myPageService.getMyInterestedPet();
-            return ResponseEntity.ok(myInterestedPetDTO);
-        } catch (Exception e) {
-            log.error("관심있는 입양 동물 조회 중 오류 발생", e);
-            return ResponseEntity.badRequest().body(null);
-        }
-    }
-     */
 }
