@@ -46,12 +46,8 @@ public class CombinedInfoService {
         PetInfo petInfo = petInfoRepository.findPetInfoWithShelterByDesertionNo(desertionNo);
 
         if (petInfo != null) {
-            Map<String, Object> petInfoDetails = detailAdoptionService.processPetInfo(petInfo);
+            Map<String, Object> petInfoDetails = detailAdoptionService.processPetInfo(petInfo, userId);
             combinedInfo.putAll(petInfoDetails);
-
-            // 좋아요 여부 추가
-            Optional<PetLike> PetLike = petLikeRepository.findByUser_UserIdAndDesertionNo(userId, desertionNo);
-            combinedInfo.put("pet_like", PetLike.isPresent());
 
             Optional<ShelterInfo> shelterInfoOptional = shelterInfoRepository.findByCareNm(petInfo.getCareNm());
             if (shelterInfoOptional.isPresent()) {

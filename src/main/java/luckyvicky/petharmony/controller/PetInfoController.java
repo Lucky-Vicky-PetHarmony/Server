@@ -8,10 +8,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -35,13 +32,15 @@ public class PetInfoController {
      *
      * @param page 페이지 번호 (기본값 0)
      * @param size 페이지 크기 (기본값 12)
+     * @param userId 사용자 아이디(좋아요 여부)
      * @return 유기동물 정보 목록 (JSON 형식)
      */
-    @GetMapping("/public/allPetsInfo")
+    @GetMapping("/public/allPetsInfo/{userId}")
     @Cacheable(value = "pets", key = "#page + '-' + #size")
     public List<Map<String, Object>> getAllPetsInfo(
             @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "size", defaultValue = "12") int size) {
+            @RequestParam(value = "size", defaultValue = "12") int size,
+            @PathVariable Long userId) {
 
         // 페이징 정보를 포함하여 PetInfo 데이터를 가져옴
         Pageable pageable = PageRequest.of(page, size);
@@ -49,7 +48,7 @@ public class PetInfoController {
 
         // 각 PetInfo 객체를 처리하여 프론트엔드에 전달할 형식으로 변환
         return petInfoPage.stream()
-                .map(petInfoFormatService::processPetInfo)
+                .map(petInfo -> petInfoFormatService.processPetInfo(petInfo, userId))
                 .collect(Collectors.toList());
     }
 }

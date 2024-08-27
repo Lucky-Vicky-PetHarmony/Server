@@ -3,6 +3,7 @@ package luckyvicky.petharmony.service;
 import luckyvicky.petharmony.entity.PetInfo;
 import luckyvicky.petharmony.entity.ShelterInfo;
 import luckyvicky.petharmony.entity.Word;
+import luckyvicky.petharmony.repository.PetLikeRepository;
 import luckyvicky.petharmony.repository.ShelterInfoRepository;
 import luckyvicky.petharmony.repository.WordRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,11 +20,13 @@ public class PetInfoFormatService implements PetInfoFormatter {
 
     private final WordRepository wordRepository;
     private final ShelterInfoRepository shelterInfoRepository;
+    private final PetLikeRepository petLikeRepository;
 
     @Autowired
-    public PetInfoFormatService(WordRepository wordRepository, ShelterInfoRepository shelterInfoRepository) {
+    public PetInfoFormatService(WordRepository wordRepository, ShelterInfoRepository shelterInfoRepository, PetLikeRepository petLikeRepository) {
         this.wordRepository = wordRepository;
         this.shelterInfoRepository = shelterInfoRepository;
+        this.petLikeRepository = petLikeRepository;
     }
 
     /**
@@ -32,7 +35,7 @@ public class PetInfoFormatService implements PetInfoFormatter {
      * @param petInfo 처리할 PetInfo 객체
      * @return 처리된 데이터를 담고 있는 Map 객체
      */
-    public Map<String, Object> processPetInfo(PetInfo petInfo) {
+    public Map<String, Object> processPetInfo(PetInfo petInfo, Long userId) {
         Map<String, Object> result = new HashMap<>();
         // 입양동물 번호
         result.put("desertion_no", petInfo.getDesertionNo());
@@ -63,6 +66,9 @@ public class PetInfoFormatService implements PetInfoFormatter {
 
         // weight필드를 결과에 추가하여 유기동물의 무게를 반환
         result.put("weight", petInfo.getWeight());
+
+        result.put("pet_like",
+                petLikeRepository.findByUser_UserIdAndDesertionNo(userId, petInfo.getDesertionNo()).isPresent());
 
         return result; // 최종 처리된 데이터를 Map으로 반환
     }

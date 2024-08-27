@@ -76,7 +76,7 @@ public class MainServiceImpl implements MainService {
      * @return 유기동물 카드 정보를 담은 PetCardResponseDTO 리스트
      */
     @Override
-    public List<PetCardResponseDTO> getPetCards() {
+    public List<PetCardResponseDTO> getPetCards(Long userId) {
         // 현재 날짜 이전에 공고된 유기동물 정보 조회
         LocalDate currentDate = LocalDate.now();
         List<PetInfo> listPetinfo = petInfoRepository.findByNoticeEdtAfter(currentDate);
@@ -84,7 +84,7 @@ public class MainServiceImpl implements MainService {
         List<PetCardResponseDTO> petCardResponseDTOList = listPetinfo.stream()
                 .map(petInfo -> {
                     // 유기동물 정보를 포맷팅하는 서비스 호출
-                    Map<String, Object> processedInfo = petInfoFormatService.processPetInfo(petInfo);
+                    Map<String, Object> processedInfo = petInfoFormatService.processPetInfo(petInfo, userId);
                     return PetCardResponseDTO.builder()
                             .desertionNo(petInfo.getDesertionNo())
                             .popFile(petInfo.getPopfile())

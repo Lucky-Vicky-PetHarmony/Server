@@ -8,6 +8,7 @@ import luckyvicky.petharmony.dto.main.SlideResponseDTO;
 import luckyvicky.petharmony.service.MainService;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -34,9 +35,9 @@ public class MainController {
      *
      * @return List<PetCardResponseDTO> - 카드에 표시될 유기동물 정보를 담은 DTO 리스트
      */
-    @GetMapping("/api/public/petCards")
-    public List<PetCardResponseDTO> getPublicPetCards() {
-        return mainService.getPetCards();
+    @GetMapping("/api/public/petCards/{userId}")
+    public List<PetCardResponseDTO> getPublicPetCards(@PathVariable Long userId) {
+        return mainService.getPetCards(userId);
     }
 
     /**

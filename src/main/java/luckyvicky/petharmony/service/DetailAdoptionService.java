@@ -41,9 +41,9 @@ public class DetailAdoptionService implements PetInfoFormatter {
      * @return 확장된 형식의 데이터를 담고 있는 Map 객체
      */
     @Override
-    public Map<String, Object> processPetInfo(PetInfo petInfo) {
+    public Map<String, Object> processPetInfo(PetInfo petInfo, Long userId) {
         // 기본 포맷팅 로직을 사용하여 결과를 가져옴
-        Map<String, Object> result = petInfoFormatService.processPetInfo(petInfo);
+        Map<String, Object> result = petInfoFormatService.processPetInfo(petInfo, userId);
 
         // 모든 단어를 반환하도록 변경된 로직 적용
         result.put("words", processAllWords(petInfo.getWords()));
