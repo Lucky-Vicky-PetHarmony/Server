@@ -39,8 +39,9 @@ public interface PetInfoRepository extends JpaRepository<PetInfo, String> {
     PetInfo findPetInfoWithShelterByDesertionNo(@Param("desertionNo") String desertionNo);
 
     // 유기동물 ID로 PetInfo 조회
-//    PetInfo findByDesertionNo(String desertionNo);
+    PetInfo findByDesertionNo(String desertionNo);
 
     // 카테고리별 입양동물 리스트
     Page<PetInfo> findByKindCdContaining(String kindCd, Pageable pageable);
+
 }
