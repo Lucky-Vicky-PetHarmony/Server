@@ -20,4 +20,6 @@ public interface MyPageService {
     List<MyCommentsDTO> getMyComments();
     // 현재 인증된 사용자가 회원탈퇴를 하는 메서드
     DeleteAccountResponseDTO deleteMyAccount();
+    // 현재 인증된 사용자가 관심있는 입양 동물 조회하는 메서드
+//    List<MyInterestedPetDTO> getMyInterestedPet();
 }

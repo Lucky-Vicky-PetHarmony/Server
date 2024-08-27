@@ -1,7 +1,6 @@
-package luckyvicky.petharmony.dto.main;
+package luckyvicky.petharmony.dto.mypage;
 
 import lombok.*;
-import luckyvicky.petharmony.entity.Word;
 
 import java.util.List;
 
@@ -9,7 +8,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PetCardResponseDTO {
+public class MyInterestedPetDTO {
     private String desertionNo;     // pet_info 테이블 id
 
     private String popFile;         // 이미지 경로

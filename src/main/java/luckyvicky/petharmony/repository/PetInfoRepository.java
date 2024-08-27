@@ -37,4 +37,7 @@ public interface PetInfoRepository extends JpaRepository<PetInfo, String> {
     // desertionNo에 해당하는 PetInfo와 연결된 ShelterInfo를 조인하여 가져옴
     @Query("SELECT p FROM PetInfo p JOIN FETCH ShelterInfo s ON p.careNm = s.careNm WHERE p.desertionNo = :desertionNo")
     PetInfo findPetInfoWithShelterByDesertionNo(@Param("desertionNo") String desertionNo);
+
+    // 유기동물 ID로 PetInfo 조회
+//    PetInfo findByDesertionNo(String desertionNo);
 }

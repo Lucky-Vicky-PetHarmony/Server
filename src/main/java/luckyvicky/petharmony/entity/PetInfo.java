@@ -69,6 +69,10 @@ public class PetInfo {
     @Column(name = "words", length = 255)
     private String words;
 
+    @ManyToOne
+    @JoinColumn(name = "care_nm", referencedColumnName = "care_nm", insertable = false, updatable = false)
+    private ShelterInfo shelterInfo;
+
     // Method to update the words field
     public void updateWordId(String words) {
         this.words = words;
