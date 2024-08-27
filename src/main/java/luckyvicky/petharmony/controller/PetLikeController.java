@@ -1,5 +1,6 @@
 package luckyvicky.petharmony.controller;
 
+import lombok.extern.log4j.Log4j2;
 import luckyvicky.petharmony.dto.petlike.PetLikeRequestDTO;
 import luckyvicky.petharmony.dto.petlike.PetLikeResponseDTO;
 import luckyvicky.petharmony.service.PetLikeService;
@@ -31,7 +32,7 @@ public class PetLikeController {
         PetLikeResponseDTO responseDTO;
 
         // 좋아요 또는 좋아요 취소 요청을 처리
-        if (requestDTO.isLiked()) {
+        if (requestDTO.getIsLiked()) {
             responseDTO = petLikeService.savePetLike(requestDTO);
         } else {
             responseDTO = petLikeService.removePetLike(requestDTO);
