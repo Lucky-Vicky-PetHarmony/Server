@@ -21,5 +21,5 @@ public interface MyPageService {
     // 현재 인증된 사용자가 회원탈퇴를 하는 메서드
     DeleteAccountResponseDTO deleteMyAccount();
     // 현재 인증된 사용자가 관심있는 입양동물 조회하는 메서드였던 것 (수정 예정)
-    List<MyInterestedPetDTO> getMyInterestedPet();
+    List<MyInterestedPetDTO> getMyInterestedPet(Long userId);
 }
