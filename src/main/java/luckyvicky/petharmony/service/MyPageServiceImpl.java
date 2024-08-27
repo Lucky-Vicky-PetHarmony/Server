@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -36,9 +35,17 @@ public class MyPageServiceImpl implements MyPageService {
     private final CommentRepository commentRepository;
     private final PetLikeRepository petLikeRepository;
     private final PetInfoRepository petInfoRepository;
-    private final PetInfoWordService petInfoFormatService;
+    private final PetInfoFormatService petInfoFormatService;
 
-    // 현재 인증된 사용자의 프로필 정보를 조회하는 메서드
+    /**
+     * 현재 인증된 사용자의 프로필 정보를 조회하는 메서드
+     *
+     * 이 메서드는 현재 로그인된 사용자의 이메일을 기반으로 사용자 정보를 조회하여 반환합니다.
+     * 조회된 정보는 사용자 프로필 정보로 변환되어 클라이언트에게 반환됩니다.
+     *
+     * @return MyProfileResponseDTO - 사용자 프로필 정보를 담은 DTO
+     * @throws IllegalArgumentException 사용자를 찾을 수 없을 때 발생
+     */
     @Override
     public MyProfileResponseDTO getMyProfile() {
         // 현재 로그인된 사용자의 정보를 가져온다(이메일)
@@ -54,7 +61,16 @@ public class MyPageServiceImpl implements MyPageService {
                 .build();
     }
 
-    // 현재 인증된 사용자의 프로필 정보를 업데이트하는 메서드
+    /**
+     * 현재 인증된 사용자의 프로필 정보를 업데이트하는 메서드
+     *
+     * 이 메서드는 클라이언트로부터 전달된 프로필 정보를 사용하여 현재 사용자의 프로필을 업데이트합니다.
+     * 업데이트된 정보는 저장된 후 클라이언트에게 반환됩니다.
+     *
+     * @param myProfileRequestDTO 수정할 프로필 정보를 담은 DTO
+     * @return MyProfileResponseDTO - 수정된 사용자 프로필 정보를 담은 DTO
+     * @throws IllegalArgumentException 사용자를 찾을 수 없을 때 발생
+     */
     @Override
     @Transactional
     public MyProfileResponseDTO updateMyProfile(MyProfileRequestDTO myProfileRequestDTO) {
@@ -74,7 +90,15 @@ public class MyPageServiceImpl implements MyPageService {
                 .build();
     }
 
-    // 현재 인증된 사용자의 비밀번호를 업데이트하는 메서드
+    /**
+     * 현재 인증된 사용자의 비밀번호를 업데이트하는 메서드
+     *
+     * 이 메서드는 클라이언트로부터 전달된 기존 비밀번호와 새로운 비밀번호를 사용하여
+     * 현재 사용자의 비밀번호를 업데이트합니다. 기존 비밀번호가 맞지 않을 경우 예외가 발생합니다.
+     *
+     * @param passwordRequestDTO 수정할 비밀번호 정보를 담은 DTO
+     * @throws IllegalArgumentException 기존 비밀번호가 맞지 않거나 사용자를 찾을 수 없을 때 발생
+     */
     @Override
     @Transactional
     public void updatePassword(PasswordRequestDTO passwordRequestDTO) {
@@ -93,7 +117,15 @@ public class MyPageServiceImpl implements MyPageService {
         }
     }
 
-    // 현재 인증된 사용자가 PIN한 게시물들을 조회하는 메서드
+    /**
+     * 현재 인증된 사용자가 PIN한 게시물들을 조회하는 메서드
+     *
+     * 이 메서드는 현재 사용자가 PIN한 게시물들을 조회하여 리스트로 반환합니다.
+     * 게시물은 BoardListResponseDTO로 변환되어 반환됩니다.
+     *
+     * @return List<BoardListResponseDTO> - PIN한 게시물 목록을 담은 DTO 리스트
+     * @throws IllegalArgumentException 사용자를 찾을 수 없을 때 발생
+     */
     @Override
     public List<BoardListResponseDTO> getPinPosts() {
         // 현재 로그인된 사용자의 정보를 가져온다(이메일)
@@ -113,7 +145,6 @@ public class MyPageServiceImpl implements MyPageService {
     }
     private BoardListResponseDTO buildBoardListResponseDTO(Board board) {
         boolean hasImage = imageRepository.existsByBoard_BoardId(board.getBoardId());
-
         return BoardListResponseDTO.builder()
                 .boardId(board.getBoardId())
                 .userId(board.getUser().getUserId())
@@ -128,8 +159,16 @@ public class MyPageServiceImpl implements MyPageService {
                 .build();
     }
 
-    // 현재 인증된 사용자가 작성한 게시물들을 조회하는 메서드
-    @Override
+    /**
+     * 현재 인증된 사용자가 작성한 게시물들을 조회하는 메서드
+     *
+     * 이 메서드는 현재 사용자가 작성한 게시물들을 조회하여 리스트로 반환합니다.
+     * 게시물은 BoardListResponseDTO로 변환되어 반환됩니다.
+     *
+     * @return List<BoardListResponseDTO> - 작성한 게시물 목록을 담은 DTO 리스트
+     * @throws IllegalArgumentException 사용자를 찾을 수 없을 때 발생
+     */
+ @Override
     public List<BoardListResponseDTO> getMyPosts() {
         // 현재 로그인된 사용자의 정보를 가져온다(이메일)
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -146,7 +185,15 @@ public class MyPageServiceImpl implements MyPageService {
                 .collect(Collectors.toList());
     }
 
-    // 현재 인증된 사용자가 작성한 댓글들을 조회하는 메소드
+    /**
+     * 현재 인증된 사용자가 작성한 댓글들을 조회하는 메소드
+     *
+     * 이 메서드는 현재 사용자가 작성한 댓글들을 조회하여 리스트로 반환합니다.
+     * 각 댓글은 MyCommentsDTO로 변환되어 반환됩니다.
+     *
+     * @return List<MyCommentsDTO> - 작성한 댓글 목록을 담은 DTO 리스트
+     * @throws IllegalArgumentException 사용자를 찾을 수 없을 때 발생
+     */
     @Override
     public List<MyCommentsDTO> getMyComments() {
         // 현재 로그인된 사용자의 정보를 가져온다(이메일)
@@ -176,7 +223,15 @@ public class MyPageServiceImpl implements MyPageService {
                 .collect(Collectors.toList());
     }
 
-    // 현재 인증된 사용자가 회원탈퇴를 하는 메서드
+    /**
+     * 현재 인증된 사용자가 회원 탈퇴를 하는 메서드
+     *
+     * 이 메서드는 현재 사용자의 계정을 비활성화하여 회원 탈퇴 처리를 합니다.
+     * 탈퇴된 사용자 정보는 DeleteAccountResponseDTO로 반환됩니다.
+     *
+     * @return DeleteAccountResponseDTO - 회원 탈퇴 처리된 사용자 정보를 담은 DTO
+     * @throws IllegalArgumentException 사용자를 찾을 수 없을 때 발생
+     */
     @Override
     @Transactional
     public DeleteAccountResponseDTO deleteMyAccount() {
@@ -195,8 +250,15 @@ public class MyPageServiceImpl implements MyPageService {
                 .build();
     }
 
-    // 현재 인증된 사용자가 관심있는 입양동물 조회하는 메서드였던 것 (수정 예정)
-    /*
+    /**
+     * 현재 인증된 사용자가 회원 탈퇴를 하는 메서드
+     *
+     * 이 메서드는 현재 사용자의 계정을 비활성화하여 회원 탈퇴 처리를 합니다.
+     * 탈퇴된 사용자 정보는 DeleteAccountResponseDTO로 반환됩니다.
+     *
+     * @return DeleteAccountResponseDTO - 회원 탈퇴 처리된 사용자 정보를 담은 DTO
+     * @throws IllegalArgumentException 사용자를 찾을 수 없을 때 발생
+     */
     @Override
     public List<MyInterestedPetDTO> getMyInterestedPet() {
         // 현재 인증된 사용자의 이메일을 가져옴
@@ -204,41 +266,31 @@ public class MyPageServiceImpl implements MyPageService {
         // 이메일로 사용자 조회
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-        // 사용자 ID로 PetLike 엔티티 리스트 조회
-        List<PetLike> petLikes = petLikeRepository.findByUser_UserId(user.getUserId());
-        // 관심 있는 입양 동물이 없으면 예외 처리
+        // 사용자 ID로 PetLike 리스트 조회
+        List<PetLike> petLikes = petLikeRepository.findByUserUserId(user.getUserId());
+        // 관심있는 입양동물이 없으면 예외 처리
         if (petLikes.isEmpty()) {
-            throw new IllegalArgumentException("관심있는 입양동물이 없습니다.");
+            return Collections.emptyList();
         }
-
-        List<MyInterestedPetDTO> myInterestedPetDTOList = petLikes.stream()
-                .map(petLike -> {
-                    PetInfo petInfo = petInfoRepository.findByDesertionNo(petLike.getDesertionNo());
-                    if (petInfo == null) {
-                        throw new IllegalArgumentException("해당하는 입양동물 정보를 찾을 수 없습니다.");
-                    }
-
-                    // PetInfo 객체를 처리하여 Map으로 변환
-                    Map<String, Object> processedInfo = petInfoFormatService.processPetInfo(petInfo);
-                    if (processedInfo == null) {
-                        processedInfo = new HashMap<>();
-                    }
-
-                    return MyInterestedPetDTO.builder()
-                            .desertionNo(petInfo.getDesertionNo())
-                            .popFile(petInfo.getPopfile())
-                            .words((List<String>) processedInfo.get("words"))
-                            .kindCd((String) processedInfo.getOrDefault("kind_cd", petInfo.getKindCd()))
-                            .sexCd((String) processedInfo.getOrDefault("sex_cd", petInfo.getSexCd()))
-                            .age((String) processedInfo.getOrDefault("age", petInfo.getAge()))
-                            .weight(petInfo.getWeight())
-                            .orgNm((String) processedInfo.getOrDefault("care_nm", "Unknown"))
-                            .neuterYn((String) processedInfo.getOrDefault("neuter_yn", "Unknown"))
-                            .build();
-                })
-                .collect(Collectors.toList());
-
-        return myInterestedPetDTOList;
+        // PetLike를 순회하며 각 입양동물 정보를 조회하고 DTO로 변환
+        return petLikes.stream().map(petLike -> {
+            PetInfo petInfo = petInfoRepository.findByDesertionNo(petLike.getDesertionNo());
+            if (petInfo == null) {
+                throw new IllegalArgumentException("해당 입양동물 정보를 찾을 수 없습니다: " + petLike.getDesertionNo());
+            }
+            // PetInfo를 처리하여 필요한 정보를 추출
+            Map<String, Object> processedInfo = petInfoFormatService.processPetInfo(petInfo);
+            return MyInterestedPetDTO.builder()
+                    .desertionNo(petInfo.getDesertionNo())
+                    .popFile(petInfo.getPopfile())
+                    .words((List<String>) processedInfo.get("words"))
+                    .kindCd((String) processedInfo.get("kind_cd_detail"))
+                    .sexCd((String) processedInfo.get("sex_cd"))
+                    .age((String) processedInfo.get("age"))
+                    .weight((String) processedInfo.get("weight"))
+                    .orgNm((String) processedInfo.get("care_nm"))
+                    .neuterYn((String) processedInfo.get("neuter_yn"))
+                    .build();
+        }).collect(Collectors.toList());
     }
-     */
 }
