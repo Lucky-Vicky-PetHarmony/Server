@@ -22,9 +22,9 @@ public class PetCardResponseDTO {
 
     private String age;             // 나이
 
-    private String weigth;          // 몸무게
+    private String weight;          // 몸무게
 
-    private String noticeNo;        // 보호 지역
+    private String orgNm;           // 보호 지역
 
     private String neuterYn;        // 중성화 여부
 }

@@ -11,7 +11,7 @@ public class SlideResponseDTO {
 
     private String popFile;         // 이미지 경로
 
-    private String noticeNo;        // 보호 지역
+    private String orgNm;           // 보호 지역
 
     private String sexCd;           // 성별
 
