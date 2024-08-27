@@ -147,8 +147,11 @@ public class PetInfoFormatService implements PetInfoFormatter {
      * @return 처리된 age 문자열
      */
     private String processAge(String age) {
-        String numericPart = age.replaceAll("\\D", ""); // 숫자만 추출
-        return numericPart + "년생"; // 추출된 숫자에 '년생'을 추가하여 반환
+        if (age != null && age.length() >= 4) {
+            return age.substring(0, 4)+"년생";
+        } else {
+            return "정보없음";
+        }
     }
 
     /**
