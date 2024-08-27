@@ -95,6 +95,7 @@ public class MainServiceImpl implements MainService {
                             .weight((String) processedInfo.get("weight"))
                             .care_nm((String) processedInfo.get("care_nm"))
                             .neuter_yn((String) processedInfo.get("neuter_yn"))
+                            .pet_like((Boolean) processedInfo.get("pet_like"))
                             .build();
                 })
                 .collect(Collectors.toList());

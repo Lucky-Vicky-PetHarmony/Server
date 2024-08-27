@@ -27,4 +27,6 @@ public class PetCardResponseDTO {
     private String care_nm;
 
     private String neuter_yn;
+
+    private Boolean pet_like;
 }
