@@ -13,7 +13,8 @@ import java.util.List;
 
 // PetInfoRepository는 PetInfo 엔티티와 데이터베이스 간의 상호작용을 처리하는 리포지토리 인터페이스
 public interface PetInfoRepository extends JpaRepository<PetInfo, String> {
-
+    // 페이징 메서드 추가
+    Page<PetInfo> findAll(Pageable pageable);
     // 특정 연령(age)과 성별(sexCd)에 따라 필터링된 PetInfo 데이터를 조회하고, 이를 WordClassificationDTO로 매핑하여 반환
     @Query("SELECT new luckyvicky.petharmony.dto.WordClassificationDTO(p.desertionNo, p.specialMark, p.age, p.sexCd, '') " +
             "FROM PetInfo p WHERE p.age = :age AND p.sexCd = :sexCd")

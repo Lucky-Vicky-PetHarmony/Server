@@ -371,4 +371,35 @@ public class UserServiceImpl implements UserService {
             user.releaseBans();
         }
     }
+
+    /**
+
+     * @param userId 주소를 확인할 유저 id
+     * @return 주소가 있으면 주소, 없으면 Empty Address
+     */
+    @Override
+    public String userAddrExist(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("유효하지않은 user"));
+        if (user.getAddress() != null) {
+            return user.getAddress();
+        } else {
+            return "Empty Address";
+        }
+    }
+
+    /**
+     * 사용자 주소 업데이트 메서드
+     *
+     * @param userAddressDTO 사용자 ID와 주소를 담은 DTO
+     */
+    @Override
+    public void updateUserAddress(UserAddressDTO userAddressDTO) {
+        User user = userRepository.findById(userAddressDTO.getUserId())
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        // 사용자 주소 업데이트
+        user.setAddress(userAddressDTO.getAddress());
+        userRepository.save(user);
+
+    }
 }

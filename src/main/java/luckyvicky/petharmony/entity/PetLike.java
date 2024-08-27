@@ -24,5 +24,10 @@ public class PetLike implements Serializable {
     @JoinColumn(name = "user_id")
     private User user;
 
-    // 필요한 경우 다른 필드 추가
+    // 특정 메서드를 통해서만 설정하도록 합니다.
+    public void assignUserAndDesertionNo(User user, String desertionNo) {
+        this.user = user;
+        this.desertionNo = desertionNo;
+    }
 }
+

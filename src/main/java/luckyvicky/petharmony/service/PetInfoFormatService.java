@@ -12,7 +12,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * MatchingProcessService는 매칭된 PetInfo 객체를 처리하여 원하는 형식으로 반환하는 서비스입니다.
+ * PetInfoFormatService는 매칭된 PetInfo 객체를 처리하여 원하는 형식으로 반환하는 서비스입니다.
  */
 @Service
 public class PetInfoFormatService implements PetInfoFormatter {
@@ -34,12 +34,17 @@ public class PetInfoFormatService implements PetInfoFormatter {
      */
     public Map<String, Object> processPetInfo(PetInfo petInfo) {
         Map<String, Object> result = new HashMap<>();
+        // 입양동물 번호
+        result.put("desertion_no", petInfo.getDesertionNo());
 
         // words 필드에서 wordId를 추출하여 Word엔티티의 wordSelect 값을 매핑
         result.put("words", processWords(petInfo.getWords()));
 
-        // kind_cd 필드를 처리하여 반환
+        // kind_cd 필드를 처리하여 반환 ex)개, 고양이
         result.put("kind_cd", processKindCd(petInfo.getKindCd()));
+
+        // kind_cd_detail 필드를 처리하여 반환 ex)말티즈, 믹스견
+        result.put("kind_cd_detail", processKindCdDetail(petInfo.getKindCd()));
 
         // age 필드를 처리하여 반환
         result.put("age", processAge(petInfo.getAge()));
@@ -55,6 +60,9 @@ public class PetInfoFormatService implements PetInfoFormatter {
 
         // popfile필드를 결과에 추가하여 유기동물의 이미지 경로를 반환
         result.put("popfile", petInfo.getPopfile());
+
+        // weight필드를 결과에 추가하여 유기동물의 무게를 반환
+        result.put("weight", petInfo.getWeight());
 
         return result; // 최종 처리된 데이터를 Map으로 반환
     }
@@ -99,12 +107,34 @@ public class PetInfoFormatService implements PetInfoFormatter {
      * @param kindCd 처리할 kind_cd 필드 값
      * @return 처리된 kind_cd 문자열
      */
-    private String processKindCd(String kindCd) {
+    private String processKindCdDetail(String kindCd) {
         // "[개] 포메라니안" 형식에서 "포메라니안"만 추출
         if (kindCd.contains("[") && kindCd.contains("]")) {
             return kindCd.substring(kindCd.indexOf("]") + 1).trim();
         } else {
             return kindCd;
+        }
+    }
+
+    /**
+     * kind_cd 필드를 처리하여 반환하는 메서드
+     * '기타축종'이라는 단어가 포함된 경우 대괄호([]) 바깥의 값을 반환하고,
+     * 포함되지 않은 경우 대괄호 안의 값을 반환합니다.
+     *
+     * @param kindCd 처리할 kind_cd 필드 값
+     * @return 처리된 kind_cd 문자열
+     */
+    public String processKindCd(String kindCd) {
+        if (kindCd.contains("기타축종")) {
+            return "기타축종";
+        }
+        int startIndex = kindCd.indexOf("[");
+        int endIndex = kindCd.indexOf("]");
+
+        if (startIndex != -1 && endIndex != -1 && startIndex < endIndex) {
+            return kindCd.substring(startIndex + 1, endIndex).trim();
+        } else {
+            return kindCd.trim();
         }
     }
 
