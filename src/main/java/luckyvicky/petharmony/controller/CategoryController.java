@@ -44,11 +44,10 @@ public class CategoryController {
             @RequestParam(value = "size", defaultValue = "12") int size ) {
 
         Pageable pageable = PageRequest.of(page, size);
-        Page<PetInfo> petInfoPage = petInfoRepository.findAll(pageable);
+        Page<PetInfo> petInfoPage = petInfoRepository.findByKindCdContaining("개", pageable);
 
         // 'kind_cd'가 '개'인 데이터를 필터링하고 포맷하여 반환
         return petInfoPage.stream()
-                .filter(pet -> "개".equals(petInfoFormatService.processKindCd(pet.getKindCd())))
                 .map(petInfoFormatService::processPetInfo)
                 .collect(Collectors.toList());
     }
@@ -67,11 +66,10 @@ public class CategoryController {
             @RequestParam(value = "size", defaultValue = "12") int size ) {
 
         Pageable pageable = PageRequest.of(page, size);
-        Page<PetInfo> petInfoPage = petInfoRepository.findAll(pageable);
+        Page<PetInfo> petInfoPage = petInfoRepository.findByKindCdContaining("고양이", pageable);
 
         // 'kind_cd'가 '고양이'인 데이터를 필터링하고 포맷하여 반환
         return petInfoPage.stream()
-                .filter(pet -> "고양이".equals(petInfoFormatService.processKindCd(pet.getKindCd())))
                 .map(petInfoFormatService::processPetInfo)
                 .collect(Collectors.toList());
     }
@@ -90,11 +88,10 @@ public class CategoryController {
             @RequestParam(value = "size", defaultValue = "12") int size ) {
 
         Pageable pageable = PageRequest.of(page, size);
-        Page<PetInfo> petInfoPage = petInfoRepository.findAll(pageable);
+        Page<PetInfo> petInfoPage = petInfoRepository.findByKindCdContaining("기타축종", pageable);
 
         // 'kind_cd'가 '기타축종'인 데이터를 필터링하고 포맷하여 반환
         return petInfoPage.stream()
-                .filter(pet -> "기타축종".equals(petInfoFormatService.processKindCd(pet.getKindCd())))
                 .map(petInfoFormatService::processPetInfo)
                 .collect(Collectors.toList());
     }
