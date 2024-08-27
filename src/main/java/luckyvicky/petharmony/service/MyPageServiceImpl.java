@@ -260,7 +260,7 @@ public class MyPageServiceImpl implements MyPageService {
      * @throws IllegalArgumentException 사용자를 찾을 수 없을 때 발생
      */
     @Override
-    public List<MyInterestedPetDTO> getMyInterestedPet() {
+    public List<MyInterestedPetDTO> getMyInterestedPet(Long userId) {
         // 현재 인증된 사용자의 이메일을 가져옴
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         // 이메일로 사용자 조회
@@ -281,15 +281,15 @@ public class MyPageServiceImpl implements MyPageService {
             // PetInfo를 처리하여 필요한 정보를 추출
             Map<String, Object> processedInfo = petInfoFormatService.processPetInfo(petInfo, user.getUserId());
             return MyInterestedPetDTO.builder()
-                    .desertionNo(petInfo.getDesertionNo())
-                    .popFile(petInfo.getPopfile())
+                    .desertion_no((String) processedInfo.get("desertion_no"))
+                    .popfile((String) processedInfo.get("popfile"))
                     .words((List<String>) processedInfo.get("words"))
-                    .kindCd((String) processedInfo.get("kind_cd_detail"))
-                    .sexCd((String) processedInfo.get("sex_cd"))
+                    .kind_cd((String) processedInfo.get("kind_cd"))
+                    .sex_cd((String) processedInfo.get("sex_cd"))
                     .age((String) processedInfo.get("age"))
                     .weight((String) processedInfo.get("weight"))
-                    .orgNm((String) processedInfo.get("care_nm"))
-                    .neuterYn((String) processedInfo.get("neuter_yn"))
+                    .care_nm((String) processedInfo.get("care_nm"))
+                    .neuter_yn((String) processedInfo.get("neuter_yn"))
                     .build();
         }).collect(Collectors.toList());
     }

@@ -68,10 +68,10 @@ public class MyPageController {
      *
      * @return ResponseEntity<List<MyInterestedPetDTO>> - 관심있는 입양 동물 목록을 담은 DTO 리스트
      */
-    @GetMapping("/api/user/interestedPets")
-    public ResponseEntity<List<MyInterestedPetDTO>> getInterestedPets() {
+    @GetMapping("/api/user/interestedPets/{userId}")
+    public ResponseEntity<List<MyInterestedPetDTO>> getInterestedPets(@PathVariable Long userId) {
         try {
-            List<MyInterestedPetDTO> myInterestedPetDTO = myPageService.getMyInterestedPet();
+            List<MyInterestedPetDTO> myInterestedPetDTO = myPageService.getMyInterestedPet(userId);
             return ResponseEntity.ok(myInterestedPetDTO);
         } catch (Exception e) {
             log.error("관심있는 입양 동물 조회 중 오류 발생", e);

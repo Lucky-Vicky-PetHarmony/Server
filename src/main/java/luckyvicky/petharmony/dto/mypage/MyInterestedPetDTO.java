@@ -9,21 +9,21 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MyInterestedPetDTO {
-    private String desertionNo;
+    private String desertion_no;
 
-    private String popFile;
+    private String popfile;
 
     private List<String> words;
 
-    private String kindCd;
+    private String kind_cd;
 
-    private String sexCd;
+    private String sex_cd;
 
     private String age;
 
     private String weight;
 
-    private String orgNm;
+    private String care_nm;
 
-    private String neuterYn;
+    private String neuter_yn;
 }

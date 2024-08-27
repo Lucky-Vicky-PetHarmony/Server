@@ -86,15 +86,15 @@ public class MainServiceImpl implements MainService {
                     // 유기동물 정보를 포맷팅하는 서비스 호출
                     Map<String, Object> processedInfo = petInfoFormatService.processPetInfo(petInfo, userId);
                     return PetCardResponseDTO.builder()
-                            .desertionNo(petInfo.getDesertionNo())
-                            .popFile(petInfo.getPopfile())
+                            .desertion_no((String) processedInfo.get("desertion_no"))
+                            .popfile((String) processedInfo.get("popfile"))
                             .words((List<String>) processedInfo.get("words"))
-                            .kindCd((String) processedInfo.get("kind_cd_detail"))
-                            .sexCd((String) processedInfo.get("sex_cd"))
+                            .kind_cd((String) processedInfo.get("kind_cd"))
+                            .sex_cd((String) processedInfo.get("sex_cd"))
                             .age((String) processedInfo.get("age"))
                             .weight((String) processedInfo.get("weight"))
-                            .orgNm((String) processedInfo.get("care_nm"))
-                            .neuterYn((String) processedInfo.get("neuter_yn"))
+                            .care_nm((String) processedInfo.get("care_nm"))
+                            .neuter_yn((String) processedInfo.get("neuter_yn"))
                             .build();
                 })
                 .collect(Collectors.toList());
