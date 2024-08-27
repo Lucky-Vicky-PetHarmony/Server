@@ -25,7 +25,7 @@ public class UserWordController {
      * @param userWordDTOs 사용자가 선택한 단어 ID 목록과 사용자 ID를 포함하는 DTO 목록
      */
     @PostMapping("/user/words")
-    public void saveUserWords(@RequestBody List<UserWordDTO> userWordDTOs) {
+    public void saveUserWords(@RequestBody UserWordDTO userWordDTOs) {
         // UserWordService를 호출하여 사용자가 선택한 단어들을 저장
         userWordService.saveUserWords(userWordDTOs);
     }
@@ -36,7 +36,7 @@ public class UserWordController {
      * @return 사용자가 선택한 UserWordDTO 목록을 반환합니다.
      */
     @GetMapping("/user/{userId}/words")
-    public List<UserWordDTO> getUserWords(@PathVariable Long userId) {
+    public UserWordDTO getUserWords(@PathVariable Long userId) {
         // UserWordService를 호출하여 사용자가 선택한 단어 목록을 조회하고 반환합니다.
         return userWordService.getUserWords(userId);
     }
