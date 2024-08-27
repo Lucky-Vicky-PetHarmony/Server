@@ -7,10 +7,12 @@ import luckyvicky.petharmony.dto.board.BoardListResponseDTO;
 import luckyvicky.petharmony.dto.main.PetCardResponseDTO;
 import luckyvicky.petharmony.dto.main.SlideResponseDTO;
 import luckyvicky.petharmony.entity.PetInfo;
+import luckyvicky.petharmony.entity.ShelterInfo;
 import luckyvicky.petharmony.entity.board.Board;
 import luckyvicky.petharmony.repository.BoardRepository;
 import luckyvicky.petharmony.repository.ImageRepository;
 import luckyvicky.petharmony.repository.PetInfoRepository;
+import luckyvicky.petharmony.repository.ShelterInfoRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,6 +34,7 @@ public class MainServiceImpl implements MainService {
     private final ImageRepository imageRepository;
     private final PetInfoRepository petInfoRepository;
     private final PetInfoFormatService petInfoFormatService;
+    private final ShelterInfoRepository shelterInfoRepository;
 
     /**
      * 유기동물 슬라이드 목록을 가져오는 메서드
@@ -47,13 +51,16 @@ public class MainServiceImpl implements MainService {
         List<PetInfo> listPetinfo = petInfoRepository.findByNoticeEdtBefore(currentDate);
 
         List<SlideResponseDTO> slideResponseDTOList = listPetinfo.stream()
-                .map(petInfo -> SlideResponseDTO.builder()
-                        .desertionNo(petInfo.getDesertionNo())
-                        .popFile(petInfo.getPopfile())
-                        .noticeNo(formatNoticeNo(petInfo.getNoticeNo()))
-                        .sexCd(formatSexCd(petInfo.getSexCd()))
-                        .age(formatAge(petInfo.getAge())+"년생")
-                        .build())
+                .map(petInfo -> {
+                    ShelterInfo shelterInfo = petInfo.getShelterInfo();
+                    return SlideResponseDTO.builder()
+                            .desertionNo(petInfo.getDesertionNo())
+                            .popFile(petInfo.getPopfile())
+                            .orgNm(shelterInfo != null ? shelterInfo.getOrgNm() : "정보 없음")
+                            .sexCd(formatSexCd(petInfo.getSexCd()))
+                            .age(formatAge(petInfo.getAge()) + "년생")
+                            .build();
+                })
                 .collect(Collectors.toList());
         // 리스트를 랜덤으로 섞음
         Collections.shuffle(slideResponseDTOList);
@@ -79,17 +86,20 @@ public class MainServiceImpl implements MainService {
         List<PetInfo> listPetinfo = petInfoRepository.findByNoticeEdtAfter(currentDate);
 
         List<PetCardResponseDTO> petCardResponseDTOList = listPetinfo.stream()
-                .map(petInfo -> PetCardResponseDTO.builder()
-                        .desertionNo(petInfo.getDesertionNo())
-                        .popFile(petInfo.getPopfile())
-                        .words(petInfoFormatService.processWords(petInfo.getWords()))
-                        .kindCd(formatKindCd(petInfo.getKindCd()))
-                        .sexCd(formatSexCd(petInfo.getSexCd()))
-                        .age(formatAge(petInfo.getAge())+"년생")
-                        .weigth(petInfo.getWeight())
-                        .noticeNo(formatNoticeNo(petInfo.getNoticeNo()))
-                        .neuterYn(formatNeuterYn(petInfo.getNeuterYn()))
-                        .build())
+                .map(petInfo -> {
+                    Map<String, Object> processedInfo = petInfoFormatService.processPetInfo(petInfo);
+                    return PetCardResponseDTO.builder()
+                            .desertionNo(petInfo.getDesertionNo())
+                            .popFile(petInfo.getPopfile())
+                            .words((List<String>) processedInfo.get("words"))
+                            .kindCd((String) processedInfo.get("kind_cd"))
+                            .sexCd(formatSexCd(petInfo.getSexCd()))
+                            .age(formatAge(petInfo.getAge())+"년생")
+                            .weight(petInfo.getWeight())
+                            .orgNm((String) processedInfo.get("care_nm"))
+                            .neuterYn((String) processedInfo.get("neuter_yn"))
+                            .build();
+                })
                 .collect(Collectors.toList());
         // 리스트를 랜덤으로 섞음
         Collections.shuffle(petCardResponseDTOList);
@@ -139,21 +149,6 @@ public class MainServiceImpl implements MainService {
     }
 
     // 포맷팅
-    private String formatNoticeNo(String noticeNo) {
-        // 예) 서울-종로-2024-00116 -> 서울 종로
-        String[] parts = noticeNo.split("-");
-        if (parts.length >= 2) {
-            return parts[0] + " " + parts[1];
-        }
-        return noticeNo;
-    }
-
-    private String formatKindCd(String kindCd) {
-        String[] parts = kindCd.split("]");
-        String kind = parts[0].substring(1, parts[0].length());
-        return kind;
-    }
-
     private String formatSexCd(String sexCd) {
         switch (sexCd) {
             case "M":
@@ -173,16 +168,4 @@ public class MainServiceImpl implements MainService {
             return "";
         }
     }
-
-    private String formatNeuterYn(String neuterYn) {
-        switch (neuterYn) {
-            case "N":
-                return "중성화 안됨";
-            case "Y":
-                return "중성화 완료";
-            default:
-                return "알 수 없음";
-        }
-    }
-
 }
