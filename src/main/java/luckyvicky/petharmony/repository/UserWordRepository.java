@@ -19,4 +19,6 @@ public interface UserWordRepository extends JpaRepository<UserWord, Long> {
      */
     @Query("SELECT uw.word.wordId FROM UserWord uw WHERE uw.user.userId = :userId")
     List<Long> findWordIdsByUserId(@Param("userId") Long userId);
+
+    List<UserWord> findByUser_UserId(Long userId);
 }
