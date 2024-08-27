@@ -35,7 +35,7 @@ public class MatchingController {
     public ResponseEntity<List<Map<String, Object>>> getMatchingPetInfos(@PathVariable Long userId) {
         return allMatchingService.getTop12PetInfos(userId)
                 .map(petInfos -> petInfos.stream()
-                        .map(petInfoFormatService::processPetInfo)
+                        .map(petInfo -> petInfoFormatService.processPetInfo(petInfo, userId))
                         .collect(Collectors.toList()))
                 .map(ResponseEntity::ok)
                 .onErrorResume(e -> {

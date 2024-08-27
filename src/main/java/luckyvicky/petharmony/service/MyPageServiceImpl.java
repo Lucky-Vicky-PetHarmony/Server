@@ -279,7 +279,7 @@ public class MyPageServiceImpl implements MyPageService {
                 throw new IllegalArgumentException("해당 입양동물 정보를 찾을 수 없습니다: " + petLike.getDesertionNo());
             }
             // PetInfo를 처리하여 필요한 정보를 추출
-            Map<String, Object> processedInfo = petInfoFormatService.processPetInfo(petInfo);
+            Map<String, Object> processedInfo = petInfoFormatService.processPetInfo(petInfo, user.getUserId());
             return MyInterestedPetDTO.builder()
                     .desertionNo(petInfo.getDesertionNo())
                     .popFile(petInfo.getPopfile())
