@@ -27,8 +27,8 @@ rowcount = 0
 while True:
     # 쿼리 파라미터 설정
     queryParams = '?' + parse.quote_plus("serviceKey") + '=' + key + '&' + parse.urlencode({
-        parse.quote_plus('bgnde'): '20240101',  # 검색 시작일
-        parse.quote_plus('endde'): '20240817',  # 검색 종료일
+        parse.quote_plus('bgnde'): '20240818',  # 검색 시작일
+        parse.quote_plus('endde'): '20240909',  # 검색 종료일
         parse.quote_plus('pageNo'): str(page_no),
         parse.quote_plus('numOfRows'): '1000',  # 한 번에 가져올 데이터 수
         parse.quote_plus('_type'): 'xml'
@@ -75,9 +75,19 @@ while True:
         break
 
     for item in items:
+        care_nm = item.find('careNm').text if item.find('careNm') is not None else None
         desertion_no = item.find('desertionNo').text if item.find('desertionNo') is not None else None
         process_state = item.find('processState').text if item.find('processState') is not None else None
 
+        # shelter_info 테이블에 care_nm이 존재하는지 확인
+        cursor.execute("SELECT COUNT(*) FROM shelter_info WHERE care_nm = %s", (care_nm,))
+        shelter_exists = cursor.fetchone()[0]
+
+        if not shelter_exists:
+            # shelter_info에 없는 경우 데이터 처리 건너뜀
+            print(f"shelter_info에 {care_nm}가 존재하지 않아 데이터를 건너뜁니다.")
+            continue
+        
         if process_state and "종료" in process_state:
             # process_state에 "종료"가 포함된 경우 데이터 삭제
             cursor.execute("DELETE FROM pet_info WHERE desertion_no = %s", (desertion_no,))
@@ -107,9 +117,6 @@ while True:
                         neuter_yn = %s,
                         special_mark = %s,
                         care_nm = %s,
-                        charge_nm = %s,
-                        officetel = %s,
-                        notice_comment = %s
                     WHERE desertion_no = %s
                     """
 
@@ -129,9 +136,6 @@ while True:
                         item.find('neuterYn').text if item.find('neuterYn') is not None else None,
                         item.find('specialMark').text if item.find('specialMark') is not None else None,
                         item.find('careNm').text if item.find('careNm') is not None else None,
-                        item.find('chargeNm').text if item.find('chargeNm') is not None else None,
-                        item.find('officetel').text if item.find('officetel') is not None else None,
-                        item.find('noticeComment').text if item.find('noticeComment') is not None else None,
                         desertion_no
                     )
 
@@ -143,8 +147,8 @@ while True:
                 sql = """
                 INSERT INTO pet_info (
                     desertion_no, happen_dt, happen_place, kind_cd, color_cd, age, weight, notice_no, notice_sdt, notice_edt, 
-                    popfile, process_state, sex_cd, neuter_yn, special_mark, care_nm, charge_nm, officetel, notice_comment
-                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    popfile, process_state, sex_cd, neuter_yn, special_mark, care_nm
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """
 
                 values = (
@@ -164,9 +168,6 @@ while True:
                     item.find('neuterYn').text if item.find('neuterYn') is not None else None,
                     item.find('specialMark').text if item.find('specialMark') is not None else None,
                     item.find('careNm').text if item.find('careNm') is not None else None,
-                    item.find('chargeNm').text if item.find('chargeNm') is not None else None,
-                    item.find('officetel').text if item.find('officetel') is not None else None,
-                    item.find('noticeComment').text if item.find('noticeComment') is not None else None
                 )
 
                 cursor.execute(sql, values)
