@@ -41,13 +41,15 @@ public class OpenAiServiceImpl implements OpenAiService {
     private void initializeDotenv() {
         if (dotenvFilePath != null && !dotenvFilePath.isEmpty()) {
             this.dotenv = Dotenv.configure()
-                    .directory(dotenvFilePath)
+                    .directory("C:\\Users\\didek\\openai-chatbot")
                     .filename(".env")
                     .ignoreIfMalformed()
                     .ignoreIfMissing()
                     .load();
         } else {
             this.dotenv = Dotenv.configure()
+                    .directory(dotenvFilePath)
+                    .filename(".env")
                     .ignoreIfMalformed()
                     .ignoreIfMissing()
                     .load();

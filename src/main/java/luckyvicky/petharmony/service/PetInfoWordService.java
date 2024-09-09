@@ -2,14 +2,17 @@ package luckyvicky.petharmony.service;
 
 import luckyvicky.petharmony.dto.WordClassificationDTO;
 import luckyvicky.petharmony.entity.PetInfo;
-import luckyvicky.petharmony.repository.PetInfoRepository;
+import luckyvicky.petharmony.entity.PetInfoWord;
+import luckyvicky.petharmony.entity.Word;
+import luckyvicky.petharmony.repository.PetInfoWordRepository;
+import luckyvicky.petharmony.repository.WordRepository;
 import luckyvicky.petharmony.service.openapi.OpenAiService;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -19,25 +22,18 @@ import java.util.stream.Collectors;
 @Service
 public class PetInfoWordService {
 
-    private final PetInfoRepository petInfoRepository;
+    private final PetInfoWordRepository petInfoWordRepository;
     private final OpenAiService openAiService;
+    private final WordRepository wordRepository;
 
-    /**
-     * PetInfoWordService의 생성자
-     *
-     * @param petInfoRepository PetInfo 엔티티와 상호작용하는 리포지토리
-     * @param openAiService     OpenAI API와 통신하는 서비스
-     */
-    public PetInfoWordService(PetInfoRepository petInfoRepository, OpenAiService openAiService) {
-        this.petInfoRepository = petInfoRepository;
+    public PetInfoWordService(PetInfoWordRepository petInfoWordRepository, OpenAiService openAiService, WordRepository wordRepository) {
+        this.petInfoWordRepository = petInfoWordRepository;
         this.openAiService = openAiService;
+        this.wordRepository = wordRepository;
     }
 
     /**
-     * 단일 PetInfo 레코드를 처리합니다.
-     * 이 메서드는 PetInfo 레코드를 WordClassificationDTO로 변환한 다음,
-     * OpenAI API를 호출하여 특성을 분석하고, 분석된 결과에 따라 PetInfo 엔티티를 업데이트합니다.
-     * 최종적으로 PetInfo 레코드를 데이터베이스에 저장합니다.
+     * PetInfo 엔티티를 처리하여 관련된 Word 정보를 업데이트
      *
      * @param petInfo 처리할 PetInfo 엔티티
      */
@@ -48,24 +44,27 @@ public class PetInfoWordService {
             return;
         }
 
-        // words 열에 이미 데이터가 있는 경우, OpenAI 호출을 건너뜀
-        if (petInfo.getWords() != null && !petInfo.getWords().isEmpty()) {
-            //System.out.println("words 필드에 이미 데이터가 있습니다. OpenAI 호출을 건너뜁니다.");
+        // 해당 desertionNo로 이미 저장된 단어가 있는지 확인
+        Optional<List<PetInfoWord>> existingWords = petInfoWordRepository.findByPetInfo(petInfo);
+        if (existingWords.isPresent() && !existingWords.get().isEmpty()) {
+            // 이미 저장된 단어가 있으면 분석을 생략
             return;
         }
 
         // PetInfo 엔티티를 DTO로 변환
         WordClassificationDTO dto = convertToDTO(petInfo);
 
-        // 특성(specialMark)을 분석하여 관련된 Words를 결정
-        String analyzedWords = analyzeSpecialMark(dto);
-        dto.setWords(analyzedWords);
+        // 특성(specialMark)을 분석하여 관련된 word_id를 결정
+        List<Word> words = analyzeSpecialMark(dto);
 
-        // DTO에서 엔티티 업데이트 로직 수행
-        dto.updateEntity(petInfo);
-
-        // 업데이트된 PetInfo 엔티티를 데이터베이스에 저장
-        petInfoRepository.save(petInfo);
+        // 분석된 결과에 따라 PetInfoWord 엔티티를 데이터베이스에 저장
+        for (Word word : words) {
+            PetInfoWord petInfoWord = PetInfoWord.builder()
+                    .petInfo(petInfo)
+                    .word(word)
+                    .build();
+            petInfoWordRepository.save(petInfoWord);
+        }
     }
 
     /**
@@ -77,24 +76,17 @@ public class PetInfoWordService {
     private WordClassificationDTO convertToDTO(PetInfo petInfo) {
         return new WordClassificationDTO(
                 petInfo.getDesertionNo(),
-                petInfo.getSpecialMark(),
-                petInfo.getAge(),
-                petInfo.getSexCd(),
-                petInfo.getWords() // Words 필드를 직접 가져옴
+                petInfo.getSpecialMark()
         );
     }
 
     /**
-     * */
-
-    /**
-     * OpenAI API를 호출하여 specialMark 필드를 분석하고, 분석 결과에 따라 Words를 반환합니다.
-     * 분석 결과는 특정 조건에 따라 다양한 Words로 매핑됩니다.
+     * OpenAI API를 호출하여 specialMark 필드를 분석하고, 분석 결과에 따라 관련된 Word 엔티티 리스트를 반환
      *
      * @param dto WordClassificationDTO 객체, 분석할 specialMark 필드를 포함
-     * @return 분석 결과에 따라 선택된 Words들 중 최대 5개의 단어 ID를 콤마로 연결한 문자열
+     * @return 분석 결과에 따라 선택된 Word 엔티티 리스트 반환
      */
-    private String analyzeSpecialMark(WordClassificationDTO dto) {
+    private List<Word> analyzeSpecialMark(WordClassificationDTO dto) {
         List<String> wordIds = new ArrayList<>();
 
         // special_mark 필드를 OpenAiService를 통해 분석
@@ -103,7 +95,7 @@ public class PetInfoWordService {
             String openAiAnalysis = openAiService.analyzeSpecialMark(specialMark);
 
             if (openAiAnalysis != null && !openAiAnalysis.isEmpty()) {
-                // 분석된 결과에 따라 Words 추가
+                // 분석된 결과에 따라 word_id 추가
                 if (openAiAnalysis.contains("건강한")) {
                     wordIds.add("1");
                 }
@@ -167,7 +159,13 @@ public class PetInfoWordService {
             }
         }
 
-        // 중복된 단어를 제거하고 최대 10개의 단어만 선택하여 반환
-        return wordIds.stream().distinct().limit(5).collect(Collectors.joining(","));
+        // 중복된 단어를 제거하고 최대 5개의 단어만 선택하여 Word 엔티티로 변환하여 반환
+        return wordIds.stream()
+                .distinct()
+                .limit(5)
+                .map(wordId -> wordRepository.findById(Long.parseLong(wordId)))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
     }
 }

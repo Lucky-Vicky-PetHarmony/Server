@@ -10,13 +10,14 @@ import lombok.*;
 @AllArgsConstructor
 @Table(name = "pet_info_word")
 public class PetInfoWord {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "petinfoword_id")
     private Long petInfoWordId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "pet_info")
+    @JoinColumn(name = "desertion_no")
     private PetInfo petInfo;
 
     @ManyToOne(fetch = FetchType.LAZY)

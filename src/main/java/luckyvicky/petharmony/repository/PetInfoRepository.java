@@ -11,12 +11,13 @@ import org.springframework.data.repository.query.Param;
 import java.time.LocalDate;
 import java.util.List;
 
-// PetInfoRepository는 PetInfo 엔티티와 데이터베이스 간의 상호작용을 처리하는 리포지토리 인터페이스
 public interface PetInfoRepository extends JpaRepository<PetInfo, String> {
+
     // 페이징 메서드 추가
     Page<PetInfo> findAll(Pageable pageable);
-    // 특정 연령(age)과 성별(sexCd)에 따라 필터링된 PetInfo 데이터를 조회하고, 이를 WordClassificationDTO로 매핑하여 반환
-    @Query("SELECT new luckyvicky.petharmony.dto.WordClassificationDTO(p.desertionNo, p.specialMark, p.age, p.sexCd, '') " +
+
+    // WordClassificationDTO로 desertionNo와 specialMark만 반환하도록 JPQL 쿼리 수정
+    @Query("SELECT new luckyvicky.petharmony.dto.WordClassificationDTO(p.desertionNo, p.specialMark) " +
             "FROM PetInfo p WHERE p.age = :age AND p.sexCd = :sexCd")
     Page<WordClassificationDTO> findWordClassificationsByCriteria(@Param("age") String age, @Param("sexCd") String sexCd, Pageable pageable);
 
@@ -33,7 +34,7 @@ public interface PetInfoRepository extends JpaRepository<PetInfo, String> {
 
     // notice_edt가 현재 날짜를 지나지 않은 PetInfo 조회
     List<PetInfo> findByNoticeEdtAfter(LocalDate currentDate);
-  
+
     // desertionNo에 해당하는 PetInfo와 연결된 ShelterInfo를 조인하여 가져옴
     @Query("SELECT p FROM PetInfo p JOIN FETCH ShelterInfo s ON p.careNm = s.careNm WHERE p.desertionNo = :desertionNo")
     PetInfo findPetInfoWithShelterByDesertionNo(@Param("desertionNo") String desertionNo);
@@ -43,5 +44,4 @@ public interface PetInfoRepository extends JpaRepository<PetInfo, String> {
 
     // 카테고리별 입양동물 리스트
     Page<PetInfo> findByKindCdContaining(String kindCd, Pageable pageable);
-
 }
