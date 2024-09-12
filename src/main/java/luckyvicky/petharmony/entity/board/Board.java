@@ -5,10 +5,8 @@ import lombok.*;
 import luckyvicky.petharmony.entity.User;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Formula;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Getter
@@ -47,9 +45,6 @@ public class Board {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;                  // 유저 테이블
-
-    @OneToMany(mappedBy = "board", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Comment> comments;  // 댓글 리스트
 
     @Formula("(select count(*) from comment c where c.board_id = board_id)")
     private int commentCount;
