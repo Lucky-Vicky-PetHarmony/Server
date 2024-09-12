@@ -149,7 +149,7 @@ public class MainServiceImpl implements MainService {
                 .viewCount(board.getCommentCount())
                 .boardCreate(board.getBoardCreate().toString())
                 .boardUpdate(board.getBoardUpdate().toString())
-                .commentCount(board.getComments().size())
+                .commentCount(board.getCommentCount())
                 .image(hasImage)
                 .pinCount(board.getPinCount())
                 .build();
