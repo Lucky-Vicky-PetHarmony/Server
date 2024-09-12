@@ -126,7 +126,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public List<CommentResponseDTO> listComment(Long boardId) {
 
-        List<Comment> comments = commentRepository.findByBoard_BoardId(boardId);
+        List<Comment> comments = commentRepository.findCommentsWithUserAndBoard(boardId);
 
         // Comment 객체들을 CommentResponseDTO로 변환
         return comments.stream()
