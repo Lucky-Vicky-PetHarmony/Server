@@ -13,20 +13,15 @@ import java.util.Map;
 @RequestMapping("/api")
 public class AnimalDetailsController {
 
-    private final CombinedInfoService combinedInfoService;
-
     @Autowired
-    public AnimalDetailsController(CombinedInfoService combinedInfoService) {
-        this.combinedInfoService = combinedInfoService;
-    }
+    private CombinedInfoService combinedInfoService;
 
     /**
      * 유기동물 정보와 보호소 정보를 결합하여 반환하는 API 엔드포인트
      */
     @GetMapping("/public/{desertionNo}/{userId}")
-    public Map<String, Object> getCombinedAnimalInfo(@PathVariable String desertionNo
-                                                    , @PathVariable Long userId) {
+    public Map<String, Object> getCombinedAnimalInfo(@PathVariable String desertionNo, @PathVariable Long userId) {
+        // CombinedInfoService에서 최적화된 데이터를 가져옴
         return combinedInfoService.getCombinedInfo(desertionNo, userId);
     }
-
 }

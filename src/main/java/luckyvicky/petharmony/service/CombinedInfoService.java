@@ -25,11 +25,12 @@ public class CombinedInfoService {
     @Autowired
     public CombinedInfoService(PetInfoRepository petInfoRepository,
                                ShelterInfoRepository shelterInfoRepository,
-                               DetailAdoptionService detailAdoption,
-                               ShelterInfoService shelterInfoService, PetLikeRepository petLikeRepository) {
+                               DetailAdoptionService detailAdoptionService,
+                               ShelterInfoService shelterInfoService,
+                               PetLikeRepository petLikeRepository) {
         this.petInfoRepository = petInfoRepository;
         this.shelterInfoRepository = shelterInfoRepository;
-        this.detailAdoptionService = detailAdoption;
+        this.detailAdoptionService = detailAdoptionService;
         this.shelterInfoService = shelterInfoService;
         this.petLikeRepository = petLikeRepository;
     }
@@ -38,28 +39,31 @@ public class CombinedInfoService {
      * 유기동물 정보와 보호소 정보를 결합하여 반환하는 메서드
      *
      * @param desertionNo 유기동물 번호
+     * @param userId      사용자 ID
      * @return 유기동물 정보와 보호소 정보가 결합된 맵 객체
      */
     public Map<String, Object> getCombinedInfo(String desertionNo, Long userId) {
-        Map<String, Object> combinedInfo = new HashMap<>();
+        Map<String, Object> resultMap = new HashMap<>();
 
-        PetInfo petInfo = petInfoRepository.findPetInfoWithShelterByDesertionNo(desertionNo);
-
+        // 첫 번째 쿼리: PetInfo 가져오기
+        PetInfo petInfo = petInfoRepository.findByDesertionNo(desertionNo);
         if (petInfo != null) {
             Map<String, Object> petInfoDetails = detailAdoptionService.processPetInfo(petInfo, userId);
-            combinedInfo.putAll(petInfoDetails);
+            resultMap.put("pet_info", petInfoDetails);
 
+            // 두 번째 쿼리: ShelterInfo 가져오기
             Optional<ShelterInfo> shelterInfoOptional = shelterInfoRepository.findByCareNm(petInfo.getCareNm());
             if (shelterInfoOptional.isPresent()) {
-                Map<String, Object> shelterInfoDetails = shelterInfoService.processShelterInfo(shelterInfoOptional.get());
-                combinedInfo.putAll(shelterInfoDetails);
+                ShelterInfo shelterInfo = shelterInfoOptional.get();
+                Map<String, Object> shelterInfoDetails = shelterInfoService.processShelterInfo(shelterInfo);
+                resultMap.put("shelter_info", shelterInfoDetails);
             } else {
-                combinedInfo.put("shelter_info", "보호소 정보를 찾을 수 없습니다.");
+                resultMap.put("shelter_info", "보호소 정보를 찾을 수 없습니다.");
             }
         } else {
-            combinedInfo.put("pet_info", "유기동물 정보를 찾을 수 없습니다.");
+            resultMap.put("pet_info", "유기동물 정보를 찾을 수 없습니다.");
         }
 
-        return combinedInfo;
+        return resultMap;
     }
 }

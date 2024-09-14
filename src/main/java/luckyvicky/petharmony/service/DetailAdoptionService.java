@@ -46,7 +46,7 @@ public class DetailAdoptionService implements PetInfoFormatter {
         Map<String, Object> result = petInfoFormatService.processPetInfo(petInfo, userId);
 
         // 모든 단어를 반환하도록 변경된 로직 적용
-        result.put("words", processAllWords(petInfo.getWords()));
+//        result.put("words", processAllWords(petInfo.getWords()));
 
         // 추가 필드 처리 (예: 색상 코드)
         result.put("color_cd", petInfo.getColorCd());

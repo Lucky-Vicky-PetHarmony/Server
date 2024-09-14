@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
  * PetInfoAnalyzer 클래스는 CommandLineRunner를 구현하여 애플리케이션 시작 시 특정 배치 작업을 실행
  */
 @Component
-public class PetInfoAnalyzer{
+public class PetInfoAnalyzer implements CommandLineRunner{
 
     private final JobLauncher jobLauncher; // 배치 작업을 실행하기 위한 JobLauncher
     private final Job processPetInfoJob; // 실행할 배치 Job
@@ -23,7 +23,7 @@ public class PetInfoAnalyzer{
         this.processPetInfoJob = processPetInfoJob;
     }
 
-    public void runJob() {
+    public void run(String... args) {
         try {
             // JobParameters 생성: 각 배치 실행 시 유니크한 값을 부여하여 여러 번 실행 가능하게 함
             JobParameters jobParameters = new JobParametersBuilder()

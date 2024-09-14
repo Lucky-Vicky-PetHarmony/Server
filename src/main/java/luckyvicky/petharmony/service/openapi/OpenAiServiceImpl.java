@@ -3,7 +3,10 @@ package luckyvicky.petharmony.service.openapi;
 import io.github.cdimascio.dotenv.Dotenv;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.*;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -67,6 +70,7 @@ public class OpenAiServiceImpl implements OpenAiService {
      * @param specialMark 분석할 특이사항 문자열
      * @return 분석된 결과 문자열
      */
+    @Cacheable(value = "specialMarkCache", key = "#specialMark")
     @Override
     public String analyzeSpecialMark(String specialMark) {
         // HTTP 요청 헤더를 설정
@@ -133,7 +137,7 @@ public class OpenAiServiceImpl implements OpenAiService {
      */
     private String categorizeResponse(String response) {
         // 응답에서 특정 키워드를 찾아서 카테고리로 매핑
-        if (response.contains("크레스티드 게코")) {
+        if (response.contains("꼬리단미 안됨") || response.contains("꼬리단미안됨") ) {
             return "독특한";
         } else if (response.contains("외상안보임") || response.contains("외상없음") || response.contains("외상 없음")) {
             return "건강한";
@@ -141,7 +145,7 @@ public class OpenAiServiceImpl implements OpenAiService {
             return "돌봄이 필요한";
         } else if (response.contains("털상태양호")) {
             return "윤기나는";
-        } else if (response.contains("몸무게 추정") || response.contains("몸무게 추정") || response.contains("색") || response.contains("단미") || response.contains("털때탐")) {
+        } else if (response.contains("몸무게 추정") || response.contains("없음") || response.contains(".") || response.contains("-")) {
             return null;
         }
         // 추가적인 카테고리 매핑 로직을 작성

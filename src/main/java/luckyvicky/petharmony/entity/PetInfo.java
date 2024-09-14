@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Getter
@@ -66,15 +67,10 @@ public class PetInfo {
     @Column(name = "care_nm", length = 50)
     private String careNm;
 
-    @Column(name = "words", length = 255)
-    private String words;
-
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "care_nm", referencedColumnName = "care_nm", insertable = false, updatable = false)
     private ShelterInfo shelterInfo;
 
-    // Method to update the words field
-    public void updateWordId(String words) {
-        this.words = words;
-    }
+    @OneToMany(mappedBy = "petInfo", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<PetInfoWord> petInfoWords;
 }

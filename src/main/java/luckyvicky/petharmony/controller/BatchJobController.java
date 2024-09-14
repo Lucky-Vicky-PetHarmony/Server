@@ -23,7 +23,7 @@ public class BatchJobController {
 
     @PostMapping("/run")
     public ResponseEntity<String> runBatchJob() {
-        petInfoAnalyzer.runJob();
+        petInfoAnalyzer.run();
         return ResponseEntity.ok("배치 작업이 실행되었습니다.");
     }
 }

@@ -1,5 +1,6 @@
 package luckyvicky.petharmony.config;
 
+import luckyvicky.petharmony.dto.WordClassificationDTO;
 import luckyvicky.petharmony.entity.PetInfo;
 import luckyvicky.petharmony.repository.PetInfoRepository;
 import luckyvicky.petharmony.service.PetInfoWordService;
@@ -47,8 +48,8 @@ public class PetInfoBatchConfig {
     @Bean
     public Step processPetInfoStep() {
         return new StepBuilder("processPetInfoStep", jobRepository)
-                .<PetInfo, PetInfo>chunk(100, transactionManager)
-                .reader(petInfoReader())
+                .<WordClassificationDTO, WordClassificationDTO>chunk(100, transactionManager)  // WordClassificationDTO 사용
+                .reader(petInfoReader())  // WordClassificationDTO를 읽어옴
                 .processor(petInfoProcessor())
                 .writer(petInfoWriter())
                 .taskExecutor(taskExecutor())
@@ -66,10 +67,10 @@ public class PetInfoBatchConfig {
     }
 
     @Bean
-    public RepositoryItemReader<PetInfo> petInfoReader() {
-        RepositoryItemReader<PetInfo> reader = new RepositoryItemReader<>();
-        reader.setRepository(petInfoRepository);
-        reader.setMethodName("findAll");
+    public RepositoryItemReader<WordClassificationDTO> petInfoReader() {
+        RepositoryItemReader<WordClassificationDTO> reader = new RepositoryItemReader<>();
+        reader.setRepository(petInfoRepository);  // PetInfoRepository 사용
+        reader.setMethodName("findDesertionNoAndSpecialMarkPaged");  // DTO 반환 메서드
         reader.setPageSize(100);
 
         Map<String, Sort.Direction> sortMap = new HashMap<>();
@@ -80,15 +81,17 @@ public class PetInfoBatchConfig {
     }
 
     @Bean
-    public ItemProcessor<PetInfo, PetInfo> petInfoProcessor() {
-        return petInfo -> {
-            petInfoWordService.processPetInfo(petInfo);
-            return petInfo;
+    public ItemProcessor<WordClassificationDTO, WordClassificationDTO> petInfoProcessor() {
+        return dto -> {
+            petInfoWordService.processSinglePetInfo(dto);  // PetInfoWordService에서 처리
+            return dto;
         };
     }
 
     @Bean
-    public ItemWriter<PetInfo> petInfoWriter() {
-        return items -> petInfoRepository.saveAll(items);
+    public ItemWriter<WordClassificationDTO> petInfoWriter() {
+        return items -> {
+            // 처리 완료 후 특별히 저장할 필요가 없을 수 있음, 여기서는 그냥 로그 처리 가능
+        };
     }
 }

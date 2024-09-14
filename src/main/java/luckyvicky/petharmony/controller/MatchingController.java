@@ -1,3 +1,4 @@
+/*
 package luckyvicky.petharmony.controller;
 
 import luckyvicky.petharmony.entity.PetInfo;
@@ -25,12 +26,14 @@ public class MatchingController {
         this.petInfoFormatService = petInfoFormatService;
     }
 
-    /**
+    */
+/**
      * 사용자 ID로 매칭된 PetInfo 데이터를 가져와 포맷된 형태로 반환하는 메서드
      *
      * @param userId 사용자 ID
      * @return 포맷된 PetInfo 데이터 리스트
-     */
+     *//*
+
     @GetMapping("/user/matching/{userId}")
     public ResponseEntity<List<Map<String, Object>>> getMatchingPetInfos(@PathVariable Long userId) {
         return allMatchingService.getTop12PetInfos(userId)
@@ -45,3 +48,4 @@ public class MatchingController {
                 .block(); // 비동기 결과를 동기적으로 반환
     }
 }
+*/

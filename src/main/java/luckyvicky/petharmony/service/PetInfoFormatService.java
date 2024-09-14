@@ -41,7 +41,7 @@ public class PetInfoFormatService implements PetInfoFormatter {
         result.put("desertion_no", petInfo.getDesertionNo());
 
         // words 필드에서 wordId를 추출하여 Word엔티티의 wordSelect 값을 매핑
-        result.put("words", processWords(petInfo.getWords()));
+//        result.put("words", processWords(petInfo.getWords()));
 
         // kind_cd 필드를 처리하여 반환 ex)개, 고양이
         result.put("kind_cd", processKindCd(petInfo.getKindCd()));

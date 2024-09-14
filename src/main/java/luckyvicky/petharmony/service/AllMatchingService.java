@@ -1,3 +1,4 @@
+/*
 package luckyvicky.petharmony.service;
 
 import luckyvicky.petharmony.entity.PetInfo;
@@ -68,9 +69,9 @@ public class AllMatchingService {
                         petInfosFromWordMatching.stream()
                                 .filter(petInfo -> !combinedSet.contains(petInfo))
                                 .sorted((p1, p2) -> {
-                                    int matchCount1 = wordMatchingService.countMatchingWords(p1.getWords(), wordMatchingService.getWordIdListAsString(userId));
-                                    int matchCount2 = wordMatchingService.countMatchingWords(p2.getWords(), wordMatchingService.getWordIdListAsString(userId));
-                                    return Integer.compare(matchCount2, matchCount1);
+//                                    int matchCount1 = wordMatchingService.countMatchingWords(p1.getWords(), wordMatchingService.getWordIdListAsString(userId));
+//                                    int matchCount2 = wordMatchingService.countMatchingWords(p2.getWords(), wordMatchingService.getWordIdListAsString(userId));
+                                    return 0;
                                 })
                                 .limit(12 - combinedList.size())
                                 .forEach(combinedList::add);
@@ -105,3 +106,4 @@ public class AllMatchingService {
         }
     }
 }
+*/
