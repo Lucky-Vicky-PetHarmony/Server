@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 @Component
 public class JwtTokenProvider {
     // Access Token 유효기간을 15분(15 * 60 * 1000)에서 테스트 용도로 30초(30 * 1000)로 변경
-    private static final long JWT_EXPIRATION_MS = 30 * 1000;
+    private static final long JWT_EXPIRATION_MS = 15 * 60 * 1000;
     // Refresh Token 유효기간 : 7일
     private static final long REFRESH_TOKEN_EXPIRATION_MS = 7 * 24 * 60 * 60 * 1000;
 
