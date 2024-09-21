@@ -29,10 +29,12 @@ public interface PetInfoRepository extends JpaRepository<PetInfo, String> {
     List<PetInfo> findAllByCareNmIn(@Param("careNmList") List<String> careNmList);
 
     // notice_edt가 현재 날짜를 지난 PetInfo 조회
-    List<PetInfo> findByNoticeEdtBefore(LocalDate currentDate);
+    @Query("SELECT p FROM PetInfo p WHERE p.noticeEdt < :date ORDER BY function('RAND')")
+    List<PetInfo> findRandomByNoticeEdtBefore(@Param("date") LocalDate date, Pageable pageable);
 
     // notice_edt가 현재 날짜를 지나지 않은 PetInfo 조회
-    List<PetInfo> findByNoticeEdtAfter(LocalDate currentDate);
+    @Query("SELECT p FROM PetInfo p WHERE p.noticeEdt >= :date ORDER BY function('RAND')")
+    List<PetInfo> findRandomByNoticeEdtAfter(@Param("date") LocalDate date, Pageable pageable);
   
     // desertionNo에 해당하는 PetInfo와 연결된 ShelterInfo를 조인하여 가져옴
     @Query("SELECT p FROM PetInfo p JOIN FETCH ShelterInfo s ON p.careNm = s.careNm WHERE p.desertionNo = :desertionNo")
