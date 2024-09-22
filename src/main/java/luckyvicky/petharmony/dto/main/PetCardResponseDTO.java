@@ -24,7 +24,7 @@ public class PetCardResponseDTO {
 
     private String weight;
 
-    private String care_nm;
+    private String org_nm;
 
     private String neuter_yn;
 
