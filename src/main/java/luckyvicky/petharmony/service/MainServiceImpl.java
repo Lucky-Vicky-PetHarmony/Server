@@ -89,7 +89,7 @@ public class MainServiceImpl implements MainService {
                 .sex_cd((String) processedInfo.get("sex_cd"))
                 .age((String) processedInfo.get("age"))
                 .weight((String) processedInfo.get("weight"))
-                .care_nm((String) processedInfo.get("care_nm"))
+                .org_nm((String) processedInfo.get("care_nm"))
                 .neuter_yn((String) processedInfo.get("neuter_yn"))
                 .pet_like((Boolean) processedInfo.get("pet_like"))
                 .build();
