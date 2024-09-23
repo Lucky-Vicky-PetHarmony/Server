@@ -1,6 +1,8 @@
 package luckyvicky.petharmony.repository;
 
 import luckyvicky.petharmony.entity.board.Comment;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -19,6 +21,5 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     void deleteByBoard_BoardId(Long boardId);
 
-    // 사용자 ID에 해당하는 게시물들을 조회하는 메소드
-    List<Comment> findByUser_UserId(Long userId);
+    Page<Comment> findByUserUserId(Long userId, Pageable pageable);
 }

@@ -2,7 +2,6 @@ package luckyvicky.petharmony.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 import luckyvicky.petharmony.dto.board.BoardListResponseDTO;
 import luckyvicky.petharmony.dto.mypage.*;
 import luckyvicky.petharmony.entity.PetInfo;
@@ -19,10 +18,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -55,6 +52,7 @@ public class MyPageServiceImpl implements MyPageService {
                 .build();
     }
 
+
     /**
      * 현재 인증된 사용자의 프로필 정보를 업데이트하는 메서드
      */
@@ -76,6 +74,7 @@ public class MyPageServiceImpl implements MyPageService {
                 .build();
     }
 
+
     /**
      * 현재 인증된 사용자의 비밀번호를 업데이트하는 메서드
      */
@@ -93,6 +92,7 @@ public class MyPageServiceImpl implements MyPageService {
             throw new IllegalArgumentException("기존 비밀번호가 일치하지 않습니다.");
         }
     }
+
 
     /**
      * 현재 인증된 사용자가 관심 있는 입양동물 목록을 조회하는 메서드
@@ -130,26 +130,26 @@ public class MyPageServiceImpl implements MyPageService {
         });
     }
 
+
     /**
      * 현재 인증된 사용자가 PIN한 게시물들을 조회하는 메서드
      */
     @Override
-    public List<BoardListResponseDTO> getPinPosts() {
+    public Page<BoardListResponseDTO> getPinPosts(Pageable pageable) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
-        List<BoardPin> pins = boardPinRepository.findByUser_UserId(user.getUserId());
+        Page<BoardPin> pins = boardPinRepository.findByUserUserId(user.getUserId(), pageable);
 
         if (pins.isEmpty()) {
-            return Collections.emptyList();
+            return Page.empty();
         }
 
-        return pins.stream()
-                .map(pin -> buildBoardListResponseDTO(pin.getBoard()))
-                .collect(Collectors.toList());
+        return pins.map(pin -> buildBoardListResponseDTO(pin.getBoard()));
     }
 
+    // Board 엔티티를 buildBoardListResponseDTO로 변환하는 헬퍼 메서드
     private BoardListResponseDTO buildBoardListResponseDTO(Board board) {
         boolean hasImage = imageRepository.existsByBoard_BoardId(board.getBoardId());
         return BoardListResponseDTO.builder()
@@ -166,56 +166,55 @@ public class MyPageServiceImpl implements MyPageService {
                 .build();
     }
 
-    /**
-     * 현재 인증된 사용자가 작성한 게시물들을 조회하는 메서드
-     */
-    @Override
-    public List<BoardListResponseDTO> getMyPosts() {
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-
-        List<Board> my = boardRepository.findByUser_UserId(user.getUserId());
-
-        if (my.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        return my.stream()
-                .map(this::buildBoardListResponseDTO)
-                .collect(Collectors.toList());
-    }
 
     /**
      * 현재 인증된 사용자가 작성한 댓글들을 조회하는 메서드
      */
     @Override
-    public List<MyCommentsDTO> getMyComments() {
+    public Page<MyCommentsDTO> getMyComments(Pageable pageable) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
-        List<Comment> my = commentRepository.findByUser_UserId(user.getUserId());
+        Page<Comment> my = commentRepository.findByUserUserId(user.getUserId(), pageable);
 
         if (my.isEmpty()) {
-            return Collections.emptyList();
+            return Page.empty();
         }
 
-        return my.stream()
-                .map(comment -> MyCommentsDTO.builder()
-                        .boardId(comment.getBoard().getBoardId())
-                        .category(comment.getBoard().getCategory())
-                        .boardTitle(comment.getBoard().getBoardTitle())
-                        .image(imageRepository.existsByBoard_BoardId(comment.getBoard().getBoardId()))
-                        .viewCount(comment.getBoard().getView())
-                        .commentCount(comment.getBoard().getCommentCount())
-                        .pinCount(comment.getBoard().getPinCount())
-                        .boardUpdate(comment.getBoard().getBoardUpdate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
-                        .content(comment.getCommContent())
-                        .commId(comment.getCommId())
-                        .build())
-                .collect(Collectors.toList());
+        return my.map(comment -> MyCommentsDTO.builder()
+                .boardId(comment.getBoard().getBoardId())
+                .category(comment.getBoard().getCategory())
+                .boardTitle(comment.getBoard().getBoardTitle())
+                .image(imageRepository.existsByBoard_BoardId(comment.getBoard().getBoardId())) // boolean 값
+                .viewCount(comment.getBoard().getView())
+                .commentCount(comment.getBoard().getCommentCount())
+                .pinCount(comment.getBoard().getPinCount())
+                .boardUpdate(comment.getBoard().getBoardUpdate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                .content(comment.getCommContent())
+                .commId(comment.getCommId())
+                .build());
     }
+
+
+    /**
+     * 현재 인증된 사용자가 작성한 게시물들을 조회하는 메서드
+     */
+    @Override
+    public Page<BoardListResponseDTO> getMyPosts(Pageable pageable) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        Page<Board> my = boardRepository.findByUserUserId(user.getUserId(), pageable);
+
+        if (my.isEmpty()) {
+            return Page.empty();
+        }
+
+        return my.map(this::buildBoardListResponseDTO);
+    }
+
 
     /**
      * 현재 인증된 사용자가 회원 탈퇴를 하는 메서드

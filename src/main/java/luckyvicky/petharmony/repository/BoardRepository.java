@@ -34,6 +34,6 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
 
     Page<Board> findByCategoryAndBoardTitleContainingIgnoreCaseOrBoardContentContainingIgnoreCaseAndIsDeletedFalse(Category category, String titleKeyword, String contentKeyword, Pageable pageable);
 
-    // 사용자 ID에 해당하는 게시물들을 조회하는 메소드
-    List<Board> findByUser_UserId(Long userId);
+    // 페이지네이션 적용
+    Page<Board> findByUserUserId(Long userId, Pageable pageable);
 }
