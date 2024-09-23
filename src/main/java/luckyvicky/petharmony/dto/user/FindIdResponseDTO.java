@@ -9,9 +9,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FindIdResponseDTO {
-    private String email;                 // 이메일
+    private String email;
 
-    private LocalDateTime createDate;     // 가입일자
+    private LocalDateTime createDate;
 
-    private String responseMsg;           // 응답 메시지
+    private String responseMsg;
 }

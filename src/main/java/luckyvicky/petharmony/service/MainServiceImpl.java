@@ -2,7 +2,6 @@ package luckyvicky.petharmony.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 import luckyvicky.petharmony.dto.board.BoardListResponseDTO;
 import luckyvicky.petharmony.dto.main.PetCardResponseDTO;
 import luckyvicky.petharmony.dto.main.SlideResponseDTO;
@@ -38,6 +37,7 @@ public class MainServiceImpl implements MainService {
     @Override
     public List<SlideResponseDTO> getSlides() {
         LocalDate currentDate = LocalDate.now();
+
         Pageable pageable = PageRequest.of(0, 18);
 
         List<PetInfo> randomPetInfos = petInfoRepository.findRandomByNoticeEdtBefore(currentDate, pageable);
@@ -47,9 +47,7 @@ public class MainServiceImpl implements MainService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * 유기동물 슬라이드에 필요한 데이터를 변환하는 헬퍼 메서드
-     */
+    // 유기동물 슬라이드에 필요한 데이터를 변환하는 헬퍼 메서드
     private SlideResponseDTO mapToSlideResponseDTO(PetInfo petInfo) {
         return SlideResponseDTO.builder()
                 .desertionNo(petInfo.getDesertionNo())
@@ -60,12 +58,14 @@ public class MainServiceImpl implements MainService {
                 .build();
     }
 
+
     /**
      * 유기동물 카드를 위한 데이터 조회 메서드
      */
     @Override
     public List<PetCardResponseDTO> getPetCards(Long userId) {
         LocalDate currentDate = LocalDate.now();
+
         Pageable pageable = PageRequest.of(0, 6);
 
         List<PetInfo> randomPetInfos = petInfoRepository.findRandomByNoticeEdtAfter(currentDate, pageable);
@@ -75,9 +75,7 @@ public class MainServiceImpl implements MainService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * 유기동물 카드에 필요한 데이터를 변환하는 헬퍼 메서드
-     */
+    // 유기동물 카드에 필요한 데이터를 변환하는 헬퍼 메서드
     private PetCardResponseDTO mapToPetCardResponseDTO(PetInfo petInfo, Long userId) {
         Map<String, Object> processedInfo = petInfoFormatService.processPetInfo(petInfo, userId);
 
@@ -89,11 +87,12 @@ public class MainServiceImpl implements MainService {
                 .sex_cd((String) processedInfo.get("sex_cd"))
                 .age((String) processedInfo.get("age"))
                 .weight((String) processedInfo.get("weight"))
-                .org_nm((String) processedInfo.get("care_nm"))
+                .org_nm((String) processedInfo.get("org_nm"))
                 .neuter_yn((String) processedInfo.get("neuter_yn"))
                 .pet_like((Boolean) processedInfo.get("pet_like"))
                 .build();
     }
+
 
     /**
      * 게시물 목록 조회 메서드
@@ -111,9 +110,7 @@ public class MainServiceImpl implements MainService {
         return new PageImpl<>(boardDTOs, pageable, boardPage.getTotalElements());
     }
 
-    /**
-     * Board 엔티티를 BoardListResponseDTO로 변환하는 헬퍼 메서드
-     */
+    // Board 엔티티를 BoardListResponseDTO로 변환하는 헬퍼 메서드
     private BoardListResponseDTO convertToDTO(Board board) {
         boolean hasImage = imageRepository.existsByBoard_BoardId(board.getBoardId());
 
@@ -131,8 +128,9 @@ public class MainServiceImpl implements MainService {
                 .build();
     }
 
+
     /**
-     * 공지 번호 포맷팅
+     * 포맷팅
      */
     private String formatNoticeNo(String noticeNo) {
         String[] parts = noticeNo.split("-");
@@ -142,9 +140,6 @@ public class MainServiceImpl implements MainService {
         return noticeNo;
     }
 
-    /**
-     * 성별 코드 포맷팅
-     */
     private String formatSexCd(String sexCd) {
         switch (sexCd) {
             case "M":
@@ -156,9 +151,6 @@ public class MainServiceImpl implements MainService {
         }
     }
 
-    /**
-     * 나이 포맷팅
-     */
     private String formatAge(String age) {
         if (age != null && age.length() >= 4) {
             return age.substring(0, 4) + "년생";

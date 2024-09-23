@@ -7,5 +7,5 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FindPasswordDTO {
-    private String email;     // 이메일
+    private String email;
 }

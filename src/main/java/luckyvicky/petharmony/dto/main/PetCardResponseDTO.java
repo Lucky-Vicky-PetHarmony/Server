@@ -1,7 +1,6 @@
 package luckyvicky.petharmony.dto.main;
 
 import lombok.*;
-import luckyvicky.petharmony.entity.Word;
 
 import java.util.List;
 

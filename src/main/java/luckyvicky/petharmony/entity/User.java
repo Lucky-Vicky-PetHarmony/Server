@@ -57,7 +57,7 @@ public class User {
     private Boolean isWithdrawal;                 // 탈퇴 여부
 
     @Column(name = "suspension_until")
-    private LocalDate suspensionUntil;                 // 정지 여부(정지 마지막 날짜)
+    private LocalDate suspensionUntil;            // 정지 여부(정지 마지막 날짜)
 
     // 비밀번호 변경
     public void updatePassword(String password) {

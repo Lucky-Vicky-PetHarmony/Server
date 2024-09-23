@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 import luckyvicky.petharmony.dto.user.KakaoAccountDTO;
 import luckyvicky.petharmony.dto.user.KakaoInfoDTO;
 import luckyvicky.petharmony.dto.user.LogInDTO;
@@ -27,15 +26,17 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Optional;
 
 @Service
-@Log4j2
 @RequiredArgsConstructor
 @Transactional
 public class AuthServiceImpl implements AuthService {
+
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
 
-    // 자체 로그인 메서드
+    /**
+     * 자체 로그인 메서드
+     */
     @Override
     public LogInResponseDTO login(LogInDTO logInDTO) {
         try {
@@ -80,7 +81,10 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
-    // 카카오 로그인 메서드
+
+    /**
+     * 카카오 로그인 메서드
+     */
     @Override
     public KakaoInfoDTO getUserInfoFromKakao(String accessToken) {
         // RestTemplate 객체를 생성하여 HTTP 요청 준비
@@ -117,7 +121,9 @@ public class AuthServiceImpl implements AuthService {
         return userInfo;
     }
 
-    // 카카오 사용자 정보 조회 메서드
+    /**
+     * 카카오 사용자 정보 조회 메서드
+     */
     @Override
     public LogInResponseDTO kakaoLogin(String accessToken) {
         KakaoInfoDTO kakaoInfoDTO = getUserInfoFromKakao(accessToken);
