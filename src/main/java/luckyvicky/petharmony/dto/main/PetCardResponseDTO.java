@@ -1,7 +1,6 @@
 package luckyvicky.petharmony.dto.main;
 
 import lombok.*;
-import luckyvicky.petharmony.entity.Word;
 
 import java.util.List;
 
@@ -24,7 +23,7 @@ public class PetCardResponseDTO {
 
     private String weight;
 
-    private String care_nm;
+    private String org_nm;
 
     private String neuter_yn;
 
