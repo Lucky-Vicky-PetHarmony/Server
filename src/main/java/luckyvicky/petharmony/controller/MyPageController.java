@@ -5,6 +5,9 @@ import lombok.extern.log4j.Log4j2;
 import luckyvicky.petharmony.dto.board.BoardListResponseDTO;
 import luckyvicky.petharmony.dto.mypage.*;
 import luckyvicky.petharmony.service.MyPageService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -64,17 +67,25 @@ public class MyPageController {
     }
 
     /**
-     * 사용자가 관심있는 입양 동물 조회 API 엔드포인트
+     * 사용자가 관심 있는 입양 동물 조회 API 엔드포인트
      *
-     * @return ResponseEntity<List<MyInterestedPetDTO>> - 관심있는 입양 동물 목록을 담은 DTO 리스트
+     * @param userId 사용자의 고유 ID
+     * @param page 요청할 페이지 번호 (기본값 0)
+     * @param size 페이지당 보여줄 데이터 수 (기본값 4)
+     * @return ResponseEntity<Page<MyInterestedPetDTO>> - 페이징 처리된 관심 있는 입양 동물 목록을 담은 DTO 페이지
      */
     @GetMapping("/api/user/interestedPets/{userId}")
-    public ResponseEntity<List<MyInterestedPetDTO>> getInterestedPets(@PathVariable Long userId) {
+    public ResponseEntity<Page<MyInterestedPetDTO>> getInterestedPets(
+            @PathVariable Long userId,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "4") int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
         try {
-            List<MyInterestedPetDTO> myInterestedPetDTO = myPageService.getMyInterestedPet(userId);
-            return ResponseEntity.ok(myInterestedPetDTO);
+            Page<MyInterestedPetDTO> myInterestedPetDTOPage = myPageService.getMyInterestedPet(userId, pageable);
+            return ResponseEntity.ok(myInterestedPetDTOPage);
         } catch (Exception e) {
-            log.error("관심있는 입양 동물 조회 중 오류 발생", e);
             return ResponseEntity.badRequest().body(null);
         }
     }
