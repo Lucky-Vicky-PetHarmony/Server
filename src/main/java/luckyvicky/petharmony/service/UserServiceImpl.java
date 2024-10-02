@@ -4,21 +4,22 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import luckyvicky.petharmony.dto.user.*;
-import luckyvicky.petharmony.entity.Certification;
 import luckyvicky.petharmony.entity.User;
-import luckyvicky.petharmony.repository.CertificationRepository;
 import luckyvicky.petharmony.repository.UserRepository;
 import luckyvicky.petharmony.security.Role;
 import luckyvicky.petharmony.security.UserState;
 import luckyvicky.petharmony.util.EmailUtil;
 import luckyvicky.petharmony.util.SmsUtil;
 import net.nurigo.sdk.message.response.SingleMessageSentResponse;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @Log4j2
@@ -28,8 +29,8 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final SmsUtil smsUtil;
-    private final CertificationRepository certificationRepository;
     private final EmailUtil emailUtil;
+    private final RedisTemplate<String, String> redisTemplate;
 
     // 자체 회원가입 메서드
     @Override
@@ -68,49 +69,36 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(user);
     }
 
-    // 아이디 찾기를 위한 인증번호 전송 메서드
+    // 아이디 찾기 시 인증번호 전송 메서드
     @Override
     @Transactional
     public String sendingNumberToFindId(FindIdDTO findIdDTO) {
-        Optional<User> optionalUser = userRepository.findByPhoneAndKakaoIdIsNull(findIdDTO.getPhone());
+        return userRepository.findByPhoneAndKakaoIdIsNull(findIdDTO.getPhone())
+                .map(user -> {
+                    String certNumber = String.format("%04d", (int) (Math.random() * 10000));
+                    SingleMessageSentResponse response = smsUtil.sendOne(user.getPhone(), certNumber);
 
-        if (optionalUser.isPresent()) {
-            String certificationNumber = String.format("%04d", (int) (Math.random() * 10000));
-            SingleMessageSentResponse response = smsUtil.sendOne(optionalUser.get().getPhone(), certificationNumber);
-
-            if (response != null && response.getStatusCode().equals("2000")) {
-                Certification certification = Certification.builder()
-                        .phone(findIdDTO.getPhone())
-                        .certificationNumber(certificationNumber)
-                        .build();
-
-                certificationRepository.save(certification);
-                return "인증번호가 전송되었습니다.";
-            } else {
-                return "인증번호 전송에 실패하였습니다.";
-            }
-        } else {
-            return "가입되지 않은 번호입니다.";
-        }
+                    if (response != null && response.getStatusCode().equals("2000")) {
+                        redisTemplate.opsForValue().set(findIdDTO.getPhone(), certNumber, 3, TimeUnit.MINUTES);
+                        return "인증번호가 전송되었습니다.";
+                    }
+                    return "인증번호 전송에 실패하였습니다.";
+                })
+                .orElse("가입되지 않은 번호입니다.");
     }
 
     // 아이디 찾기 시 인증번호 확인 메서드
     @Override
     public FindIdResponseDTO checkNumberToFindid(FindIdDTO findIdDTO) {
-        Optional<Certification> optionalCertification = certificationRepository.findTopByPhoneOrderByCreateDateDesc(findIdDTO.getPhone());
+        String storedCertNumber = redisTemplate.opsForValue().get(findIdDTO.getPhone());
 
-        if (optionalCertification.isPresent() && optionalCertification.get().getCertificationNumber().equals(findIdDTO.getCertificationNumber())) {
-            Optional<User> optionalUser = userRepository.findByPhoneAndKakaoIdIsNull(findIdDTO.getPhone());
-
-            if (optionalUser.isPresent()) {
-                User user = optionalUser.get();
-                return new FindIdResponseDTO(user.getEmail(), user.getCreateDate(), null);
-            } else {
-                return new FindIdResponseDTO(null, null, "해당 전화번호로 등록된 사용자가 없습니다.");
-            }
-        } else {
-            return new FindIdResponseDTO(null, null, "인증번호가 틀립니다.");
+        if (storedCertNumber != null && storedCertNumber.equals(findIdDTO.getCertificationNumber())) {
+            return userRepository.findByPhoneAndKakaoIdIsNull(findIdDTO.getPhone())
+                    .map(user -> new FindIdResponseDTO(user.getEmail(), user.getCreateDate(), null))
+                    .orElse(new FindIdResponseDTO(null, null, "해당 전화번호로 등록된 사용자가 없습니다."));
         }
+
+        return new FindIdResponseDTO(null, null, "인증번호가 틀립니다.");
     }
 
     // 비밀번호 찾기 시 임시 비밀번호 이메일 전송 메서드
