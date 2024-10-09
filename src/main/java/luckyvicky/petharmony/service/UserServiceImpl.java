@@ -2,7 +2,6 @@ package luckyvicky.petharmony.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 import luckyvicky.petharmony.dto.user.*;
 import luckyvicky.petharmony.entity.User;
 import luckyvicky.petharmony.repository.UserRepository;
@@ -12,7 +11,6 @@ import luckyvicky.petharmony.util.EmailUtil;
 import luckyvicky.petharmony.util.SmsUtil;
 import net.nurigo.sdk.message.response.SingleMessageSentResponse;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -22,17 +20,19 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Service
-@Log4j2
 @RequiredArgsConstructor
 @Transactional
 public class UserServiceImpl implements UserService {
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final SmsUtil smsUtil;
     private final EmailUtil emailUtil;
     private final RedisTemplate<String, String> redisTemplate;
 
-    // 자체 회원가입 메서드
+    /**
+     * 자체 회원가입 메서드
+     */
     @Override
     @Transactional
     public User signUp(SignUpDTO signUpDTO) {
@@ -69,7 +69,9 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(user);
     }
 
-    // 아이디 찾기 시 인증번호 전송 메서드
+    /**
+     * 아이디 찾기 시 인증번호 전송 메서드
+     */
     @Override
     @Transactional
     public String sendingNumberToFindId(FindIdDTO findIdDTO) {
@@ -87,7 +89,9 @@ public class UserServiceImpl implements UserService {
                 .orElse("가입되지 않은 번호입니다.");
     }
 
-    // 아이디 찾기 시 인증번호 확인 메서드
+    /**
+     * 아이디 찾기 시 인증번호 확인 메서드
+     */
     @Override
     public FindIdResponseDTO checkNumberToFindid(FindIdDTO findIdDTO) {
         String storedCertNumber = redisTemplate.opsForValue().get(findIdDTO.getPhone());
@@ -101,7 +105,9 @@ public class UserServiceImpl implements UserService {
         return new FindIdResponseDTO(null, null, "인증번호가 틀립니다.");
     }
 
-    // 비밀번호 찾기 시 임시 비밀번호 이메일 전송 메서드
+    /**
+     * 비밀번호 찾기 시 임시 비밀번호 이메일 전송 메서드
+     */
     @Override
     public String sendingEmailToFindPassword(FindPasswordDTO findPasswordDTO) {
         Optional<User> optionalUser = userRepository.findByEmail(findPasswordDTO.getEmail());
@@ -140,7 +146,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public void releaseBans() {
         List<User> users = userRepository.findBySuspensionUntil(LocalDate.now());
-        log.info(users);
         for(User user : users){
             user.releaseBans();
         }

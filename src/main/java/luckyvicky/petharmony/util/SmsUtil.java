@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class SmsUtil {
+
     @Value("${coolsms.api.key}")
     private String apiKey;
     @Value("${coolsms.api.secret}")

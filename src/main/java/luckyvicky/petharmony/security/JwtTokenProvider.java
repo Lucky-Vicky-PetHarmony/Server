@@ -6,7 +6,6 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
-import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -16,7 +15,6 @@ import java.security.Key;
 import java.util.Date;
 import java.util.stream.Collectors;
 
-@Log4j2
 @Component
 public class JwtTokenProvider {
     // Access Token 유효기간을 15분(15 * 60 * 1000)에서 테스트 용도로 30초(30 * 1000)로 변경
@@ -87,7 +85,6 @@ public class JwtTokenProvider {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
         } catch (Exception ex) {
-            log.error("토큰 검증 실패: {}", ex.getMessage());
             return false;
         }
     }
