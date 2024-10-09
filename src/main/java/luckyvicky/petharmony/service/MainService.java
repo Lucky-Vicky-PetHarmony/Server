@@ -13,5 +13,5 @@ public interface MainService {
     // 유기동물 카드를 위한 데이터 조회 메서드
     List<PetCardResponseDTO> getPetCards(Long userId);
     // 게시물 목록 조회 메서드
-    Page<BoardListResponseDTO> getPublicBoards(int size);
+    Page<BoardListResponseDTO> getPublicBoards(int page, int size);
 }
