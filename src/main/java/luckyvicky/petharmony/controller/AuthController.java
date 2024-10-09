@@ -33,9 +33,6 @@ public class AuthController {
     /**
      * ----- 이채림
      * 로그인 API 엔드포인트
-     * <p>
-     * 클라이언트에서 전달받은 로그인 정보를 처리하고, JWT Access Token 및 Refresh Token을 발급합니다.
-     * Access Token은 응답 헤더에, Refresh Token은 HttpOnly 쿠키에 저장됩니다.
      *
      * @param logInDTO 로그인 정보를 담은 DTO (이메일, 비밀번호)
      * @param response 응답 객체로, 헤더에 Access Token을 포함하고 쿠키에 Refresh Token을 저장합니다.
@@ -58,8 +55,12 @@ public class AuthController {
             response.addCookie(cookieUtil.createRefreshTokenCookie(refreshToken));
 
             return ResponseEntity.ok(logInResponseDTO);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("로그인 처리 중 오류가 발생했습니다.");
         }
     }
 
@@ -67,9 +68,6 @@ public class AuthController {
     /**
      * ----- 이채림
      * Access Token 재발급 API 엔드포인트
-     * <p>
-     * 클라이언트의 요청에서 Refresh Token을 추출하여 유효성 검사를 통과하면 새로운 Access Token을 발급합니다.
-     * 발급된 Access Token은 응답 헤더에 추가됩니다.
      *
      * @param request  클라이언트 요청 객체로, 여기에서 Refresh Token을 추출합니다.
      * @param response 응답 객체로, 헤더에 새로운 Access Token을 포함합니다.
@@ -96,8 +94,6 @@ public class AuthController {
     /**
      * ----- 이채림
      * 로그아웃 API 엔드포인트
-     * <p>
-     * 사용자가 로그아웃 요청 시 Refresh Token을 쿠키에서 삭제합니다.
      *
      * @param response 응답 객체로, 쿠키에서 Refresh Token을 삭제합니다.
      * @return "로그아웃이 성공적으로 처리되었습니다." 메시지 반환
