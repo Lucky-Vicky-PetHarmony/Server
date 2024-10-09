@@ -156,7 +156,7 @@ public class AuthServiceImpl implements AuthService {
                 .userId(user.getUserId())
                 .email(user.getEmail())
                 .userName(user.getUserName())
-                .role(user.getRole().toString())
+                .role("[ROLE_"+user.getRole().toString()+"]")
                 .build();
     }
 
