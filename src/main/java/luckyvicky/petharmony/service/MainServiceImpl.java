@@ -98,10 +98,10 @@ public class MainServiceImpl implements MainService {
      * 게시물 목록 조회 메서드
      */
     @Override
-    public Page<BoardListResponseDTO> getPublicBoards(int size) {
-        Pageable pageable = PageRequest.of(0, size);
+    public Page<BoardListResponseDTO> getPublicBoards(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
 
-        Page<Board> boardPage = boardRepository.findAllByIsDeletedFalse(pageable);
+        Page<Board> boardPage = boardRepository.findAllByIsDeletedFalseOrderByBoardCreateDesc(pageable);
 
         List<BoardListResponseDTO> boardDTOs = boardPage.getContent().stream()
                 .map(this::convertToDTO)

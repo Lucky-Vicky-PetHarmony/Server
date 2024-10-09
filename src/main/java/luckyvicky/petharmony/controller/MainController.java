@@ -51,7 +51,8 @@ public class MainController {
      */
     @GetMapping("/boards")
     public Page<BoardListResponseDTO> getPublicBoards(
-            @RequestParam(value = "size", defaultValue = "5") int size) {
-        return mainService.getPublicBoards(size);
+            @RequestParam(value = "size", defaultValue = "5") int size,
+            @RequestParam(value = "page", defaultValue = "0") int page) {
+        return mainService.getPublicBoards(page, size);
     }
 }

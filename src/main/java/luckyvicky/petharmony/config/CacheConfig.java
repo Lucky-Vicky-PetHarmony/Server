@@ -28,28 +28,23 @@ public class CacheConfig {
     @Value("${spring.data.redis.port}")
     private int redisPort;
 
-    @Value("${spring.data.redis.password}")
-    private String redisPassword;
-
     // RedisConnectionFactory 설정
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
         RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration(redisHost, redisPort);
         configuration.setDatabase(0);
-        configuration.setPassword(redisPassword);
+        configuration.setPassword("");
 
+        // Socket 설정 추가 (타임아웃 설정)
         SocketOptions socketOptions = SocketOptions.builder()
-                .connectTimeout(Duration.ofSeconds(10)).build();
-        ClientOptions clientOptions = ClientOptions.builder()
-                .socketOptions(socketOptions).build();
-
-        LettuceClientConfiguration lettuceClientConfiguration = LettuceClientConfiguration.builder()
-                .clientOptions(clientOptions)
-                .commandTimeout(Duration.ofSeconds(5))
-                .shutdownTimeout(Duration.ZERO)
+                .connectTimeout(Duration.ofSeconds(10)) // 연결 타임아웃 설정
                 .build();
 
-        return new LettuceConnectionFactory(configuration, lettuceClientConfiguration);
+        // Lettuce
+        LettuceClientConfiguration clientConfig = LettuceClientConfiguration.builder()
+                .build();
+
+        return new LettuceConnectionFactory(configuration, clientConfig);
     }
 
     // RedisCacheManager 설정

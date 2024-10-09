@@ -12,6 +12,8 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
 
     Page<Board> findAllByIsDeletedFalse(Pageable pageable);
 
+    Page<Board> findAllByIsDeletedFalseOrderByBoardCreateDesc(Pageable pageable);
+
     //카테고리별 list
     Page<Board> findByCategoryAndIsDeletedFalse(Category category, Pageable pageable);
 
